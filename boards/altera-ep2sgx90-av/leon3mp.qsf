@@ -1,0 +1,620 @@
+# Copyright (C) 1991-2006 Altera Corporation
+# Your use of Altera Corporation's design tools, logic functions 
+# and other software and tools, and its AMPP partner logic 
+# functions, and any output files any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Altera Program License 
+# Subscription Agreement, Altera MegaCore Function License 
+# Agreement, or other applicable license agreement, including, 
+# without limitation, that your use is for the sole purpose of 
+# programming logic devices manufactured by Altera and sold by 
+# Altera or its authorized distributors.  Please refer to the 
+# applicable agreement for further details.
+
+# The default values for assignments are stored in the file
+#		full_featured_assignment_defaults.qdf
+# If this file doesn't exist, and for assignments not listed, see file
+#		assignment_defaults.qdf
+
+# Altera recommends that you do not modify this file. This
+# file is updated automatically by the Quartus II software
+# and any changes you make may be lost or overwritten.
+
+set_global_assignment -name FAMILY "Stratix II GX"
+set_global_assignment -name DEVICE EP2SGX90FF1508C3
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 6.0
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "12:54:53  MAY 22, 2006"
+set_global_assignment -name LAST_QUARTUS_VERSION 8.0
+set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
+set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_DUPLICATION ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_ASYNCHRONOUS_SIGNAL_PIPELINING ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_RETIMING ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT EXTRA
+set_global_assignment -name ROUTER_TIMING_OPTIMIZATION_LEVEL MAXIMUM
+set_global_assignment -name SEED 7
+set_global_assignment -name PLACEMENT_EFFORT_MULTIPLIER 1.5
+set_global_assignment -name ROUTER_LCELL_INSERTION_AND_LOGIC_DUPLICATION ON
+set_global_assignment -name AUTO_PACKED_REGISTERS_STRATIXII AUTO
+set_global_assignment -name OPTIMIZE_HOLD_TIMING "ALL PATHS"
+set_global_assignment -name OPTIMIZE_POWER_DURING_FITTING OFF
+set_global_assignment -name ADV_NETLIST_OPT_SYNTH_WYSIWYG_REMAP ON
+set_global_assignment -name ADV_NETLIST_OPT_SYNTH_GATE_RETIME ON
+set_global_assignment -name OPTIMIZE_POWER_DURING_SYNTHESIS OFF
+set_global_assignment -name STATE_MACHINE_PROCESSING "ONE-HOT"
+set_global_assignment -name REMOVE_DUPLICATE_REGISTERS OFF
+set_global_assignment -name ENABLE_CLOCK_LATENCY ON
+set_global_assignment -name STRATIXII_OPTIMIZATION_TECHNIQUE SPEED
+set_global_assignment -name STRATIXII_CONFIGURATION_SCHEME "ACTIVE SERIAL"
+set_global_assignment -name STRATIXII_CONFIGURATION_DEVICE EPCS64
+set_global_assignment -name GENERATE_TTF_FILE ON
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED"
+set_global_assignment -name RESERVE_DATA0_AFTER_CONFIGURATION "AS INPUT TRI-STATED"
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
+set_global_assignment -name RESERVE_ASDO_AFTER_CONFIGURATION "AS INPUT TRI-STATED"
+set_global_assignment -name USE_CONFIGURATION_DEVICE OFF
+
+set_location_assignment PIN_C22 -to clk
+set_location_assignment PIN_AM22 -to resetn
+set_location_assignment PIN_AB39 -to dsuact
+set_location_assignment PIN_AB38 -to io_wen
+set_location_assignment PIN_AA38 -to io_cen
+set_location_assignment PIN_Y25 -to flash_oen
+set_location_assignment PIN_AA31 -to flash_cen
+set_location_assignment PIN_Y27 -to flash_wen
+set_location_assignment PIN_P18 -to ssram_bw[2]
+set_location_assignment PIN_N21 -to ssram_bw[3]
+set_location_assignment PIN_H21 -to ssram_bw[0]
+set_location_assignment PIN_J21 -to ssram_bw[1]
+set_location_assignment PIN_D16 -to ssram_wen
+set_location_assignment PIN_N24 -to ssram_cen
+set_location_assignment PIN_C21 -to ssram_oen
+set_location_assignment PIN_L27 -to ssram_clk
+set_location_assignment PIN_G21 -to ssram_adscn
+set_location_assignment PIN_B33 -to ssram_adspn
+set_location_assignment PIN_D21 -to ssram_advn
+set_location_assignment PIN_A24 -to fs_addr[0]
+set_location_assignment PIN_A23 -to fs_addr[1]
+set_location_assignment PIN_B24 -to fs_addr[2]
+set_location_assignment PIN_B19 -to fs_addr[3]
+set_location_assignment PIN_C20 -to fs_addr[4]
+set_location_assignment PIN_D20 -to fs_addr[5]
+set_location_assignment PIN_F20 -to fs_addr[6]
+set_location_assignment PIN_G20 -to fs_addr[7]
+set_location_assignment PIN_A22 -to fs_addr[8]
+set_location_assignment PIN_B22 -to fs_addr[9]
+set_location_assignment PIN_D22 -to fs_addr[10]
+set_location_assignment PIN_E22 -to fs_addr[11]
+set_location_assignment PIN_F22 -to fs_addr[12]
+set_location_assignment PIN_G22 -to fs_addr[13]
+set_location_assignment PIN_C24 -to fs_addr[14]
+set_location_assignment PIN_C23 -to fs_addr[15]
+set_location_assignment PIN_D24 -to fs_addr[16]
+set_location_assignment PIN_D23 -to fs_addr[17]
+set_location_assignment PIN_F24 -to fs_addr[18]
+set_location_assignment PIN_F23 -to fs_addr[19]
+set_location_assignment PIN_K24 -to fs_addr[20]
+set_location_assignment PIN_L25 -to fs_addr[21]
+set_location_assignment PIN_M25 -to fs_addr[22]
+set_location_assignment PIN_N25 -to fs_addr[23]
+set_location_assignment PIN_M24 -to fs_addr[24]
+set_location_assignment PIN_M20 -to fs_data[16]
+set_location_assignment PIN_N20 -to fs_data[17]
+set_location_assignment PIN_N19 -to fs_data[18]
+set_location_assignment PIN_N18 -to fs_data[19]
+set_location_assignment PIN_N17 -to fs_data[20]
+set_location_assignment PIN_K18 -to fs_data[21]
+set_location_assignment PIN_J18 -to fs_data[22]
+set_location_assignment PIN_H19 -to fs_data[23]
+set_location_assignment PIN_H18 -to fs_data[24]
+set_location_assignment PIN_G19 -to fs_data[25]
+set_location_assignment PIN_G18 -to fs_data[26]
+set_location_assignment PIN_G17 -to fs_data[27]
+set_location_assignment PIN_D19 -to fs_data[28]
+set_location_assignment PIN_C19 -to fs_data[29]
+set_location_assignment PIN_F19 -to fs_data[30]
+set_location_assignment PIN_F18 -to fs_data[31]
+set_location_assignment PIN_F17 -to fs_data[0]
+set_location_assignment PIN_E18 -to fs_data[1]
+set_location_assignment PIN_D18 -to fs_data[2]
+set_location_assignment PIN_D17 -to fs_data[3]
+set_location_assignment PIN_C18 -to fs_data[4]
+set_location_assignment PIN_C17 -to fs_data[5]
+set_location_assignment PIN_B18 -to fs_data[6]
+set_location_assignment PIN_A18 -to fs_data[7]
+set_location_assignment PIN_A17 -to fs_data[8]
+set_location_assignment PIN_P16 -to fs_data[9]
+set_location_assignment PIN_P15 -to fs_data[10]
+set_location_assignment PIN_N16 -to fs_data[11]
+set_location_assignment PIN_N15 -to fs_data[12]
+set_location_assignment PIN_M16 -to fs_data[13]
+set_location_assignment PIN_M15 -to fs_data[14]
+set_location_assignment PIN_M14 -to fs_data[15]
+set_location_assignment PIN_AW19 -to ddr_clk[0]
+set_location_assignment PIN_AU20 -to ddr_clk[1]
+set_location_assignment PIN_AP20 -to ddr_clk[2]
+set_location_assignment PIN_AV19 -to ddr_clkb[0]
+set_location_assignment PIN_AT20 -to ddr_clkb[1]
+set_location_assignment PIN_AN20 -to ddr_clkb[2]
+set_location_assignment PIN_AN26 -to ddr_ad[0]
+set_location_assignment PIN_AN25 -to ddr_ad[1]
+set_location_assignment PIN_AM25 -to ddr_ad[2]
+set_location_assignment PIN_AL25 -to ddr_ad[3]
+set_location_assignment PIN_AM24 -to ddr_ad[4]
+set_location_assignment PIN_AL24 -to ddr_ad[5]
+set_location_assignment PIN_AN24 -to ddr_ad[6]
+set_location_assignment PIN_AK18 -to ddr_ad[7]
+set_location_assignment PIN_AM19 -to ddr_ad[8]
+set_location_assignment PIN_AM18 -to ddr_ad[9]
+set_location_assignment PIN_AN27 -to ddr_ad[10]
+set_location_assignment PIN_AL18 -to ddr_ad[11]
+set_location_assignment PIN_AM16 -to ddr_ad[12]
+set_location_assignment PIN_AN29 -to ddr_ad[13]
+set_location_assignment PIN_AP26 -to ddr_ba[0]
+set_location_assignment PIN_AP27 -to ddr_ba[1]
+set_location_assignment PIN_AK16 -to ddr_ba[2]
+set_location_assignment PIN_AL28 -to ddr_odt[0]
+set_location_assignment PIN_AP29 -to ddr_odt[1]
+set_location_assignment PIN_AN28 -to ddr_rasb
+set_location_assignment PIN_AM28 -to ddr_casb
+set_location_assignment PIN_AK15 -to ddr_cke[0]
+set_location_assignment PIN_AL15 -to ddr_cke[1]
+set_location_assignment PIN_AM27 -to ddr_csb[0]
+set_location_assignment PIN_AP28 -to ddr_csb[1]
+set_location_assignment PIN_AL27 -to ddr_web
+set_location_assignment PIN_AU9 -to ddr_dq[0]
+set_location_assignment PIN_AN10 -to ddr_dq[1]
+set_location_assignment PIN_AP10 -to ddr_dq[2]
+set_location_assignment PIN_AW9 -to ddr_dq[3]
+set_location_assignment PIN_AV10 -to ddr_dq[4]
+set_location_assignment PIN_AU10 -to ddr_dq[5]
+set_location_assignment PIN_AN11 -to ddr_dq[6]
+set_location_assignment PIN_AW10 -to ddr_dq[7]
+set_location_assignment PIN_AT12 -to ddr_dq[8]
+set_location_assignment PIN_AW11 -to ddr_dq[9]
+set_location_assignment PIN_AR12 -to ddr_dq[10]
+set_location_assignment PIN_AW12 -to ddr_dq[11]
+set_location_assignment PIN_AN13 -to ddr_dq[12]
+set_location_assignment PIN_AT13 -to ddr_dq[13]
+set_location_assignment PIN_AN12 -to ddr_dq[14]
+set_location_assignment PIN_AU13 -to ddr_dq[15]
+set_location_assignment PIN_AW13 -to ddr_dq[16]
+set_location_assignment PIN_AN14 -to ddr_dq[17]
+set_location_assignment PIN_AV13 -to ddr_dq[18]
+set_location_assignment PIN_AP14 -to ddr_dq[19]
+set_location_assignment PIN_AT15 -to ddr_dq[20]
+set_location_assignment PIN_AR15 -to ddr_dq[21]
+set_location_assignment PIN_AW14 -to ddr_dq[22]
+set_location_assignment PIN_AW15 -to ddr_dq[23]
+set_location_assignment PIN_AN16 -to ddr_dq[24]
+set_location_assignment PIN_AN15 -to ddr_dq[25]
+set_location_assignment PIN_AU16 -to ddr_dq[26]
+set_location_assignment PIN_AT16 -to ddr_dq[27]
+set_location_assignment PIN_AN17 -to ddr_dq[28]
+set_location_assignment PIN_AW16 -to ddr_dq[29]
+set_location_assignment PIN_AV16 -to ddr_dq[30]
+set_location_assignment PIN_AP17 -to ddr_dq[31]
+set_location_assignment PIN_AP23 -to ddr_dq[32]
+set_location_assignment PIN_AW23 -to ddr_dq[33]
+set_location_assignment PIN_AW24 -to ddr_dq[34]
+set_location_assignment PIN_AV24 -to ddr_dq[35]
+set_location_assignment PIN_AT24 -to ddr_dq[36]
+set_location_assignment PIN_AP24 -to ddr_dq[37]
+set_location_assignment PIN_AW25 -to ddr_dq[38]
+set_location_assignment PIN_AV25 -to ddr_dq[39]
+set_location_assignment PIN_AP25 -to ddr_dq[40]
+set_location_assignment PIN_AR25 -to ddr_dq[41]
+set_location_assignment PIN_AU26 -to ddr_dq[42]
+set_location_assignment PIN_AW26 -to ddr_dq[43]
+set_location_assignment PIN_AU27 -to ddr_dq[44]
+set_location_assignment PIN_AW27 -to ddr_dq[45]
+set_location_assignment PIN_AW28 -to ddr_dq[46]
+set_location_assignment PIN_AT27 -to ddr_dq[47]
+set_location_assignment PIN_AT28 -to ddr_dq[48]
+set_location_assignment PIN_AW29 -to ddr_dq[49]
+set_location_assignment PIN_AR28 -to ddr_dq[50]
+set_location_assignment PIN_AT29 -to ddr_dq[51]
+set_location_assignment PIN_AU30 -to ddr_dq[52]
+set_location_assignment PIN_AW30 -to ddr_dq[53]
+set_location_assignment PIN_AW31 -to ddr_dq[54]
+set_location_assignment PIN_AU31 -to ddr_dq[55]
+set_location_assignment PIN_AW32 -to ddr_dq[56]
+set_location_assignment PIN_AU32 -to ddr_dq[57]
+set_location_assignment PIN_AU33 -to ddr_dq[58]
+set_location_assignment PIN_AW34 -to ddr_dq[59]
+set_location_assignment PIN_AW35 -to ddr_dq[60]
+set_location_assignment PIN_AV34 -to ddr_dq[61]
+set_location_assignment PIN_AV37 -to ddr_dq[62]
+set_location_assignment PIN_AW37 -to ddr_dq[63]
+set_location_assignment PIN_AT9 -to ddr_dqs[0]
+set_location_assignment PIN_AU12 -to ddr_dqs[1]
+set_location_assignment PIN_AT14 -to ddr_dqs[2]
+set_location_assignment PIN_AP15 -to ddr_dqs[3]
+set_location_assignment PIN_AU23 -to ddr_dqs[4]
+set_location_assignment PIN_AT25 -to ddr_dqs[5]
+set_location_assignment PIN_AU28 -to ddr_dqs[6]
+set_location_assignment PIN_AW33 -to ddr_dqs[7]
+set_location_assignment PIN_AT11 -to ddr_dm[0]
+set_location_assignment PIN_AP12 -to ddr_dm[1]
+set_location_assignment PIN_AU15 -to ddr_dm[2]
+set_location_assignment PIN_AT17 -to ddr_dm[3]
+set_location_assignment PIN_AU24 -to ddr_dm[4]
+set_location_assignment PIN_AV27 -to ddr_dm[5]
+set_location_assignment PIN_AV30 -to ddr_dm[6]
+set_location_assignment PIN_AW36 -to ddr_dm[7]
+set_location_assignment PIN_AF34 -to gpio[0]
+set_location_assignment PIN_AR39 -to gpio[1]
+set_location_assignment PIN_AP38 -to gpio[2]
+set_location_assignment PIN_AP39 -to gpio[3]
+set_location_assignment PIN_AN39 -to gpio[4]
+set_location_assignment PIN_AM39 -to gpio[5]
+set_location_assignment PIN_AL39 -to gpio[6]
+set_location_assignment PIN_AL38 -to gpio[7]
+set_location_assignment PIN_AM34 -to gpio[8]
+set_location_assignment PIN_AL34 -to gpio[9]
+set_location_assignment PIN_AK34 -to gpio[10]
+set_location_assignment PIN_AK35 -to gpio[11]
+set_location_assignment PIN_AK36 -to gpio[12]
+set_location_assignment PIN_AK37 -to gpio[13]
+set_location_assignment PIN_AK38 -to gpio[14]
+set_location_assignment PIN_AK39 -to gpio[15]
+set_location_assignment PIN_AJ33 -to gpio[16]
+set_location_assignment PIN_AJ34 -to gpio[17]
+set_location_assignment PIN_AJ36 -to gpio[18]
+set_location_assignment PIN_AJ37 -to gpio[19]
+set_location_assignment PIN_AJ39 -to gpio[20]
+set_location_assignment PIN_AH33 -to gpio[21]
+set_location_assignment PIN_AH34 -to gpio[22]
+set_location_assignment PIN_AH36 -to gpio[23]
+set_location_assignment PIN_AH37 -to gpio[24]
+set_location_assignment PIN_AH38 -to gpio[25]
+set_location_assignment PIN_AH39 -to gpio[26]
+set_location_assignment PIN_AG30 -to gpio[27]
+set_location_assignment PIN_AG31 -to gpio[28]
+set_location_assignment PIN_AG32 -to gpio[29]
+set_location_assignment PIN_AG33 -to gpio[30]
+set_location_assignment PIN_AG34 -to gpio[31]
+set_location_assignment PIN_AE38 -to ft245_data[0]
+set_location_assignment PIN_AE37 -to ft245_data[1]
+set_location_assignment PIN_AE36 -to ft245_data[2]
+set_location_assignment PIN_AE35 -to ft245_data[3]
+set_location_assignment PIN_AE34 -to ft245_data[4]
+set_location_assignment PIN_AE33 -to ft245_data[5]
+set_location_assignment PIN_AE32 -to ft245_data[6]
+set_location_assignment PIN_AE31 -to ft245_data[7]
+set_location_assignment PIN_AE29 -to ft245_rdn
+set_location_assignment PIN_AE28 -to ft245_rxfn
+set_location_assignment PIN_AE27 -to ft245_txen
+set_location_assignment PIN_AE26 -to ft245_wr
+set_location_assignment PIN_AE30 -to ft245_pwrenn
+set_location_assignment PIN_B13 -to phy_col
+set_location_assignment PIN_A13 -to phy_crs
+set_location_assignment PIN_J36 -to phy_dv
+set_location_assignment PIN_G13 -to phy_gtx_clk
+set_location_assignment PIN_D13 -to phy_mii_clk
+set_location_assignment PIN_C13 -to phy_mii_data
+set_location_assignment PIN_AV21 -to phy_rx_clk
+set_location_assignment PIN_G11 -to phy_rx_data[7]
+set_location_assignment PIN_A12 -to phy_rx_data[6]
+set_location_assignment PIN_B12 -to phy_rx_data[5]
+set_location_assignment PIN_C12 -to phy_rx_data[4]
+set_location_assignment PIN_D12 -to phy_rx_data[3]
+set_location_assignment PIN_E12 -to phy_rx_data[2]
+set_location_assignment PIN_F12 -to phy_rx_data[1]
+set_location_assignment PIN_G12 -to phy_rx_data[0]
+set_location_assignment PIN_K36 -to phy_rx_er
+set_location_assignment PIN_J32 -to phy_tx_clk
+set_location_assignment PIN_B10 -to phy_tx_data[7]
+set_location_assignment PIN_C9 -to phy_tx_data[6]
+set_location_assignment PIN_C10 -to phy_tx_data[5]
+set_location_assignment PIN_A11 -to phy_tx_data[4]
+set_location_assignment PIN_C11 -to phy_tx_data[3]
+set_location_assignment PIN_D9 -to phy_tx_data[2]
+set_location_assignment PIN_D10 -to phy_tx_data[1]
+set_location_assignment PIN_D11 -to phy_tx_data[0]
+set_location_assignment PIN_G10 -to phy_tx_en
+set_location_assignment PIN_F10 -to phy_tx_er
+
+
+set_instance_assignment -name OUTPUT_ENABLE_GROUP 1 -to ddr_dm
+set_instance_assignment -name OUTPUT_ENABLE_GROUP 1 -to ddr_dqs
+set_instance_assignment -name OUTPUT_ENABLE_GROUP 1 -to ddr_dq
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to resetn
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to phy_rx_clk
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[0]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[1]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[2]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[3]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[4]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[5]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[6]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[7]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[8]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[9]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[10]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[11]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[12]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ad[13]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[0]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[1]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[2]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[3]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[4]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[5]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[6]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[7]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[8]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[9]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[10]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[11]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[12]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[13]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[14]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[15]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[16]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[17]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[18]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[19]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[20]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[21]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[22]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[23]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[24]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[25]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[26]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[27]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[28]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[29]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[30]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[31]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[32]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[33]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[34]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[35]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[36]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[37]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[38]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[39]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[40]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[41]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[42]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[43]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[44]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[45]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[46]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[47]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[48]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[49]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[50]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[51]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[52]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[53]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[54]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[55]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[56]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[57]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[58]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[59]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[60]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[61]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[62]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dq[63]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_dm[0]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_dm[1]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_dm[2]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_dm[3]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_dm[4]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_dm[5]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_dm[6]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_dm[7]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dqs[0]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dqs[1]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dqs[2]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dqs[3]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dqs[4]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dqs[5]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dqs[6]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS II" -to ddr_dqs[7]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ba[0]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ba[1]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_ba[2]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_odt[0]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_odt[1]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_rasb
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_casb
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_web
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_cke[0]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_cke[1]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_csb[0]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_csb[1]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_clk[0]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_clk[1]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_clk[2]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_clkb[0]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_clkb[1]
+set_instance_assignment -name IO_STANDARD "SSTL-18 CLASS I" -to ddr_clkb[2]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_dm[0]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_dm[1]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_dm[2]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_dm[3]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_dm[4]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_dm[5]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_dm[6]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_dm[7]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[0]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[1]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[2]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[3]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[4]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[5]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[6]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[7]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[8]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[9]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[10]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[11]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[12]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[13]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[14]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[15]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[16]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[17]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[18]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[19]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[20]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[21]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[22]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[23]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[24]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[25]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[26]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[27]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[28]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[29]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[30]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[31]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[32]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[33]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[34]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[35]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[36]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[37]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[38]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[39]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[40]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[41]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[42]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[43]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[44]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[45]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[46]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[47]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[48]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[49]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[50]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[51]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[52]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[53]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[54]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[55]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[56]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[57]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[58]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[59]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[60]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[61]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[62]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dq[63]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dqs[0]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dqs[1]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dqs[2]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dqs[3]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dqs[4]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dqs[5]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dqs[6]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 25 OHMS WITHOUT CALIBRATION" -to ddr_dqs[7]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[2]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[3]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[4]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[5]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[6]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[7]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[8]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[9]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[10]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[11]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[12]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ad[13]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ba[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ba[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_ba[2]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_rasb
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_casb
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_web
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_cke[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_cke[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_csb[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_csb[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_odt[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ddr_odt[1]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_clk[0]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_clk[1]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_clk[2]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_clkb[0]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_clkb[1]
+set_instance_assignment -name STRATIXII_TERMINATION "SERIES 50 OHMS WITHOUT CALIBRATION" -to ddr_clkb[2]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[0]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[1]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[2]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[3]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[4]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[5]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[6]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[7]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[8]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[9]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[10]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[11]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[12]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ad[13]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ba[0]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ba[1]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_ba[2]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_rasb
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_casb
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_web
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_cke[0]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_cke[1]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_csb[0]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_csb[1]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_odt[0]
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ddr_odt[1]
+
+set_global_assignment -name ASSIGNMENT_GROUP_MEMBER ddr_clk[0] -section_id ddr2_sdram_clk_out_0
+set_global_assignment -name ASSIGNMENT_GROUP_MEMBER ddr_clk[1] -section_id ddr2_sdram_clk_out_1
+set_global_assignment -name ASSIGNMENT_GROUP_MEMBER ddr_clk[2] -section_id ddr2_sdram_clk_out_2
+set_global_assignment -name ASSIGNMENT_GROUP_MEMBER ddr_clkb[0] -section_id ddr2_sdram_clk_out_0
+set_global_assignment -name ASSIGNMENT_GROUP_MEMBER ddr_clkb[1] -section_id ddr2_sdram_clk_out_1
+set_global_assignment -name ASSIGNMENT_GROUP_MEMBER ddr_clkb[2] -section_id ddr2_sdram_clk_out_2
+set_instance_assignment -name MAX_DATA_ARRIVAL_SKEW "100 ps" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altpll:dll|_clk0" -to ddr2_sdram_clk_out_0
+set_instance_assignment -name MAX_DATA_ARRIVAL_SKEW "100 ps" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altpll:dll|_clk0" -to ddr2_sdram_clk_out_1
+set_instance_assignment -name MAX_DATA_ARRIVAL_SKEW "100 ps" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altpll:dll|_clk0" -to ddr2_sdram_clk_out_2
+
+set_instance_assignment -name CUT ON -from ddr_dqs[0] -to *
+set_instance_assignment -name CUT ON -from ddr_dqs[1] -to *
+set_instance_assignment -name CUT ON -from ddr_dqs[2] -to *
+set_instance_assignment -name CUT ON -from ddr_dqs[3] -to *
+set_instance_assignment -name CUT ON -from ddr_dqs[4] -to *
+set_instance_assignment -name CUT ON -from ddr_dqs[5] -to *
+set_instance_assignment -name CUT ON -from ddr_dqs[6] -to *
+set_instance_assignment -name CUT ON -from ddr_dqs[7] -to *
+set_instance_assignment -name CUT ON -from "clkgen:clkgen0|clkgen_altera_mf:\\alt:v|altera_pll:sdclk_pll|altpll:\\nosd:altpll0|_clk0" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altpll:dll|_clk0"
+set_instance_assignment -name CUT ON -from "clkgen:clkgen0|clkgen_altera_mf:\\alt:v|altera_pll:sdclk_pll|altpll:\\nosd:altpll0|_clk0" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altpll:dll|_clk1"
+set_instance_assignment -name CUT ON -from "clkgen:clkgen0|clkgen_altera_mf:\\alt:v|altera_pll:sdclk_pll|altpll:\\nosd:altpll0|_clk0" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altpll:dll|_clk2"
+set_instance_assignment -name CUT ON -from "clkgen:clkgen0|clkgen_altera_mf:\\alt:v|altera_pll:sdclk_pll|altpll:\\nosd:altpll0|_clk0" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altpll:dll|_clk3"
+set_instance_assignment -name CUT ON -from "clkgen:clkgen0|clkgen_altera_mf:\\alt:v|altera_pll:sdclk_pll|altpll:\\nosd:altpll0|_clk0" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altpll:dll|_clk4"
+set_instance_assignment -name CUT ON -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altpll:dll|_clk0" -to "clkgen:clkgen0|clkgen_altera_mf:\\alt:v|altera_pll:sdclk_pll|altpll:\\nosd:altpll0|_clk0"
+set_instance_assignment -name CUT ON -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altpll:dll|_clk1" -to "clkgen:clkgen0|clkgen_altera_mf:\\alt:v|altera_pll:sdclk_pll|altpll:\\nosd:altpll0|_clk0"
+set_instance_assignment -name CUT ON -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altpll:dll|_clk2" -to "clkgen:clkgen0|clkgen_altera_mf:\\alt:v|altera_pll:sdclk_pll|altpll:\\nosd:altpll0|_clk0"
+set_instance_assignment -name CUT ON -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altpll:dll|_clk3" -to "clkgen:clkgen0|clkgen_altera_mf:\\alt:v|altera_pll:sdclk_pll|altpll:\\nosd:altpll0|_clk0"
+set_instance_assignment -name CUT ON -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altpll:dll|_clk4" -to "clkgen:clkgen0|clkgen_altera_mf:\\alt:v|altera_pll:sdclk_pll|altpll:\\nosd:altpll0|_clk0"
+
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:0:altdq|dataout_h" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:0:altdq|dataout_l" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:1:altdq|dataout_h" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:1:altdq|dataout_l" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:2:altdq|dataout_h" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:2:altdq|dataout_l" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:3:altdq|dataout_h" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:3:altdq|dataout_l" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:4:altdq|dataout_h" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:4:altdq|dataout_l" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:5:altdq|dataout_h" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:5:altdq|dataout_l" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:6:altdq|dataout_h" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:6:altdq|dataout_l" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:7:altdq|dataout_h" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"
+set_instance_assignment -name TPD_REQUIREMENT "1.2 ns" -from "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|altdq_stxii:\\dqgen:7:altdq|dataout_l" -to "ddr2spa:\\ddrsp0:ddrc0|ddr2_phy:ddr_phy0|ddr2phy:ddr_phy0|stratixii_ddr2_phy:\\stra2:ddr_phy0|dqin"

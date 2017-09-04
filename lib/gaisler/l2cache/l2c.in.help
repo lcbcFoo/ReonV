@@ -1,0 +1,61 @@
+L2 Associativity
+CONFIG_L2_ASSO1
+  Select how many cache ways the L2 cache should have.
+
+L2 Way size
+CONFIG_L2_SZ1
+  Select the szie of each way in kbytes. The total L2 cache
+  size will be way size * number of ways.
+
+L2 cache line size
+CONFIG_L2_LINE16
+  The L2 cache can have either 16 or 32 bytes per line. It is
+  recommened to use 32 bytes for best performance.
+
+HPROT cachebility decoding
+CONFIG_L2_HPROT
+  Say yes here to enable the AHB HPROT signals to define if an
+  L2 access should be cached. Should be disabled for now until
+  all I/O units in grlib generate these signals correctly.
+
+L2 power-on enable
+CONFIG_L2_PEN
+  Say yes here to enable the L2 cache directly after reset.
+  This will allow to use the cache without first enable it
+  in software. The cache will automatically be flushed before
+  enabled.
+
+Random replacement
+CONFIG_L2_RAN
+  Say Y here to enable random replacement policy rather then
+  the default LRU.
+
+Write-through operation
+CONFIG_L2_WT
+  The L2 cache operates by default in copy-back mode. Say yes
+  here to enable write-through operation at power-on.
+
+Cachebility mapping
+CONFIG_L2_MAP
+  This 16-bit hexadecimal vaule defines which address areas
+  are to be cacheable by the L2 cache. Each bit set indicates
+  a cacheable 256 Mbyte block. The left-most bit (LSB) indicates
+  address 0 - 256M and so on.
+
+RAM sharing
+CONFIG_L2_SHARE
+  Say yes here to implement one shared data RAM for all cache ways.
+  This will reduce the number of RAM blocks for multi-way caches.
+
+MTRR registers
+CONFIG_L2_MTRR
+  Specify the number of MTRR registers. Each MTRR can define one
+  memory area to be uncached, write-through, or copy-back.
+
+EDAC protection
+CONFIG_L2_EDAC
+  Say yes here to enable EDAC protection.
+
+AXI backend interface
+CONFIG_L2_AXI
+  Say yes here to enable AXI backend interface

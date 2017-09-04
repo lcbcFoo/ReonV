@@ -1,0 +1,8 @@
+stdlib
+ftlib
+util
+sparc
+modgen
+amba
+atf
+dftlib

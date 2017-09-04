@@ -1,0 +1,109 @@
+--- ./mig/user_design/rtl/ip_top/infrastructure.v	2012-12-18 14:40:25.000000000 +0100
++++ ./mig_patch/p/a/t/c/h/mig_design/infrastructure.v	2012-12-18 10:03:46.821589702 +0100
+@@ -88,6 +88,7 @@
+    parameter DIVCLK_DIVIDE      = 1,     // write PLL VCO divisor
+    parameter CLKOUT_DIVIDE      = 2,     // VCO output divisor for fast
+                                          // (memory) clocks
++   parameter CLKOUT_DIVIDE4     = 12,
+    parameter RST_ACT_LOW        = 1
+    )
+   (
+@@ -101,6 +102,8 @@
+    output clk_mem,            // 2x logic clock
+    output clk,                // 1x logic clock
+    output clk_rd_base,        // 2x base read clock
++   output clk_amba,
++   output clk_100,
+    // Reset outputs
+    output rstdiv0,            // Reset CLK and CLKDIV logic (incl I/O),
+    // Phase Shift Interface
+@@ -135,10 +138,14 @@
+   localparam CLKOUT0_DIVIDE_F = CLKOUT_DIVIDE;
+   localparam CLKOUT1_DIVIDE   = CLKOUT_DIVIDE * nCK_PER_CLK;
+   localparam CLKOUT2_DIVIDE   = CLKOUT_DIVIDE;
++  localparam CLKOUT3_DIVIDE   = CLKOUT_DIVIDE * nCK_PER_CLK * 2;
++  localparam CLKOUT4_DIVIDE   = CLKOUT_DIVIDE4;
+ 
+   localparam CLKOUT0_PERIOD = VCO_PERIOD * CLKOUT0_DIVIDE_F;
+   localparam CLKOUT1_PERIOD = VCO_PERIOD * CLKOUT1_DIVIDE;
+   localparam CLKOUT2_PERIOD = VCO_PERIOD * CLKOUT2_DIVIDE;
++  localparam CLKOUT3_PERIOD = VCO_PERIOD * CLKOUT3_DIVIDE;
++  localparam CLKOUT4_PERIOD = VCO_PERIOD * CLKOUT4_DIVIDE;
+ 
+   //synthesis translate_off
+   initial begin
+@@ -152,9 +159,12 @@
+     $display("CLKOUT0_DIVIDE_F = %7d",   CLKOUT0_DIVIDE_F);
+     $display("CLKOUT1_DIVIDE   = %7d",   CLKOUT1_DIVIDE  );
+     $display("CLKOUT2_DIVIDE   = %7d",   CLKOUT2_DIVIDE  );
+-    $display("CLKOUT0_PERIOD   = %7d",   CLKOUT0_PERIOD  );
++    $display("CLKOUT3_DIVIDE   = %7d",   CLKOUT3_DIVIDE  );
++    $display("CLKOUT4_DIVIDE   = %7d",   CLKOUT4_DIVIDE  );
+     $display("CLKOUT1_PERIOD   = %7d",   CLKOUT1_PERIOD  );
+     $display("CLKOUT2_PERIOD   = %7d",   CLKOUT2_PERIOD  );
++    $display("CLKOUT3_PERIOD   = %7d",   CLKOUT3_PERIOD  );
++    $display("CLKOUT4_PERIOD   = %7d",   CLKOUT4_PERIOD  );
+     $display("############################################################\n");
+   end
+   //synthesis translate_on
+@@ -163,6 +173,8 @@
+   wire                       clk_mem_bufg;
+   wire                       clk_mem_pll;
+   wire                       clk_pll;
++  wire                       clk_pll_amba;
++  wire                       clk_pll_100;
+   wire                       clkfbout_pll;
+   wire                       pll_lock
+                              /* synthesis syn_maxfan = 10 */;
+@@ -225,15 +237,15 @@
+      .CLKOUT2_DUTY_CYCLE    (0.500),
+      .CLKOUT2_PHASE         (0.000),
+      .CLKOUT2_USE_FINE_PS   ("TRUE"),
+-     .CLKOUT3_DIVIDE        (1),
++     .CLKOUT3_DIVIDE        (CLKOUT3_DIVIDE),
+      .CLKOUT3_DUTY_CYCLE    (0.500),
+      .CLKOUT3_PHASE         (0.000),
+-     .CLKOUT3_USE_FINE_PS   ("FALSE"),
++     .CLKOUT3_USE_FINE_PS   ("TRUE"),
+      .CLKOUT4_CASCADE       ("FALSE"),
+-     .CLKOUT4_DIVIDE        (1),
++     .CLKOUT4_DIVIDE        (CLKOUT4_DIVIDE),
+      .CLKOUT4_DUTY_CYCLE    (0.500),
+      .CLKOUT4_PHASE         (0.000),
+-     .CLKOUT4_USE_FINE_PS   ("FALSE"),
++     .CLKOUT4_USE_FINE_PS   ("TRUE"),
+      .CLKOUT5_DIVIDE        (1),
+      .CLKOUT5_DUTY_CYCLE    (0.500),
+      .CLKOUT5_PHASE         (0.000),
+@@ -255,9 +267,9 @@
+        .CLKOUT1B     (),
+        .CLKOUT2      (clk_rd_base),
+        .CLKOUT2B     (),
+-       .CLKOUT3      (),
++       .CLKOUT3      (clk_pll_100),
+        .CLKOUT3B     (),
+-       .CLKOUT4      (),
++       .CLKOUT4      (clk_pll_amba),
+        .CLKOUT5      (),
+        .CLKOUT6      (),
+        .DO           (),
+@@ -292,6 +304,19 @@
+      .I (clk_pll)
+      );
+ 
++  BUFG u_bufg_clkamba
++    (
++     .O (clk_amba),
++     .I (clk_pll_amba)
++     );
++
++  BUFG u_bufg_clk100
++    (
++     .O (clk_100),
++     .I (clk_pll_100)
++     );
++
++
+   //***************************************************************************
+   // RESET SYNCHRONIZATION DESCRIPTION:
+   //  Various resets are generated to ensure that:

@@ -1,0 +1,26 @@
+Dynamic Partial Reconfiguration
+CONFIG_PARTIAL
+	Say Y here to enable Partial Reconfiguration (only for Xilinx Devices).
+	
+Bitstream Verification
+CONFIG_CRC
+	Say Y to enable bitstream verification (CRC) (i.e., DPRC works in D2PRC-CRC mode).
+
+Bitstream Error Detection and Correction
+CONFIG_EDAC
+	Say Y to enable bitstream EDAC (i.e., DPRC works in D2PRC-SECDED mode).
+
+CRC Block Size
+CONFIG_BLOCK
+	Number of 32-bit words in a CRC block. Valid range 2 to 496. This value must not be greater than FIFO depth-16
+	
+Instantiate DCM and FIFO buffers
+CONFIG_DCM_FIFO
+	Say Y(N) to setup DPRC in Async(Sync) mode. If AHB/APB bus frequency is lower than 100 MHz, and if bitstream verification is disabled, DPRC can be setup to work in Sync mode.
+
+Configure the depth of the FIFO buffer
+CONFIG_DPR_FIFO64
+	Valid for Async and D2PRC modes only. Set the depth of the FIFO buffer.
+
+
+

@@ -1,0 +1,14 @@
+// This example file is from the Xilinx Virtex-5 FPGA System Monitor User Guide
+// Must use valid headers on all columns
+// Comments can be added to the stimulus file using '//'
+TIME   TEMP  VCCAUX  VCCINT  VP   VN   VAUXP[0]  VAUXN[0]
+00000  45.0  2.5     1.0     0.5  0.0  0.7       0.0
+05000  85.0  2.45    1.1     0.3  0.0  0.2       0.0
+// Time stamp data is in nano seconds (ns)
+// Temperature is recorded in °C (degrees centigrade)
+// All other channels are recorded as V (Volts)
+// Valid column headers are:
+// TIME, TEMP, VCCAUX, VCCINT, VP, VN,
+// VAUXP[0], VAUXN[0],...............VAUXP[15], VAUXN[15]
+// External analog inputs are differential so VP = 0.5 and VN = 0.0 the
+// input on channel VP/VN in 0.5 - 0.0 = 0.5V

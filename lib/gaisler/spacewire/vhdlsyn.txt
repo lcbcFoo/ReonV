@@ -1,0 +1,12 @@
+spacewire.vhd
+grspw.vhd
+grspw2.vhd
+grspwm.vhd
+grspw2_phy.vhd
+grspw2_dma.vhd
+grspw2_fifo.vhd
+grspw_codec_clockgate.vhd
+grspw_codec.vhd
+grspwrouter.vhd
+grspw_phy.vhd
+grspw2_sist.vhd

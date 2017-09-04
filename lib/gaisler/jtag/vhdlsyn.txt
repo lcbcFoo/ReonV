@@ -1,0 +1,9 @@
+jtag.vhd
+libjtagcom.vhd
+jtagcom.vhd
+bscanctrl.vhd
+bscanregs.vhd
+bscanregsbd.vhd
+jtagcom2.vhd
+ahbjtag.vhd
+ahbjtag_bsd.vhd

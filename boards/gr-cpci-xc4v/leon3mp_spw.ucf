@@ -1,0 +1,62 @@
+#GRSPW - XST 13.02
+#INST "spw.swloop[2].spw1_input.spw_phy0/Mxor_rxclki_Result1" LOC = SLICE_X1Y159;
+#INST "spw.swloop[1].spw1_input.spw_phy0/Mxor_rxclki_Result1" LOC = SLICE_X0Y172;
+#INST "spw.swloop[0].spw1_input.spw_phy0/Mxor_rxclki_Result1" LOC = SLICE_X0Y184;
+#INST "spw.swloop[2].spw1_input.spw_phy0/r.shftreg"     IOB="FALSE";
+#INST "spw.swloop[2].spw1_input.spw_phy0/nr.shftreg_0" IOB="FALSE";
+#INST "spw.swloop[1].spw1_input.spw_phy0/r.shftreg"     IOB="FALSE";
+#INST "spw.swloop[1].spw1_input.spw_phy0/nr.shftreg_0" IOB="FALSE";
+#INST "spw.swloop[0].spw1_input.spw_phy0/r.shftreg"     IOB="FALSE";
+#INST "spw.swloop[0].spw1_input.spw_phy0/nr.shftreg_0" IOB="FALSE";
+#INST "spw.swloop[2].spw1_input.spw_phy0/r.shftreg"     LOC=SLICE_X78Y69;
+#INST "spw.swloop[2].spw1_input.spw_phy0/nr.shftreg_0" LOC=SLICE_X78Y68;
+#INST "spw.swloop[1].spw1_input.spw_phy0/r.shftreg"     LOC=SLICE_X79Y64;
+#INST "spw.swloop[1].spw1_input.spw_phy0/nr.shftreg_0" LOC=SLICE_X73Y159;
+#INST "spw.swloop[0].spw1_input.spw_phy0/r.shftreg"     LOC=SLICE_X74Y96;
+#INST "spw.swloop[0].spw1_input.spw_phy0/nr.shftreg_0" LOC=SLICE_X78Y158;
+
+#GRSPW - Synplify G-2012.09-SP1
+#INST "spw.swloop.2.spw1_input.spw_phy0/rxclki_1" LOC = SLICE_X1Y159;
+#INST "spw.swloop.1.spw1_input.spw_phy0/rxclki_1" LOC = SLICE_X0Y172;
+#INST "spw.swloop.0.spw1_input.spw_phy0/rxclki_1" LOC = SLICE_X0Y184;
+#INST "spw.swloop.2.spw1_input.spw_phy0/r.shftreg"     IOB="FALSE";
+#INST "spw.swloop.2.spw1_input.spw_phy0/nr.shftreg[0]" IOB="FALSE";
+#INST "spw.swloop.1.spw1_input.spw_phy0/r.shftreg"     IOB="FALSE";
+#INST "spw.swloop.1.spw1_input.spw_phy0/nr.shftreg[0]" IOB="FALSE";
+#INST "spw.swloop.0.spw1_input.spw_phy0/r.shftreg"     IOB="FALSE";
+#INST "spw.swloop.0.spw1_input.spw_phy0/nr.shftreg[0]" IOB="FALSE";
+#INST "spw.swloop.2.spw1_input.spw_phy0/r.shftreg"     LOC=SLICE_X78Y69;
+#INST "spw.swloop.2.spw1_input.spw_phy0/nr.shftreg[0]" LOC=SLICE_X78Y68;
+#INST "spw.swloop.1.spw1_input.spw_phy0/r.shftreg"     LOC=SLICE_X79Y64;
+#INST "spw.swloop.1.spw1_input.spw_phy0/nr.shftreg[0]" LOC=SLICE_X73Y159;
+#INST "spw.swloop.0.spw1_input.spw_phy0/r.shftreg"     LOC=SLICE_X74Y96;
+#INST "spw.swloop.0.spw1_input.spw_phy0/nr.shftreg[0]" LOC=SLICE_X78Y158;
+
+NET "spw_rxdp(0)" IOBDELAY="NONE";
+NET "spw_rxdp(1)" IOBDELAY="NONE";
+NET "spw_rxdp(2)" IOBDELAY="NONE";
+
+#Remember to set DIFF_TERM attribute for receivers either in UCF or as generic in VHDL declaration
+#ISE 13.02
+#INST "spw.swloop[0].spw_rxd_pad/xc4v.u0/xlvds.lvds_25.ip" DIFF_TERM = TRUE;
+#INST "spw.swloop[1].spw_rxd_pad/xc4v.u0/xlvds.lvds_25.ip" DIFF_TERM = TRUE;
+#INST "spw.swloop[2].spw_rxd_pad/xc4v.u0/xlvds.lvds_25.ip" DIFF_TERM = TRUE;
+#INST "spw.swloop[0].spw_rxs_pad/xc4v.u0/xlvds.lvds_25.ip" DIFF_TERM = TRUE;
+#INST "spw.swloop[1].spw_rxs_pad/xc4v.u0/xlvds.lvds_25.ip" DIFF_TERM = TRUE;
+#INST "spw.swloop[2].spw_rxs_pad/xc4v.u0/xlvds.lvds_25.ip" DIFF_TERM = TRUE;
+#Synplify G-2012.09-SP1
+#INST "spw.swloop.0.spw_rxd_pad/xc4v.u0/xlvds.lvds_25.ip" DIFF_TERM = TRUE;
+#INST "spw.swloop.1.spw_rxd_pad/xc4v.u0/xlvds.lvds_25.ip" DIFF_TERM = TRUE;
+#INST "spw.swloop.2.spw_rxd_pad/xc4v.u0/xlvds.lvds_25.ip" DIFF_TERM = TRUE;
+#INST "spw.swloop.0.spw_rxs_pad/xc4v.u0/xlvds.lvds_25.ip" DIFF_TERM = TRUE;
+#INST "spw.swloop.1.spw_rxs_pad/xc4v.u0/xlvds.lvds_25.ip" DIFF_TERM = TRUE;
+#INST "spw.swloop.2.spw_rxs_pad/xc4v.u0/xlvds.lvds_25.ip" DIFF_TERM = TRUE;
+
+# Contraints to make SpW rx paths visible
+OFFSET = IN : 1.00 : BEFORE  "spw_rxdp(0)";
+OFFSET = IN : 1.00 : BEFORE  "spw_rxsp(0)";
+OFFSET = IN : 1.00 : BEFORE  "spw_rxdp(1)";
+OFFSET = IN : 1.00 : BEFORE  "spw_rxsp(1)";
+OFFSET = IN : 1.00 : BEFORE  "spw_rxdp(2)";
+OFFSET = IN : 1.00 : BEFORE  "spw_rxsp(2)";
+

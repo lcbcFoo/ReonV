@@ -1,0 +1,19 @@
+diff -Naur pcie.org/v6_pcie_v1_7/source/v6_pcie_v1_7.vhd pcie/v6_pcie_v1_7/source/v6_pcie_v1_7.vhd
+--- pcie.org/v6_pcie_v1_7/source/v6_pcie_v1_7.vhd	2013-07-16 16:50:59.000000000 +0200
++++ pcie/v6_pcie_v1_7/source/v6_pcie_v1_7.vhd	2012-08-10 12:23:30.000000000 +0200
+@@ -752,10 +752,10 @@
+       VSEC_CAP_ON                              : boolean;
+       VSEC_CAP_VERSION                         : bit_vector);
+     port (
+-      PCIEXPRXN                           : in  std_logic_vector(7 downto 0);
+-      PCIEXPRXP                           : in  std_logic_vector(7 downto 0);
+-      PCIEXPTXN                           : out std_logic_vector(7 downto 0);
+-      PCIEXPTXP                           : out std_logic_vector(7 downto 0);
++      PCIEXPRXN                           : in  std_logic_vector(LINK_CAP_MAX_LINK_WIDTH_int-1 downto 0);
++      PCIEXPRXP                           : in  std_logic_vector(LINK_CAP_MAX_LINK_WIDTH_int-1 downto 0);
++      PCIEXPTXN                           : out std_logic_vector(LINK_CAP_MAX_LINK_WIDTH_int-1 downto 0);
++      PCIEXPTXP                           : out std_logic_vector(LINK_CAP_MAX_LINK_WIDTH_int-1 downto 0);
+       SYSCLK                              : in  std_logic;
+       FUNDRSTN                            : in  std_logic;
+       TRNLNKUPN                           : out std_logic;
+

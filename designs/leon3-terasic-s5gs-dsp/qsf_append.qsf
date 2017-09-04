@@ -1,0 +1,14 @@
+set_global_assignment -name SIP_FILE ddr3ctrl.sip
+set_global_assignment -name QIP_FILE ddr3ctrl.qip
+
+set_global_assignment -name SDC_FILE leon3mp_quartus.sdc
+
+set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_RETIMING ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_DUPLICATION ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT EXTRA
+set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING ON
+set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
+
+# Workaround needed if GRFPU is used
+set_global_assignment -name AUTO_ROM_RECOGNITION OFF

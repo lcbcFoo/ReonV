@@ -1,0 +1,656 @@
+# UCF file for GR-XC6S FPGA Development Board
+# revision 0.0 : 2011-02-11
+# Pender Electronic Design GmbH, www.pender.ch
+
+# Bank 0 => 3.3V (LVDS)
+# Bank 1 => 3.3V
+# Bank 2 => 3.3V
+# Bank 3 => 1.8V (DDR2)
+
+############################################################################
+# VCC AUX VOLTAGE 
+############################################################################
+CONFIG VCCAUX=3.3;
+
+############################################################################
+# DDR2 requires the MCB to operate in Extended performance mode with higher Vccint
+# specification to achieve maximum frequency. Therefore, the following CONFIG constraint
+# follows the corresponding GUI option setting. However, DDR3 can operate at higher 
+# frequencies with any Vcciint value by operating MCB in extended mode. Please do not
+# remove/edit the below constraint to avoid false errors.
+############################################################################
+CONFIG MCB_PERFORMANCE= STANDARD;
+
+# --- MIG37 ---
+NET "mig_gen.ddrc/MCB_inst/memc?_wrapper_inst/memc?_mcb_raw_wrapper_inst/selfrefresh_mcb_mode" TIG;
+NET "mig_gen.ddrc/MCB_inst/c?_pll_lock" TIG;
+NET "mig_gen.ddrc/MCB_inst/memc?_wrapper_inst/memc?_mcb_raw_wrapper_inst/gen_term_calib.mcb_soft_calibration_top_inst/mcb_soft_calibration_inst/CKE_Train" TIG; ## This path exists for DDR2 only
+
+# --- MIG39 ---
+INST "mig_gen.ddrc/MCB_inst/memc?_wrapper_inst/memc?_mcb_raw_wrapper_inst/gen_term_calib.mcb_soft_calibration_top_inst/mcb_soft_calibration_inst/DONE_SOFTANDHARD_CAL*" TIG;
+ 
+############################################################################
+# Main clocks
+############################################################################
+
+# Input clock
+NET "clk" TNM_NET = "clk";
+TIMESPEC "TS_clk" = PERIOD "clk" 20.000 ns HIGH 50.00%;
+
+# Input clock 2
+NET "clk2" TNM_NET = "clk2";
+TIMESPEC "TS_clk2" = PERIOD "clk2" 5.000 ns HIGH 50.00%;
+
+# -------------------------------
+# RGMII interface
+
+# Allow non dedicated clock routing (Onlu needed if clock mux is used)
+PIN "rgmii0/useclkmux0.tecclkmux.clkmux1000/tec.xil.buf/buf.O" CLOCK_DEDICATED_ROUTE = FALSE;
+
+# Ethernet PHY LOC to ease placement
+INST "rgmiirgmii0/no_clk_mux0.rgmii_tx_clk/xil.xil0/s6.c_dm" LOC = OLOGIC_X17Y67;
+INST "rgmii0/rgmii_tx_ctl/xil.xil0/s6.c_dm" LOC = OLOGIC_X17Y30;
+INST "rgmii0/rgmii_txd[0].ddr_oreg0/xil.xil0/s6.c_dm" LOC  = OLOGIC_X17Y29;
+INST "rgmii0/rgmii_txd[1].ddr_oreg0/xil.xil0/s6.c_dm" LOC  = OLOGIC_X17Y57;
+INST "rgmii0/rgmii_txd[2].ddr_oreg0/xil.xil0/s6.c_dm" LOC  = OLOGIC_X17Y66;
+INST "rgmii0/rgmii_txd[3].ddr_oreg0/xil.xil0/s6.c_dm" LOC  = OLOGIC_X17Y79;
+
+# -- GTX clock inout
+# Only used when external GTX clock is used
+#NET "clk125" TNM_NET = "clk125";
+#TIMESPEC "TS_clk125" = PERIOD "clk125" 8.000 ns HIGH 50.00%;
+
+# To be used for internal GTX clock generation when 10/100 mode is used
+PIN "ethpads.gtx_clk0.clk_125_bufg0.O" CLOCK_DEDICATED_ROUTE = FALSE;
+#PIN "ethpads.gtx_clk2.clkgen0/xc3s.v/bufg0.O" CLOCK_DEDICATED_ROUTE =FALSE;
+#PIN "ethpads.gtx_clk2.clk_125_bufg0.O" CLOCK_DEDICATED_ROUTE = FALSE;
+
+NET "erx_clk" TNM_NET = "erx_clk";
+TIMESPEC "TS_erx_clk" = PERIOD "erx_clk" 8.000 ns HIGH 50.00%;
+
+#NET "mig_gen.ddrc/MCB_inst/memc3_infrastructure_inst/clk0" TNM_NET = clkm;
+NET "clkm" TNM_NET = clkm;
+
+# All mode
+#NET "rgmii0/gmiii_gtx_clk" TNM_NET = "clk125_mux";
+NET "gmiii_gtx_clk" TNM_NET = "clk125_mux";
+TIMESPEC TS_clk125_mux = PERIOD "clk125_mux" 8 ns  HIGH 50.00%;
+TIMESPEC "TS_clkm_gtx_clk" = FROM "clkm" TO "clk125_mux" TIG;
+TIMESPEC "TS_gtx_clk_clkm" = FROM "clk125_mux" TO "clkm" TIG;
+
+# Giga mode only
+NET "clk_125_bufg" TNM_NET = "clk125_bufg";
+TIMESPEC TS_clk125_bufg = PERIOD "clk125_bufg" 8 ns  HIGH 50.00%;
+TIMESPEC "TS_clkm_gtx_clk_2" = FROM "clkm" TO "clk125_bufg" TIG;
+TIMESPEC "TS_gtx_clk_clkm_2" = FROM "clk125_bufg" TO "clkm" TIG;
+
+INST "etx_clk" SLEW = FAST;
+INST "etxd*  " SLEW = FAST;
+INST "etx_en " SLEW = FAST;
+
+INST "erxd*"   TNM = IN_RGMII; 
+INST "erx_dv"  TNM = IN_RGMII;
+
+# See http://www.xilinx.com/support/documentation/sw_manuals/xilinx11/ug612.pdf figure 2-4
+# http://www.xilinx.com/support/documentation/sw_manuals/xilinx14_4/ug612.pdf
+
+# Use when IODELAY is inserted
+#TIMEGRP "IN_RGMII" OFFSET = IN 5.1 ns VALID 2.2 ns BEFORE "erx_clk" RISING; 
+#TIMEGRP "IN_RGMII" OFFSET = IN 5.1 ns VALID 2.2 ns BEFORE "erx_clk" FALLING;
+
+# No IODELAY
+# Please, note that these will fail but will be fixed by setup script in GRMON2
+#TIMEGRP "IN_RGMII" OFFSET = IN 1.5 ns VALID 2.25 ns BEFORE "erx_clk" RISING;
+#TIMEGRP "IN_RGMII" OFFSET = IN 1.5 ns VALID 2.25 ns BEFORE "erx_clk" FALLING;
+
+# Use when IODELAY is inserted
+NET "etxd[0]" OFFSET = OUT 2.25 ns AFTER "clk125" REFERENCE_PIN "etx_clk" RISING;
+NET "etxd[0]" OFFSET = OUT 2.25 ns AFTER "clk125" REFERENCE_PIN "etx_clk" FALLING;
+NET "etxd[1]" OFFSET = OUT 2.25 ns AFTER "clk125" REFERENCE_PIN "etx_clk" RISING;
+NET "etxd[1]" OFFSET = OUT 2.25 ns AFTER "clk125" REFERENCE_PIN "etx_clk" FALLING;
+NET "etxd[2]" OFFSET = OUT 2.25 ns AFTER "clk125" REFERENCE_PIN "etx_clk" RISING;
+NET "etxd[2]" OFFSET = OUT 2.25 ns AFTER "clk125" REFERENCE_PIN "etx_clk" FALLING;
+NET "etxd[3]" OFFSET = OUT 2.25 ns AFTER "clk125" REFERENCE_PIN "etx_clk" RISING;
+NET "etxd[3]" OFFSET = OUT 2.25 ns AFTER "clk125" REFERENCE_PIN "etx_clk" FALLING;
+NET "etx_en"  OFFSET = OUT 2.25 ns AFTER "clk125" REFERENCE_PIN "etx_clk" RISING;
+NET "etx_en"  OFFSET = OUT 2.25 ns AFTER "clk125" REFERENCE_PIN "etx_clk" FALLING;
+
+############################################################################
+# I/O STANDARDS AND LOCATIONS
+############################################################################
+
+NET "clk"   LOC = "J20" | IOSTANDARD =LVCMOS33; # soldered oscillator, 50 MHz
+NET "clk2"  LOC = "K20" | IOSTANDARD =LVCMOS33; # socket - user provided frequency
+
+# memory interface (for Parallel Flash U8)
+# on I/O BANK1 and I/O BANK2 => 3.3V logic 
+
+# NET "address(*)" IOSTANDARD = LVCMOS33;
+
+NET "address(0)"  LOC = "Y3"   | IOSTANDARD =LVCMOS33;
+NET "address(1)"  LOC = "AB10" | IOSTANDARD =LVCMOS33;
+NET "address(2)"  LOC = "AB4"  | IOSTANDARD =LVCMOS33;
+NET "address(3)"  LOC = "AA4"  | IOSTANDARD =LVCMOS33;
+NET "address(4)"  LOC = "AB8"  | IOSTANDARD =LVCMOS33;
+NET "address(5)"  LOC = "AB12" | IOSTANDARD =LVCMOS33;
+NET "address(6)"  LOC = "AA10" | IOSTANDARD =LVCMOS33;
+NET "address(7)"  LOC = "V11"  | IOSTANDARD =LVCMOS33;
+NET "address(8)"  LOC = "AA14" | IOSTANDARD =LVCMOS33;
+NET "address(9)"  LOC = "AB14" | IOSTANDARD =LVCMOS33;
+NET "address(10)" LOC = "AA16" | IOSTANDARD =LVCMOS33;
+NET "address(11)" LOC = "AB16" | IOSTANDARD =LVCMOS33;
+NET "address(12)" LOC = "AB17" | IOSTANDARD =LVCMOS33;
+NET "address(13)" LOC = "P18"  | IOSTANDARD =LVCMOS33;
+NET "address(14)" LOC = "P21"  | IOSTANDARD =LVCMOS33;
+NET "address(15)" LOC = "R19"  | IOSTANDARD =LVCMOS33;
+NET "address(16)" LOC = "V21"  | IOSTANDARD =LVCMOS33;
+NET "address(17)" LOC = "V22"  | IOSTANDARD =LVCMOS33;
+NET "address(18)" LOC = "Y17"  | IOSTANDARD =LVCMOS33;
+NET "address(19)" LOC = "U22"  | IOSTANDARD =LVCMOS33;
+NET "address(20)" LOC = "U20"  | IOSTANDARD =LVCMOS33;
+NET "address(21)" LOC = "T19"  | IOSTANDARD =LVCMOS33;
+NET "address(22)" LOC = "T20"  | IOSTANDARD =LVCMOS33;
+NET "address(23)" LOC = "V15"  | IOSTANDARD =LVCMOS33;
+NET "address(24)" LOC = "T6"   | IOSTANDARD =LVCMOS33;
+
+# NET "data(*)" IOSTANDARD = LVCMOS33;
+ 
+NET "data(24)" LOC = "W4"  | IOSTANDARD =LVCMOS33;
+NET "data(25)" LOC = "Y4"  | IOSTANDARD =LVCMOS33;
+NET "data(26)" LOC = "W11" | IOSTANDARD =LVCMOS33;
+NET "data(27)" LOC = "Y7"  | IOSTANDARD =LVCMOS33;
+NET "data(28)" LOC = "AA2" | IOSTANDARD =LVCMOS33;
+NET "data(29)" LOC = "AB2" | IOSTANDARD =LVCMOS33;
+NET "data(30)" LOC = "AB3" | IOSTANDARD =LVCMOS33;
+NET "data(31)" LOC = "AB7" | IOSTANDARD =LVCMOS33;
+
+NET "writen"   LOC = "H17"  | IOSTANDARD = LVCMOS33;
+#NET "read"     LOC = "a14"  | IOSTANDARD = LVCMOS33;
+#NET "iosn"     LOC = "b14"  | IOSTANDARD = LVCMOS33;
+NET "romsn"    LOC = "AA22" | IOSTANDARD = LVCMOS33; # also used as pin M0
+NET "oen"      LOC = "H16"  | IOSTANDARD = LVCMOS33;
+
+#NET "resetn" CLOCK_DEDICATED_ROUTE = FALSE;
+NET "resetn"      LOC = "aa12" | IOSTANDARD = LVCMOS33;
+NET "wdogn"       LOC = "a4"   | IOSTANDARD = LVCMOS33;
+
+# DDR2 memory interface, to U7
+# on I/O BANK3 => 1.8V logic 
+
+NET "ddr_dq(*)"     IN_TERM = NONE;       
+NET "ddr_dqs(*)"    IN_TERM = NONE; 
+NET "ddr_dqsn(*)"   IN_TERM = NONE; 
+
+NET "ddr_ad(13)"   LOC = "g6" | IOSTANDARD = SSTL18_II;
+NET "ddr_ad(12)"   LOC = "d1" | IOSTANDARD = SSTL18_II;
+NET "ddr_ad(11)"   LOC = "c1" | IOSTANDARD = SSTL18_II; 
+NET "ddr_ad(10)"   LOC = "g4" | IOSTANDARD = SSTL18_II; 
+NET "ddr_ad(9)"    LOC = "e1" | IOSTANDARD = SSTL18_II; 
+NET "ddr_ad(8)"    LOC = "e3" | IOSTANDARD = SSTL18_II;
+NET "ddr_ad(7)"    LOC = "h6" | IOSTANDARD = SSTL18_II; 
+NET "ddr_ad(6)"    LOC = "j4" | IOSTANDARD = SSTL18_II;
+NET "ddr_ad(5)"    LOC = "k3" | IOSTANDARD = SSTL18_II;
+NET "ddr_ad(4)"    LOC = "f3" | IOSTANDARD = SSTL18_II;
+NET "ddr_ad(3)"    LOC = "k6" | IOSTANDARD = SSTL18_II;
+NET "ddr_ad(2)"    LOC = "h5" | IOSTANDARD = SSTL18_II;
+NET "ddr_ad(1)"    LOC = "h1" | IOSTANDARD = SSTL18_II;
+NET "ddr_ad(0)"    LOC = "h2" | IOSTANDARD = SSTL18_II;
+                   
+NET "ddr_ba(2)"    LOC = "f1" | IOSTANDARD = SSTL18_II;
+NET "ddr_ba(1)"    LOC = "g1" | IOSTANDARD = SSTL18_II;
+NET "ddr_ba(0)"    LOC = "g3" | IOSTANDARD = SSTL18_II;
+NET "ddr_cas"      LOC = "k4" | IOSTANDARD = SSTL18_II;
+NET "ddr_cke"      LOC = "d2" | IOSTANDARD = SSTL18_II;
+NET "ddr_csn"      LOC = "c3" | IOSTANDARD = SSTL18_II;
+NET "ddr_clk"      LOC = "h4" | IOSTANDARD = DIFF_SSTL18_II;
+NET "ddr_clkb"     LOC = "h3" | IOSTANDARD = DIFF_SSTL18_II;
+NET "ddr_dm(1)"    LOC = "m3" | IOSTANDARD = SSTL18_II; 
+NET "ddr_dm(0)"    LOC = "l4" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(0)"    LOC = "N3" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(10)"   LOC = "R3" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(11)"   LOC = "R1" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(12)"   LOC = "U3" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(13)"   LOC = "U1" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(14)"   LOC = "V2" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(15)"   LOC = "V1" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(1)"    LOC = "N1" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(2)"    LOC = "M2" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(3)"    LOC = "M1" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(4)"    LOC = "J3" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(5)"    LOC = "J1" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(6)"    LOC = "K2" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(7)"    LOC = "K1" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(8)"    LOC = "P2" | IOSTANDARD = SSTL18_II;
+NET "ddr_dq(9)"    LOC = "P1" | IOSTANDARD = SSTL18_II;
+NET "ddr_dqsn(1)"  LOC = "t1" | IOSTANDARD = DIFF_SSTL18_II;
+NET "ddr_dqsn(0)"  LOC = "l1" | IOSTANDARD = DIFF_SSTL18_II;
+NET "ddr_dqs(1)"   LOC = "t2" | IOSTANDARD = DIFF_SSTL18_II;
+NET "ddr_dqs(0)"   LOC = "l3" | IOSTANDARD = DIFF_SSTL18_II;
+NET "ddr_odt"      LOC = "j6" | IOSTANDARD = SSTL18_II;
+NET "ddr_ras"      LOC = "k5" | IOSTANDARD = SSTL18_II;
+NET "ddr_we"       LOC = "f2" | IOSTANDARD = SSTL18_II;
+NET "ddr_rzq"      LOC = "k7" | IOSTANDARD = SSTL18_II;
+NET "ddr_zio"      LOC = "d5" | IOSTANDARD = SSTL18_II;
+
+# RMII Ethernet Interface, to 10/100/1000 RGMII PHY, U3
+# on I/O BANK1 => 3.3V logic 
+# dedicated 25MHz clock is generated by crystal locally to PHY
+# Optionally PHY can generate 125MHz output clock as input to FPGA
+
+NET "clk125" LOC = "m20"  | IOSTANDARD =LVCMOS33;
+
+NET "emdc"    LOC = "j16" | IOSTANDARD =LVCMOS33;
+NET "emdint"  LOC = "l15" | IOSTANDARD =LVCMOS33;
+NET "emdio"   LOC = "h18" | IOSTANDARD =LVCMOS33;
+
+NET "erx_dv"   LOC = "k16" | IOSTANDARD =LVCMOS33;
+NET "erx_clk"  LOC = "k19" | IOSTANDARD =LVCMOS33;
+
+NET "erxd(0)" LOC = "h19" | IOSTANDARD =LVCMOS33;
+NET "erxd(1)" LOC = "k17" | IOSTANDARD =LVCMOS33;
+NET "erxd(2)" LOC = "n16" | IOSTANDARD =LVCMOS33;
+NET "erxd(3)" LOC = "m17" | IOSTANDARD =LVCMOS33;
+
+NET "etx_en"  LOC = "m18" | IOSTANDARD =LVTTL | FAST | DRIVE = 12; 
+NET "etx_clk" LOC = "m19" | IOSTANDARD =LVTTL | FAST | DRIVE = 12;
+NET "etxd(0)" LOC = "p17" | IOSTANDARD =LVTTL | FAST | DRIVE = 12;
+NET "etxd(1)" LOC = "m16" | IOSTANDARD =LVTTL | FAST | DRIVE = 12;
+NET "etxd(2)" LOC = "n19" | IOSTANDARD =LVTTL | FAST | DRIVE = 12;
+NET "etxd(3)" LOC = "n20" | IOSTANDARD =LVTTL | FAST | DRIVE = 12;
+
+
+# I2C interface conecting to Monitor via DVI-I connector J4
+# on I/O BANK1 => 3.3V logic 
+
+NET "ddc_scl" LOC = "h13" | IOSTANDARD = LVCMOS33;
+NET "ddc_sda" LOC = "g13" | IOSTANDARD = LVCMOS33;
+
+
+# I2C interface conecting to CH7301C Graphics chip, U11
+# on I/O BANK1 => 3.3V logic 
+
+NET "dvi_iic_scl" LOC = "f13" | IOSTANDARD = LVCMOS33;
+NET "dvi_iic_sda" LOC = "d13" | IOSTANDARD = LVCMOS33;
+
+
+# I2C interface for User connections on connector-header J16
+# on I/O BANK1 => 3.3V logic 
+
+NET "iic_scl" LOC = "d12" | IOSTANDARD = LVCMOS33;
+NET "iic_sda" LOC = "e12" | IOSTANDARD = LVCMOS33;
+
+
+# PS2 mouse and keyboard interfaces
+
+NET "ps2clk(0)"  LOC = "h20" | IOSTANDARD = LVCMOS33; # mouse
+NET "ps2data(0)" LOC = "j19" | IOSTANDARD = LVCMOS33; # mouse
+
+NET "ps2clk(1)"  LOC = "p19" | IOSTANDARD = LVCMOS33; # keyboard
+NET "ps2data(1)" LOC = "p20" | IOSTANDARD = LVCMOS33; # keyboard
+
+
+# DVI-I Video interface to CH7301C Graphics chip, U11
+# on I/O BANK1 => 3.3V logic 
+
+NET "tft_lcd_clk_n"    LOC = "h22" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_clk_p"    LOC = "h21" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_data(11)" LOC = "d21" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_data(10)" LOC = "d22" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_data(9)"  LOC = "f21" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_data(8)"  LOC = "f22" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_data(7)"  LOC = "g20" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_data(6)"  LOC = "g22" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_data(5)"  LOC = "j22" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_data(4)"  LOC = "k21" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_data(3)"  LOC = "k22" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_data(2)"  LOC = "l22" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_data(1)"  LOC = "l20" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_data(0)"  LOC = "m22" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_de"       LOC = "p22" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_hsync"    LOC = "n22" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_reset_b"  LOC = "j17" | IOSTANDARD = LVCMOS33;
+NET "tft_lcd_vsync"    LOC = "m21" | IOSTANDARD = LVCMOS33;
+
+
+# USB interface
+# on I/O BANK3 => 1.8V logic 
+
+NET "usb_clk"    LOC = "l19" | IOSTANDARD = LVCMOS33; # 60MHz input to FPGA
+# pin USB_CLK is moved to bank 1 to put it on a clock capable I/O.
+# usb_clk is a 1.8V signal on a 3.3V bank.
+
+NET "usb_clock"  LOC = "m8"  | IOSTANDARD = LVCMOS18; # output from PHY, not normaly used
+NET "usb_d(7)"   LOC = "v3"  | IOSTANDARD = LVCMOS18 | FAST;
+NET "usb_d(6)"   LOC = "t3"  | IOSTANDARD = LVCMOS18 | FAST;
+NET "usb_d(5)"   LOC = "t4"  | IOSTANDARD = LVCMOS18 | FAST;
+NET "usb_d(4)"   LOC = "n6"  | IOSTANDARD = LVCMOS18 | FAST;
+NET "usb_d(3)"   LOC = "m7"  | IOSTANDARD = LVCMOS18 | FAST;
+NET "usb_d(2)"   LOC = "m6"  | IOSTANDARD = LVCMOS18 | FAST;
+NET "usb_d(1)"   LOC = "m5"  | IOSTANDARD = LVCMOS18 | FAST;
+NET "usb_d(0)"   LOC = "n4 " | IOSTANDARD = LVCMOS18 | FAST;
+NET "usb_dir"    LOC = "p7"  | IOSTANDARD = LVCMOS18 | FAST;
+NET "usb_nxt"    LOC = "p5"  | IOSTANDARD = LVCMOS18 | FAST;
+NET "usb_resetn" LOC = "n7"  | IOSTANDARD = LVCMOS18 | FAST;
+NET "usb_stp"    LOC = "p6"  | IOSTANDARD = LVCMOS18 | FAST;
+
+
+# Serial interface 2 
+# on I/O BANK1 => 3.3V logic 
+
+NET "txd2"       LOC = "w20" | IOSTANDARD = LVCMOS33;
+NET "rxd2"       LOC = "w22" | IOSTANDARD = LVCMOS33;
+NET "ctsn2"      LOC = "v20" | IOSTANDARD = LVCMOS33;
+NET "rtsn2"      LOC = "u19" | IOSTANDARD = LVCMOS33;
+
+
+# Serial interface 1 
+# on I/O BANK1 => 3.3V logic 
+
+NET "txd1"       LOC = "f17" | IOSTANDARD = LVCMOS33;
+NET "rxd1"       LOC = "f16" | IOSTANDARD = LVCMOS33;
+NET "ctsn1"      LOC = "g17" | IOSTANDARD = LVCMOS33;
+NET "rtsn1"      LOC = "g16" | IOSTANDARD = LVCMOS33;
+
+
+# SD Card interface (optional)
+# on I/O BANK2 => 3.3V logic 
+# These signals are shared with GENIO pins
+
+#NET "sd_clk"      LOC = "p8"  | IOSTANDARD = LVCMOS33; # => GENIO(35)
+#NET "sd_cmd"      LOC = "f5"  | IOSTANDARD = LVCMOS33; # => GENIO(34)
+#NET "sd_dat(3)"   LOC = "r4"  | IOSTANDARD = LVCMOS33; # => GENIO(39)
+#NET "sd_dat(2)"   LOC = "p4"  | IOSTANDARD = LVCMOS33; # => GENIO(38)
+#NET "sd_dat(1)"   LOC = "l6"  | IOSTANDARD = LVCMOS33; # => GENIO(37)
+#NET "sd_dat(0)"   LOC = "u4"  | IOSTANDARD = LVCMOS33; # => GENIO(36)
+#NET "sd_detectn"  LOC = "aa4" | IOSTANDARD = LVCMOS33; # => GENIO(33)
+#NET "sd_protectn" LOC = "aa8" | IOSTANDARD = LVCMOS33; # => GENIO(32)
+
+
+# SPI Flash prom interface
+# on I/O BANK2 => 3.3V logic 
+
+NET "spi_sel_n" LOC = "t5"   | IOSTANDARD = LVCMOS33; # labeled on schematic "ss"
+NET "spi_clk"   LOC = "y21"  | IOSTANDARD = LVCMOS33; # labeled on schematic "sclk"
+# NET "spd(3)"    LOC = "u13"  | IOSTANDARD = LVCMOS33; # shared with GENIO(31)
+NET "spd(2)"    LOC = "u14"  | IOSTANDARD = LVCMOS33;
+NET "spd(1)"    LOC = "aa20" | IOSTANDARD = LVCMOS33;
+NET "spi_mosi"  LOC = "ab20" | IOSTANDARD = LVCMOS33; # labeled on schematic spd(0)
+
+
+# DSU interface
+
+#NET "dsutx"  LOC = "w20" | IOSTANDARD = LVCMOS33 ; # txd1
+#NET "dsurx"  LOC = "w22" | IOSTANDARD = LVCMOS33 ; # rxd1
+#NET "dsuen"  LOC = "g7"  | IOSTANDARD = LVCMOS18 ; # switch(7)
+#NET "dsubre" LOC = "h8"  | IOSTANDARD = LVCMOS18 ; # switch(9)
+#NET "dsuact" LOC = "w3"  | IOSTANDARD = LVCMOS33 ; # led(1)
+#NET "errorn" LOC = "y2"  | IOSTANDARD = LVCMOS33 ; # led(0)
+
+
+# Switch Input pins
+# on I/O BANK3 => 1.8V logic 
+
+NET "switch(9)" LOC = "h8" | IOSTANDARD = LVCMOS18; # Push button switch S1, normally used for DSUBREAK
+NET "switch(8)" LOC = "j7" | IOSTANDARD = LVCMOS18; # Push button switch S2
+NET "switch(7)" LOC = "g7" | IOSTANDARD = LVCMOS18; # DIP switch s1-8, normally used for DSUEN
+NET "switch(6)" LOC = "f7" | IOSTANDARD = LVCMOS18; # DIP switch s1-7
+NET "switch(5)" LOC = "e5" | IOSTANDARD = LVCMOS18; # DIP switch s1-6
+NET "switch(4)" LOC = "e6" | IOSTANDARD = LVCMOS18; # DIP switch s1-5
+NET "switch(3)" LOC = "d3" | IOSTANDARD = LVCMOS18; # DIP switch s1-4
+NET "switch(2)" LOC = "c4" | IOSTANDARD = LVCMOS18; # DIP switch s1-3
+NET "switch(1)" LOC = "b1" | IOSTANDARD = LVCMOS18; # DIP switch s1-2
+NET "switch(0)" LOC = "b2" | IOSTANDARD = LVCMOS18; # DIP switch s1-1
+
+
+# General purpose I/O pins, on connector headers
+# on I/O BANK2 => 3.3V logic 
+
+#NET "genio(*)" PULLDOWN;
+
+NET "genio(0)"  LOC = "c17"  | IOSTANDARD =LVCMOS33;
+NET "genio(1)"  LOC = "a17"  | IOSTANDARD =LVCMOS33;
+NET "genio(2)"  LOC = "d15"  | IOSTANDARD =LVCMOS33;
+NET "genio(3)"  LOC = "c16"  | IOSTANDARD =LVCMOS33;
+NET "genio(4)"  LOC = "c15"  | IOSTANDARD =LVCMOS33;
+NET "genio(5)"  LOC = "a15"  | IOSTANDARD =LVCMOS33;
+NET "genio(6)"  LOC = "c13"  | IOSTANDARD =LVCMOS33;
+NET "genio(7)"  LOC = "a13"  | IOSTANDARD =LVCMOS33;
+NET "genio(8)"  LOC = "d14"  | IOSTANDARD =LVCMOS33;
+NET "genio(9)"  LOC = "c14"  | IOSTANDARD =LVCMOS33;
+NET "genio(10)" LOC = "d10"  | IOSTANDARD =LVCMOS33;
+NET "genio(11)" LOC = "c10"  | IOSTANDARD =LVCMOS33;
+NET "genio(12)" LOC = "c9"   | IOSTANDARD =LVCMOS33;
+NET "genio(13)" LOC = "a9"   | IOSTANDARD =LVCMOS33;
+NET "genio(14)" LOC = "d9"   | IOSTANDARD =LVCMOS33;
+NET "genio(15)" LOC = "c8"   | IOSTANDARD =LVCMOS33;
+NET "genio(16)" LOC = "d7"   | IOSTANDARD =LVCMOS33;
+NET "genio(17)" LOC = "d8"   | IOSTANDARD =LVCMOS33;
+NET "genio(18)" LOC = "d6"   | IOSTANDARD =LVCMOS33;
+NET "genio(19)" LOC = "c6"   | IOSTANDARD =LVCMOS33;
+NET "genio(20)" LOC = "e14"  | IOSTANDARD =LVCMOS33;
+NET "genio(21)" LOC = "f15"  | IOSTANDARD =LVCMOS33;
+NET "genio(22)" LOC = "f14"  | IOSTANDARD =LVCMOS33;
+NET "genio(23)" LOC = "h14"  | IOSTANDARD =LVCMOS33;
+NET "genio(24)" LOC = "l17"  | IOSTANDARD =LVCMOS33;
+NET "genio(25)" LOC = "k18"  | IOSTANDARD =LVCMOS33;
+NET "genio(26)" LOC = "r20"  | IOSTANDARD =LVCMOS33;
+NET "genio(27)" LOC = "r22"  | IOSTANDARD =LVCMOS33;
+NET "genio(28)" LOC = "t21"  | IOSTANDARD =LVCMOS33;
+NET "genio(29)" LOC = "t22"  | IOSTANDARD =LVCMOS33;
+NET "genio(30)" LOC = "u15"  | IOSTANDARD =LVCMOS33; # also used as pin M1
+NET "genio(31)" LOC = "u13"  | IOSTANDARD =LVCMOS33; # also used as pin SPD(3)
+NET "genio(32)" LOC = "p8"   | IOSTANDARD =LVCMOS18;
+NET "genio(33)" LOC = "f5"   | IOSTANDARD =LVCMOS18;
+NET "genio(34)" LOC = "aa8"  | IOSTANDARD =LVCMOS33;
+NET "genio(35)" LOC = "a2"   | IOSTANDARD =LVCMOS18;
+NET "genio(36)" LOC = "u4"   | IOSTANDARD =LVCMOS18;
+NET "genio(37)" LOC = "l6"   | IOSTANDARD =LVCMOS18;
+NET "genio(38)" LOC = "p4"   | IOSTANDARD =LVCMOS18;
+NET "genio(39)" LOC = "r4"   | IOSTANDARD =LVCMOS18;
+NET "genio(40)" LOC = "aa21" | IOSTANDARD =LVCMOS33;
+NET "genio(41)" LOC = "ab21" | IOSTANDARD =LVCMOS33;
+NET "genio(42)" LOC = "y19"  | IOSTANDARD =LVCMOS33;
+NET "genio(43)" LOC = "ab19" | IOSTANDARD =LVCMOS33;
+NET "genio(44)" LOC = "aa18" | IOSTANDARD =LVCMOS33;
+NET "genio(45)" LOC = "ab18" | IOSTANDARD =LVCMOS33;
+NET "genio(46)" LOC = "t18"  | IOSTANDARD =LVCMOS33;
+NET "genio(47)" LOC = "t17"  | IOSTANDARD =LVCMOS33;
+NET "genio(48)" LOC = "y15"  | IOSTANDARD =LVCMOS33;
+NET "genio(49)" LOC = "ab15" | IOSTANDARD =LVCMOS33;
+NET "genio(50)" LOC = "y13"  | IOSTANDARD =LVCMOS33;
+NET "genio(51)" LOC = "ab13" | IOSTANDARD =LVCMOS33;
+NET "genio(52)" LOC = "w12"  | IOSTANDARD =LVCMOS33;
+NET "genio(53)" LOC = "y12"  | IOSTANDARD =LVCMOS33;
+NET "genio(54)" LOC = "y11"  | IOSTANDARD =LVCMOS33;
+NET "genio(55)" LOC = "ab11" | IOSTANDARD =LVCMOS33;
+NET "genio(56)" LOC = "y9"   | IOSTANDARD =LVCMOS33;
+NET "genio(57)" LOC = "ab9"  | IOSTANDARD =LVCMOS33;
+NET "genio(58)" LOC = "aa6"  | IOSTANDARD =LVCMOS33;
+NET "genio(59)" LOC = "ab6"  | IOSTANDARD =LVCMOS33;
+
+
+
+
+# General purpose I/O pins, on connector-header J1
+# on I/O BANK1 => 3.3V logic 
+
+#NET "pio(*)" PULLDOWN;
+
+NET "pio(15)" LOC = "a21" | IOSTANDARD = LVCMOS33;
+NET "pio(14)" LOC = "a20" | IOSTANDARD = LVCMOS33;
+NET "pio(13)" LOC = "b20" | IOSTANDARD = LVCMOS33; 
+NET "pio(12)" LOC = "c19" | IOSTANDARD = LVCMOS33;
+NET "pio(11)" LOC = "b22" | IOSTANDARD = LVCMOS33; 
+NET "pio(10)" LOC = "b21" | IOSTANDARD = LVCMOS33; 
+NET "pio(8)"  LOC = "c20" | IOSTANDARD = LVCMOS33;
+NET "pio(9)"  LOC = "c22" | IOSTANDARD = LVCMOS33;
+NET "pio(7)"  LOC = "d20" | IOSTANDARD = LVCMOS33; 
+NET "pio(6)"  LOC = "d19" | IOSTANDARD = LVCMOS33; 
+NET "pio(5)"  LOC = "e22" | IOSTANDARD = LVCMOS33; 
+NET "pio(4)"  LOC = "e20" | IOSTANDARD = LVCMOS33; 
+NET "pio(3)"  LOC = "f20" | IOSTANDARD = LVCMOS33; 
+NET "pio(2)"  LOC = "g19" | IOSTANDARD = LVCMOS33; 
+NET "pio(1)"  LOC = "f19" | IOSTANDARD = LVCMOS33;
+NET "pio(0)"  LOC = "f18" | IOSTANDARD = LVCMOS33;
+
+# User LED's
+# on I/O BANK1 => 3.3V logic 
+
+NET "led(3)" LOC = "p3" | IOSTANDARD = LVCMOS18;
+NET "led(2)" LOC = "w1" | IOSTANDARD = LVCMOS18;
+NET "led(1)" LOC = "w3" | IOSTANDARD = LVCMOS18; # normally used for ERRORN
+NET "led(0)" LOC = "y2" | IOSTANDARD = LVCMOS18; # normally used for DSUACT
+
+
+# LVDS I/O interface
+# on BANK0 => => 3.3V logic 
+# pins are routed as differntial pairs, but could be used singly
+
+# Add diff_term attribute on input pairs (receivers) to place internal 100 Ohm termination
+
+#NET "lvdsio_p(0)"  LOC = "e16" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_p(1)"  LOC = "b18" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_p(2)"  LOC = "b16" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_p(4)"  LOC = "b12" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_p(5)"  LOC = "d11" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_p(6)"  LOC = "c11" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_p(7)"  LOC = "b10" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_p(8)"  LOC = "b8"  | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_p(9)"  LOC = "c7"  | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_p(10)" LOC = "b6"  | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_p(11)" LOC = "c5"  | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#
+#NET "lvdsio_n(0)"  LOC = "d17" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_n(1)"  LOC = "a18" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_n(2)"  LOC = "a16" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_n(3)"  LOC = "a14" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_n(4)"  LOC = "a12" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_n(5)"  LOC = "c12" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_n(6)"  LOC = "a11" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_n(7)"  LOC = "a10" | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_n(8)"  LOC = "a8"  | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_n(9)"  LOC = "a7"  | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_n(10)" LOC = "a6"  | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+#NET "lvdsio_n(11)" LOC = "a5"  | IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE ;
+
+
+
+# CAN interface, used if GR-PCI-CAN board is plugged on to J1
+# on BANK1 => => 3.3V logic 
+
+#NET "can_stb(2)" LOC = "g19" | IOSTANDARD = LVTTL; # gpio(0)
+#NET "can_rxd(2)" LOC = "g20" | IOSTANDARD = LVTTL; # gpio(1)
+#NET "can_txd(2)" LOC = "f19" | IOSTANDARD = LVTTL; # gpio(2)
+#NET "can_stb(1)" LOC = "f20" | IOSTANDARD = LVTTL; # gpio(3)
+#NET "can_rxd(1)" LOC = "d20" | IOSTANDARD = LVTTL; # gpio(4)
+#NET "can_txd(1)" LOC = "e20" | IOSTANDARD = LVTTL; # gpio(5) 
+
+
+# ATA interface, used if GR-XC3S-IDE mezzanine on to J14, J15
+# on BANK2 => => 3.3V logic 
+
+#NET "ata_rstn"     LOC = "t15"  | IOSTANDARD = LVTTL; #genio(20)
+#NET "ata_data(7)"  LOC = "u16"  | IOSTANDARD = LVTTL; #genio(21)
+#NET "ata_data(6)"  LOC = "v19"  | IOSTANDARD = LVTTL; #genio(22)
+#NET "ata_data(5)"  LOC = "v18"  | IOSTANDARD = LVTTL; #genio(23)
+#NET "ata_data(4)"  LOC = "u17"  | IOSTANDARD = LVTTL; #genio(24)
+#NET "ata_data(3)"  LOC = "aa18" | IOSTANDARD = LVTTL; #genio(25)
+#NET "ata_data(2)"  LOC = "v17"  | IOSTANDARD = LVTTL; #genio(26)
+#NET "ata_data(1)"  LOC = "w15"  | IOSTANDARD = LVTTL; #genio(27)
+#NET "ata_data(0)"  LOC = "ab14" | IOSTANDARD = LVTTL; #genio(28)
+##NET "genio(29)"   LOC = "y13"  | IOSTANDARD = LVTTL; #genio(29) / not used
+#NET "ata_dmarq"    LOC = "y12"  | IOSTANDARD = LVTTL | PULLDOWN; #genio(30) / DMARQ
+#NET "ata_diow"     LOC = "aa12" | IOSTANDARD = LVTTL; #genio(31) / nDIOW
+#NET "ata_dior"     LOC = "w12"  | IOSTANDARD = LVTTL; #genio(32) / DIOR
+#NET "ata_iordy"    LOC = "y14"  | IOSTANDARD = LVTTL | PULLUP; #genio(33) / IORDY
+#NET "ata_dmack"    LOC = "v13"  | IOSTANDARD = LVTTL; #genio(34) / nDMACK
+#NET "ata_intrq"    LOC = "ab12" | IOSTANDARD = LVTTL | PULLDOWN; #genio(35) / INTRQ
+#NET "ata_da(1)"    LOC = "u12"  | IOSTANDARD = LVTTL; #genio(36) / DA1
+#NET "ata_da(0)"    LOC = "t12"  | IOSTANDARD = LVTTL; #genio(37) / DA0
+#NET "ata_cs0"      LOC = "aa14" | IOSTANDARD = LVTTL; #genio(38) / nCS0
+#NET "ata_dasp"     LOC = "r13"  | IOSTANDARD = LVTTL; #genio(39) / nDASP
+
+##NET "genio(40)"   LOC = "ab21" | IOSTANDARD = LVCMOS33; #genio(40) / not used
+#NET "ata_data(8)"  LOC = "t16"  | IOSTANDARD = LVCMOS33; #genio(41)
+#NET "ata_data(9)"  LOC = "w18"  | IOSTANDARD = LVCMOS33; #genio(42)
+#NET "ata_data(10)" LOC = "w17"  | IOSTANDARD = LVCMOS33; #genio(43)
+#NET "ata_data(11)" LOC = "ab19" | IOSTANDARD = LVCMOS33; #genio(44)
+#NET "ata_data(12)" LOC = "r16"  | IOSTANDARD = LVCMOS33; #genio(45)
+#NET "ata_data(13)" LOC = "ab17" | IOSTANDARD = LVCMOS33; #genio(46)
+#NET "ata_data(14)" LOC = "y18"  | IOSTANDARD = LVCMOS33; #genio(47)
+#NET "ata_data(15)" LOC = "ab18" | IOSTANDARD = LVCMOS33; #genio(48)
+##NET "genio(49)"   LOC = "ab16" | IOSTANDARD = LVCMOS33; #genio(49) / not used
+##NET "genio(50)"   LOC = "r15"  | IOSTANDARD = LVCMOS33; #genio(50) / not used
+##NET "genio(51)"   LOC = "t14"  | IOSTANDARD = LVCMOS33; #genio(51) / not used
+##NET "genio(52)"   LOC = "y15"  | IOSTANDARD = LVCMOS33; #genio(52) / not used
+#NET "ata_csel"     LOC = "ab13" | IOSTANDARD = LVCMOS33; #genio(53) / Cable SEL
+##NET "genio(54)"   LOC = "aa16" | IOSTANDARD = LVCMOS33; #genio(54) / not used
+##NET "genio(55)"   LOC = "w14"  | IOSTANDARD = LVCMOS33; #genio(55) / not used
+##NET "genio(56)"   LOC = "y16"  | IOSTANDARD = LVCMOS33; #genio(56) / nPDIAG
+#NET "ata_da(2)"    LOC = "ab15" | IOSTANDARD = LVCMOS33; #genio(57)
+#NET "ata_cs1"      LOC = "y19"  | IOSTANDARD = LVCMOS33; #genio(58)
+##NET "genio(59)"   LOC = "y17"  | IOSTANDARD = LVCMOS33; #genio(59) 
+
+
+# Spacewire interface 0, on connector J12
+# Add diff_term attribute on input pairs (receivers) to place 
+# internal 100 Ohm termination if not already accommodated in pad generic
+
+NET "spw_rxdp(0)" LOC = "e16" ;#| IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE; # lvdsio0_p
+NET "spw_rxdn(0)" LOC = "d17" ;#| IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE; # lvdsio0_n
+NET "spw_rxsp(0)" LOC = "b18" ;#| IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE; # lvdsio1_p
+NET "spw_rxsn(0)" LOC = "a18" ;#| IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE; # lvdsio1_n
+NET "spw_txdp(0)" LOC = "b16" ;#| IOSTANDARD = LVDS_33; # lvdsio2_p
+NET "spw_txdn(0)" LOC = "a16" ;#| IOSTANDARD = LVDS_33; # lvdsio2_n
+NET "spw_txsp(0)" LOC = "b14" ;#| IOSTANDARD = LVDS_33; # lvdsio3_p
+NET "spw_txsn(0)" LOC = "a14" ;#| IOSTANDARD = LVDS_33; # lvdsio3_n
+
+
+# Spacewire interface 1, on connector J12
+# Add diff_term attribute on input pairs (receivers) to place 
+# internal 100 Ohm termination if not already accommodated in pad generic
+
+NET "spw_rxdp(1)" LOC = "b12" ;#| IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE; # lvdsio4_p
+NET "spw_rxdn(1)" LOC = "a12" ;#| IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE; # lvdsio4_n
+NET "spw_rxsp(1)" LOC = "d11" ;#| IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE; # lvdsio5_p
+NET "spw_rxsn(1)" LOC = "c12" ;#| IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE; # lvdsio5_n
+NET "spw_txdp(1)" LOC = "c11" ;#| IOSTANDARD = LVDS_33; # lvdsio6_p
+NET "spw_txdn(1)" LOC = "a11" ;#| IOSTANDARD = LVDS_33; # lvdsio6_n
+NET "spw_txsp(1)" LOC = "b10" ;#| IOSTANDARD = LVDS_33; # lvdsio7_p
+NET "spw_txsn(1)" LOC = "a10" ;#| IOSTANDARD = LVDS_33; # lvdsio7_n
+
+
+# Spacewire interface 2, on connector J12
+# Add diff_term attribute on input pairs (receivers) to place 
+# internal 100 Ohm termination if not already accommodated in pad generic
+
+NET "spw_rxdp(2)" LOC = "b8" ;#| IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE; # lvdsio8_p
+NET "spw_rxdn(2)" LOC = "a8" ;#| IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE; # lvdsio8_n
+NET "spw_rxsp(2)" LOC = "c7" ;#| IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE; # lvdsio9_p
+NET "spw_rxsn(2)" LOC = "a7" ;#| IOSTANDARD = LVDS_33 | DIFF_TERM = TRUE; # lvdsio9_n
+NET "spw_txdp(2)" LOC = "b6" ;#| IOSTANDARD = LVDS_33; # lvdsio10_p
+NET "spw_txdn(2)" LOC = "a6" ;#| IOSTANDARD = LVDS_33; # lvdsio10_n
+NET "spw_txsp(2)" LOC = "c5" ;#| IOSTANDARD = LVDS_33; # lvdsio11_p
+NET "spw_txsn(2)" LOC = "a5" ;#| IOSTANDARD = LVDS_33; # lvdsio11_n
+
+
+  
+# reserved FPGA function pins
+
+CONFIG PROHIBIT = "a3"; # "hswapen" 
+ 
+#CONFIG PROHIBIT = "t6";   # "fpgainit"  # reused as A24
+#CONFIG PROHIBIT = "aa22"; # M0 = high   # reused as ROMSN
+#CONFIG PROHIBIT = "u15";  # M1 = low    # reused as GENIO30
+
+# The following pins are used by the Xilinx DDR2 core
+
+#CONFIG PROHIBIT = "d5"; # reserved for RSQ
+CONFIG PROHIBIT = "y1"; # reserved for VREF
+CONFIG PROHIBIT = "m4"; # reserved for VREF
+CONFIG PROHIBIT = "k8"; # reserved for VREF
+CONFIG PROHIBIT = "b3"; # reserved for VREF
+#CONFIG PROHIBIT = "k7"; # reserved for ZIO
+
+
+

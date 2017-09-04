@@ -1,0 +1,22 @@
+# Date: Sat Nov 19 20:57:56 2011
+
+SET addpads = false
+SET asysymbol = true
+SET busformat = BusFormatParenNotRipped
+SET createndf = false
+SET designentry = VHDL
+SET device = xc4vlx60
+SET devicefamily = virtex4
+SET flowvendor = Synplicity
+SET formalverification = false
+SET foundationsym = false
+SET implementationfiletype = Ngc
+SET package = ff668
+SET removerpms = false
+SET simulationfiles = Behavioral
+SET speedgrade = -10
+SET verilogsim = false
+SET vhdlsim = true
+SET workingdirectory = ./tmp/
+
+# CRC: f2f7bf18

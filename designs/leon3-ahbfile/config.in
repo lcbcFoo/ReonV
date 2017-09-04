@@ -1,0 +1,34 @@
+# LEON3 configuration for ahbfile example design
+
+mainmenu_name "LEON3MP Design Configuration"
+
+mainmenu_option next_comment
+  comment 'Synthesis      '
+  source lib/techmap/gencomp/tech.in
+endmenu
+
+source lib/gaisler/leon3/leon3.in
+source lib/grlib/amba/amba.in
+
+mainmenu_option next_comment
+comment 'Peripherals             '
+
+  mainmenu_option next_comment
+  comment 'On-chip RAM/ROM                 '
+    source lib/gaisler/misc/ahbram.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'UARTs, timers and irq control         '
+    source lib/gaisler/uart/uart1.in
+    source lib/gaisler/irqmp/irqmp.in
+    source lib/gaisler/misc/gptimer.in
+    source lib/gaisler/misc/grgpio.in
+  endmenu
+
+endmenu
+
+mainmenu_option next_comment
+comment 'VHDL Debugging        '
+  source lib/grlib/util/debug.in
+endmenu

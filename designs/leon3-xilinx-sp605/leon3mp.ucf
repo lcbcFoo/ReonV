@@ -1,0 +1,262 @@
+CONFIG VCCAUX=2.5;
+CONFIG MCB_PERFORMANCE= EXTENDED;
+
+NET "clk27"  period = 37.000 ;
+NET "clk33"  period = 30.000 ;
+NET "clk200p" period = 5.000 ;
+
+NET "clk33" LOC = "N19" | IOSTANDARD = LVCMOS25;
+
+NET "clkm" 		TNM_NET = "clkm";
+NET "clk33"             TNM_NET = "clk33";
+
+TIMESPEC "TS_clkm_clk33" = FROM "clkm" TO "clk33" TIG;
+TIMESPEC "TS_clk33_clkm" = FROM "clk33" TO "clkm" TIG;
+
+# --- MIG37 ---
+NET "mig_gen.ddrc/MCB_inst/memc?_wrapper_inst/memc?_mcb_raw_wrapper_inst/selfrefresh_mcb_mode" TIG;
+NET "mig_gen.ddrc/MCB_inst/c?_pll_lock" TIG;
+#NET "mig_gen.ddrc/MCB_inst/memc?_wrapper_inst/memc?_mcb_raw_wrapper_inst/gen_term_calib.mcb_soft_calibration_top_inst/mcb_soft_calibration_inst/CKE_Train" TIG; ## This path exists for DDR2 only
+
+# --- MIG39 ---
+INST "mig_gen.ddrc/MCB_inst/memc?_wrapper_inst/memc?_mcb_raw_wrapper_inst/gen_term_calib.mcb_soft_calibration_top_inst/mcb_soft_calibration_inst/DONE_SOFTANDHARD_CAL*" TIG;
+
+NET "address(0)"  LOC = "n22"   | IOSTANDARD =LVCMOS25;
+NET "address(1)"  LOC = "n20" | IOSTANDARD =LVCMOS25;
+NET "address(2)"  LOC = "m22"  | IOSTANDARD =LVCMOS25;
+NET "address(3)"  LOC = "m21" | IOSTANDARD =LVCMOS25;
+NET "address(4)"  LOC = "l19"  | IOSTANDARD =LVCMOS25;
+NET "address(5)"  LOC = "k20" | IOSTANDARD =LVCMOS25;
+NET "address(6)"  LOC = "h22" | IOSTANDARD =LVCMOS25;
+NET "address(7)"  LOC = "h21"  | IOSTANDARD =LVCMOS25;
+NET "address(8)"  LOC = "l17" | IOSTANDARD =LVCMOS25;
+NET "address(9)"  LOC = "k17" | IOSTANDARD =LVCMOS25;
+NET "address(10)" LOC = "g22" | IOSTANDARD =LVCMOS25;
+NET "address(11)" LOC = "g20" | IOSTANDARD =LVCMOS25;
+NET "address(12)" LOC = "k18" | IOSTANDARD =LVCMOS25;
+NET "address(13)" LOC = "k19"  | IOSTANDARD =LVCMOS25;
+NET "address(14)" LOC = "h20"  | IOSTANDARD =LVCMOS25;
+NET "address(15)" LOC = "j19"  | IOSTANDARD =LVCMOS25;
+NET "address(16)" LOC = "e22"  | IOSTANDARD =LVCMOS25;
+NET "address(17)" LOC = "e20"  | IOSTANDARD =LVCMOS25;
+NET "address(18)" LOC = "f22"  | IOSTANDARD =LVCMOS25;
+NET "address(19)" LOC = "f21"  | IOSTANDARD =LVCMOS25;
+NET "address(20)" LOC = "h19"  | IOSTANDARD =LVCMOS25;
+NET "address(21)" LOC = "h18"  | IOSTANDARD =LVCMOS25;
+NET "address(22)" LOC = "f20"  | IOSTANDARD =LVCMOS25;
+NET "address(23)" LOC = "g19"  | IOSTANDARD =LVCMOS25;
+
+NET "data(0)" LOC = "aa20"  | IOSTANDARD =LVCMOS25;
+NET "data(1)" LOC = "r13"  | IOSTANDARD =LVCMOS25;
+NET "data(2)" LOC = "t14" | IOSTANDARD =LVCMOS25;
+NET "data(3)" LOC = "aa6"  | IOSTANDARD =LVCMOS25;
+NET "data(4)" LOC = "ab6" | IOSTANDARD =LVCMOS25;
+NET "data(5)" LOC = "y5" | IOSTANDARD =LVCMOS25;
+NET "data(6)" LOC = "AB5" | IOSTANDARD =LVCMOS25;
+NET "data(7)" LOC = "w9" | IOSTANDARD =LVCMOS25;
+NET "data(8)" LOC = "t7"  | IOSTANDARD =LVCMOS25;
+NET "data(9)" LOC = "u6"  | IOSTANDARD =LVCMOS25;
+NET "data(10)" LOC = "ab19" | IOSTANDARD =LVCMOS25;
+NET "data(11)" LOC = "aa18"  | IOSTANDARD =LVCMOS25;
+NET "data(12)" LOC = "ab18" | IOSTANDARD =LVCMOS25;
+NET "data(13)" LOC = "y13" | IOSTANDARD =LVCMOS25;
+NET "data(14)" LOC = "aa12" | IOSTANDARD =LVCMOS25;
+NET "data(15)" LOC = "ab12" | IOSTANDARD =LVCMOS25;
+
+NET "writen"   LOC = "r20"  | IOSTANDARD = LVCMOS25;
+NET "romsn"    LOC = "p21" | IOSTANDARD = LVCMOS25; # also used as pin M0
+NET "oen"      LOC = "p22"  | IOSTANDARD = LVCMOS25;
+
+NET "reset"      LOC = "h8" | IOSTANDARD = LVCMOS15;
+
+# DDR3 memory interface
+NET "ddr_dq(*)"     IN_TERM = NONE;       
+NET "ddr_dqs(*)"    IN_TERM = NONE; 
+NET "ddr_dqs_n(*)"    IN_TERM = NONE; 
+NET "ddr_dq(*)"    IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+
+#NET "ddr_ad(14)" LOC = "h5" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+#NET "ddr_ad(13)" LOC = "j6" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ad(12)" LOC = "f1" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ad(11)" LOC = "e1" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ad(10)" LOC = "j4" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ad(9)"  LOC = "g1" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ad(8)"  LOC = "g3" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ad(7)"  LOC = "k6" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ad(6)"  LOC = "l4" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ad(5)"  LOC = "m3" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ad(4)"  LOC = "h3" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ad(3)"  LOC = "m6" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ad(2)"  LOC = "k5" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ad(1)"  LOC = "k1" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ad(0)"  LOC = "k2" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+
+NET "ddr_ba(2)"  LOC = "h1" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ba(1)"  LOC = "j1" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ba(0)"  LOC = "j3" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+
+NET "ddr_cas"    LOC = "m4" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_cke"    LOC = "f2" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+
+NET "ddr_clk"    LOC = "k4" | IOSTANDARD = DIFF_SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_clkb"   LOC = "k3" | IOSTANDARD = DIFF_SSTL15_II | OUT_TERM = UNTUNED_50;
+
+NET "ddr_dm(1)"  LOC = "p3" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50; 
+NET "ddr_dm(0)"  LOC = "n4" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+
+NET  "ddr_dq(0)"                           LOC = "r3" ;
+NET  "ddr_dq(10)"                          LOC = "u3" ;
+NET  "ddr_dq(11)"                          LOC = "u1" ;
+NET  "ddr_dq(12)"                          LOC = "w3" ;
+NET  "ddr_dq(13)"                          LOC = "w1" ;
+NET  "ddr_dq(14)"                          LOC = "y2" ;
+NET  "ddr_dq(15)"                          LOC = "y1" ;
+NET  "ddr_dq(1)"                           LOC = "r1" ;
+NET  "ddr_dq(2)"                           LOC = "p2" ;
+NET  "ddr_dq(3)"                           LOC = "p1" ;
+NET  "ddr_dq(4)"                           LOC = "l3" ;
+NET  "ddr_dq(5)"                           LOC = "l1" ;
+NET  "ddr_dq(6)"                           LOC = "m2" ;
+NET  "ddr_dq(7)"                           LOC = "m1" ;
+NET  "ddr_dq(8)"                           LOC = "t2" ;
+NET  "ddr_dq(9)"                           LOC = "t1" ;
+
+NET "ddr_dqs_n(1)"   LOC = "v1" | IOSTANDARD = DIFF_SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_dqs_n(0)"   LOC = "n1" | IOSTANDARD = DIFF_SSTL15_II | OUT_TERM = UNTUNED_50;
+
+NET "ddr_dqs(1)"   LOC = "v2" | IOSTANDARD = DIFF_SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_dqs(0)"   LOC = "n3" | IOSTANDARD = DIFF_SSTL15_II | OUT_TERM = UNTUNED_50;
+
+NET "ddr_odt"      LOC = "l6" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_ras"      LOC = "m5" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET "ddr_we"       LOC = "h2" | IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+
+NET  "ddr_rzq"     LOC = "k7" |  IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET  "ddr_zio"     LOC = "m7" |  IOSTANDARD = SSTL15_II | OUT_TERM = UNTUNED_50;
+NET  "ddr_reset_n" LOC = "e3" | IOSTANDARD =LVCMOS15;
+
+NET "clk200p" LOC = "k21" | IOSTANDARD =LVDS_25;
+NET "clk200n" LOC = "k22" | IOSTANDARD =LVDS_25;
+
+NET phy_tx_data(*) TNM = gtxphypads;
+TIMESPEC "TSGTXOUT" = FROM "egtx_clk" TO "gtxphypads" 4.8 ns;
+NET phy_gtx_clk TNM = phy_gtx_clkpad;
+TIMESPEC "TSGTXOUT2" = FROM "egtx_clk" TO "phy_gtx_clkpad" 4.8 ns;
+
+NET "phy_rx_clk" PERIOD = 8.000 ;
+OFFSET = IN : 5.000 : BEFORE phy_rx_clk ;
+
+NET "phy_tx_clk" PERIOD = 40.000 ;
+OFFSET = OUT : 15.000 : AFTER phy_tx_clk ;
+OFFSET = IN : 8.000 : BEFORE phy_tx_clk ;
+
+NET "phy_tx_clk" MAXSKEW= 1.0 ns;
+NET "phy_rx_clk" MAXSKEW= 1.0 ns;
+#NET "egtx_clk" MAXSKEW= 1.0 ns;
+
+NET phy_col        LOC = m16 | IOSTANDARD = LVCMOS25;
+NET phy_crs        LOC = n15 | IOSTANDARD = LVCMOS25;
+NET phy_dv         LOC = t22 | IOSTANDARD = LVCMOS25;
+NET phy_rx_clk     LOC = p20 | IOSTANDARD = LVCMOS25;
+NET phy_rx_data(7) LOC = u22 | IOSTANDARD = LVCMOS25;
+NET phy_rx_data(6) LOC = v21 | IOSTANDARD = LVCMOS25;
+NET phy_rx_data(5) LOC = v22 | IOSTANDARD = LVCMOS25;
+NET phy_rx_data(4) LOC = w20 | IOSTANDARD = LVCMOS25;
+NET phy_rx_data(3) LOC = w22 | IOSTANDARD = LVCMOS25;
+NET phy_rx_data(2) LOC = y21 | IOSTANDARD = LVCMOS25;
+NET phy_rx_data(1) LOC = y22 | IOSTANDARD = LVCMOS25;
+NET phy_rx_data(0) LOC = p19 | IOSTANDARD = LVCMOS25;
+
+NET phy_rx_er      LOC = u20 | IOSTANDARD = LVCMOS25;
+NET phy_tx_clk     LOC = l20 | IOSTANDARD = LVCMOS25;
+NET phy_mii_clk    LOC = r19 | SLEW=SLOW | IOSTANDARD = LVCMOS25;
+NET phy_mii_int_n  LOC = j20 | IOSTANDARD = LVCMOS25;
+NET phy_rst_n      LOC = j22 | SLEW=SLOW | IOSTANDARD = LVCMOS25;
+NET phy_tx_data(7) LOC = w12 | IOSTANDARD = LVCMOS25;
+NET phy_tx_data(6) LOC = y12 | IOSTANDARD = LVCMOS25;
+NET phy_tx_data(5) LOC = y9  | IOSTANDARD = LVCMOS25;
+NET phy_tx_data(4) LOC = ab9 | IOSTANDARD = LVCMOS25;
+NET phy_tx_data(3) LOC = aa8 | IOSTANDARD = LVCMOS25;
+NET phy_tx_data(2) LOC = ab8 | IOSTANDARD = LVCMOS25;
+NET phy_tx_data(1) LOC = t10 | IOSTANDARD = LVCMOS25;
+NET phy_tx_data(0) LOC = u10 | IOSTANDARD = LVCMOS25;
+NET phy_tx_en      LOC = t8  | IOSTANDARD = LVCMOS25;
+NET phy_tx_er      LOC = u8  | IOSTANDARD = LVCMOS25;
+NET phy_gtx_clk    LOC = ab7 | IOSTANDARD = LVCMOS25;
+NET phy_mii_data   LOC = v20 | SLEW=SLOW | IOSTANDARD = LVCMOS25;
+
+
+# I2C interface connecting to CH7301C Graphics chip
+NET "dvi_iic_scl" LOC = "w13" | IOSTANDARD = LVCMOS25;
+NET "dvi_iic_sda" LOC = "aa4" | IOSTANDARD = LVCMOS25;
+#
+#NET "main_scl" LOC = "t21" | IOSTANDARD = LVCMOS25;
+#NET "main_sda" LOC = "r22" | IOSTANDARD = LVCMOS25;
+#NET "sfp_scl" LOC = "e5" | IOSTANDARD = LVCMOS25;
+#NET "sfp_sda" LOC = "e6" | IOSTANDARD = LVCMOS25;
+#
+#
+NET "tft_lcd_clk_n"    LOC = "c22" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_clk_p"    LOC = "c20" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_data(11)" LOC = "r17" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_data(10)" LOC = "p18" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_data(9)"  LOC = "p17" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_data(8)"  LOC = "r16" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_data(7)"  LOC = "r15" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_data(6)"  LOC = "m18" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_data(5)"  LOC = "m17" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_data(4)"  LOC = "p16" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_data(3)"  LOC = "n16" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_data(2)"  LOC = "t20" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_data(1)"  LOC = "u19" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_data(0)"  LOC = "k16" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_de"       LOC = "j17" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_hsync"    LOC = "j16" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_reset_b"  LOC = "l15" | IOSTANDARD = LVCMOS25;
+NET "tft_lcd_vsync"    LOC = "b22" | IOSTANDARD = LVCMOS25;
+
+NET "rxd1"       LOC = "h17" | IOSTANDARD = LVCMOS25;
+NET "txd1"       LOC = "b21" | IOSTANDARD = LVCMOS25;
+NET "ctsn1"      LOC = "f19" | IOSTANDARD = LVCMOS25;
+NET "rtsn1"      LOC = "f18" | IOSTANDARD = LVCMOS25;
+
+
+NET "spi_sel_n" LOC = "aa3"   | IOSTANDARD = LVCMOS25;
+NET "spi_clk"   LOC = "y20"  | IOSTANDARD = LVCMOS25;
+NET "spi_mosi"  LOC = "ab20" | IOSTANDARD = LVCMOS25;
+
+
+NET "switch(3)" LOC = "e4" | IOSTANDARD = LVCMOS15; # DIP switch s2-4
+NET "switch(2)" LOC = "w6" | IOSTANDARD = LVCMOS25; # DIP switch s2-3
+NET "switch(1)" LOC = "y6" | IOSTANDARD = LVCMOS25; # DIP switch s2-2
+NET "switch(0)" LOC = "c18" | IOSTANDARD = LVCMOS25; # DIP switch s2-1
+NET "button(0)" LOC = "f3" | IOSTANDARD = LVCMOS15;
+NET "button(1)" LOC = "g6" | IOSTANDARD = LVCMOS15;
+NET "button(2)" LOC = "f5" | IOSTANDARD = LVCMOS15;
+NET "button(3)" LOC = "c1" | IOSTANDARD = LVCMOS15;
+
+NET "led(3)" LOC = "w15" | IOSTANDARD = LVCMOS25;
+NET "led(2)" LOC = "d21" | IOSTANDARD = LVCMOS25;
+NET "led(1)" LOC = "ab4" | IOSTANDARD = LVCMOS25; # normally used for ERRORN
+NET "led(0)" LOC = "d17" | IOSTANDARD = LVCMOS25; # normally used for DSUACT
+
+NET "sysace_mpa(6)" LOC = "D2" | IOSTANDARD = LVCMOS15;
+NET "sysace_mpa(5)" LOC = "G4" | IOSTANDARD = LVCMOS15;
+NET "sysace_mpa(4)" LOC = "H4" | IOSTANDARD = LVCMOS15;
+NET "sysace_mpa(3)" LOC = "P4" | IOSTANDARD = LVCMOS15;
+NET "sysace_mpa(2)" LOC = "P5" | IOSTANDARD = LVCMOS15;
+NET "sysace_mpa(1)" LOC = "V3" | IOSTANDARD = LVCMOS15;
+NET "sysace_mpa(0)" LOC = "V5" | IOSTANDARD = LVCMOS15;
+NET "sysace_mpce" LOC = "W4" | IOSTANDARD = LVCMOS15;
+NET "sysace_mpirq" LOC = "AA2" | IOSTANDARD = LVCMOS15;
+NET "sysace_mpoe" LOC = "T6" | IOSTANDARD = LVCMOS15;
+NET "sysace_mpwe" LOC = "T5" | IOSTANDARD = LVCMOS15;
+NET "sysace_d(7)" LOC = "R4" | IOSTANDARD = LVCMOS15;
+NET "sysace_d(6)" LOC = "T3" | IOSTANDARD = LVCMOS15;
+NET "sysace_d(5)" LOC = "P7" | IOSTANDARD = LVCMOS15;
+NET "sysace_d(4)" LOC = "P6" | IOSTANDARD = LVCMOS15;
+NET "sysace_d(3)" LOC = "T4" | IOSTANDARD = LVCMOS15;
+NET "sysace_d(2)" LOC = "U4" | IOSTANDARD = LVCMOS15;
+NET "sysace_d(1)" LOC = "N7" | IOSTANDARD = LVCMOS15;
+NET "sysace_d(0)" LOC = "N6" | IOSTANDARD = LVCMOS15;
+

@@ -1,0 +1,2 @@
+sdram
+ddr_sdram

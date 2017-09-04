@@ -1,0 +1,42 @@
+##############################################################
+#
+# Xilinx Core Generator version 13.1
+# Date: Mon Sep 26 14:00:46 2011
+#
+##############################################################
+#
+#  This file contains the customisation parameters for a
+#  Xilinx CORE Generator IP GUI. It is strongly recommended
+#  that you do not manually alter this file as it may cause
+#  unexpected and unsupported behavior.
+#
+##############################################################
+#
+# BEGIN Project Options
+SET addpads = false
+SET asysymbol = true
+SET busformat = BusFormatParenNotRipped
+SET createndf = false
+SET designentry = VHDL
+SET device = xc5vlx50
+SET devicefamily = virtex5
+SET flowvendor = Synplicity
+SET formalverification = false
+SET foundationsym = false
+SET implementationfiletype = Ngc
+SET package = ff676
+SET removerpms = false
+SET simulationfiles = Behavioral
+SET speedgrade = -1
+SET verilogsim = false
+SET vhdlsim = true
+# END Project Options
+# BEGIN Select
+SELECT MIG xilinx.com:ip:mig:3.61
+# END Select
+# BEGIN Parameters
+CSET component_name=mig_36_1
+CSET xml_input_file=mig.prj
+# END Parameters
+GENERATE
+# CRC: 9f97911c

@@ -1,0 +1,30 @@
+--- /home/anandhavel/mig.v	2013-10-25 20:00:01.000000000 +0200
++++ mig/user_design/rtl/ip_top/mig.v	2013-10-25 20:02:02.115036358 +0200
+@@ -250,7 +250,8 @@
+    output                               clk100,
+    output                               phy_init_done,
+ 
+-   input                                sys_rst   // System reset
++   input                                sys_rst_13,   // System reset
++   input                                sys_rst_14   // System reset
+    );
+ 
+ 
+@@ -404,7 +405,7 @@
+        .clk_ref_p        (clk_ref_p),
+        .clk_ref_n        (clk_ref_n),
+        .clk_ref          (clk_ref),
+-       .sys_rst          (sys_rst),
++       .sys_rst          (sys_rst_14),
+        .clk_200          (clk_200),    // ML605 200MHz clock from BUFG to MMCM CLKIN1
+        .iodelay_ctrl_rdy (iodelay_ctrl_rdy)
+        );
+@@ -444,7 +445,7 @@
+        .clk_100          (clk100),
+        .rstdiv0          (rst),
+        .mmcm_clk         (clk_200),    // ML605 single input clock 200MHz from "iodelay_ctrl"
+-       .sys_rst          (sys_rst),
++       .sys_rst          (sys_rst_14),
+        .iodelay_ctrl_rdy (iodelay_ctrl_rdy),
+        .PSDONE           (pd_PSDONE),
+        .PSEN             (pd_PSEN),

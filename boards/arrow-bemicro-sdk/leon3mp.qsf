@@ -1,0 +1,374 @@
+set_global_assignment -name FAMILY "Cyclone IV E"
+set_global_assignment -name DEVICE EP4CE22F17C7
+set_global_assignment -name DEVICE_FILTER_PACKAGE FBGA
+set_global_assignment -name DEVICE_FILTER_PIN_COUNT 256
+set_global_assignment -name DEVICE_FILTER_SPEED_GRADE 7
+set_global_assignment -name NUM_PARALLEL_PROCESSORS 2
+set_global_assignment -name SDC_FILE quartus.sdc
+set_global_assignment -name CYCLONEII_RESERVE_NCEO_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_FLASH_NCE_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_DATA0_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_DATA1_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_DCLK_AFTER_CONFIGURATION "USE AS REGULAR IO"
+
+
+# PIN LOCATION ASSIGNMENTS
+set_location_assignment PIN_T4 -to TEMP_SC
+set_location_assignment PIN_R6 -to TEMP_CS_N
+set_location_assignment PIN_L15 -to P[57]
+set_location_assignment PIN_L14 -to P[56]
+set_location_assignment PIN_N12 -to P[55]
+set_location_assignment PIN_P14 -to P[54]
+set_location_assignment PIN_N11 -to P[53]
+set_location_assignment PIN_T11 -to P[52]
+set_location_assignment PIN_J2 -to P[51]
+set_location_assignment PIN_N2 -to P[50]
+set_location_assignment PIN_N3 -to P[49]
+set_location_assignment PIN_R16 -to P[48]
+set_location_assignment PIN_L1 -to P[47]
+set_location_assignment PIN_N16 -to P[46]
+set_location_assignment PIN_F3 -to P[45]
+set_location_assignment PIN_G5 -to P[44]
+set_location_assignment PIN_R7 -to CPU_RST_N
+set_location_assignment PIN_C2 -to PBSW_N
+set_location_assignment PIN_T3 -to RESET_EXP_N
+set_location_assignment PIN_R13 -to RECONFIG_SW[2]
+set_location_assignment PIN_T14 -to RECONFIG_SW[1]
+set_location_assignment PIN_T9 -to P[1]
+set_location_assignment PIN_R9 -to P[2]
+set_location_assignment PIN_R3 -to P[3]
+set_location_assignment PIN_P8 -to P[4]
+set_location_assignment PIN_P1 -to P[5]
+set_location_assignment PIN_R4 -to SD_CLK
+set_location_assignment PIN_P2 -to P[7]
+set_location_assignment PIN_N6 -to P[8]
+set_location_assignment PIN_R1 -to P[9]
+set_location_assignment PIN_N5 -to P[10]
+set_location_assignment PIN_K1 -to P[11]
+set_location_assignment PIN_K2 -to P[12]
+set_location_assignment PIN_P11 -to P[13]
+set_location_assignment PIN_L2 -to P[14]
+set_location_assignment PIN_P16 -to P[15]
+set_location_assignment PIN_P3 -to P[16]
+set_location_assignment PIN_N1 -to P[17]
+set_location_assignment PIN_L4 -to P[18]
+set_location_assignment PIN_L3 -to P[19]
+set_location_assignment PIN_J1 -to P[20]
+set_location_assignment PIN_T10 -to P[21]
+set_location_assignment PIN_G2 -to P[22]
+set_location_assignment PIN_G1 -to P[23]
+set_location_assignment PIN_R12 -to SD_DAT3
+set_location_assignment PIN_N14 -to P[24]
+set_location_assignment PIN_F1 -to P[25]
+set_location_assignment PIN_T8 -to P[35]
+set_location_assignment PIN_R8 -to P[36]
+set_location_assignment PIN_P6 -to P[37]
+set_location_assignment PIN_N8 -to P[38]
+set_location_assignment PIN_M7 -to P[39]
+set_location_assignment PIN_L8 -to P[40]
+set_location_assignment PIN_T15 -to MDIO
+set_location_assignment PIN_M6 -to P[42]
+set_location_assignment PIN_T12 -to SD_CMD
+set_location_assignment PIN_T13 -to SD_DAT2
+set_location_assignment PIN_T6 -to SD_DAT1
+set_location_assignment PIN_N9 -to EXP_PRESENT
+set_location_assignment PIN_R11 -to SD_DAT0
+set_location_assignment PIN_R14 -to MDC
+set_location_assignment PIN_F14 -to ETH_RESET_N
+set_location_assignment PIN_C16 -to RX_ER
+set_location_assignment PIN_G16 -to TXD[0]
+set_location_assignment PIN_J16 -to TXD[1]
+set_location_assignment PIN_J15 -to TXD[2]
+set_location_assignment PIN_K16 -to TXD[3]
+set_location_assignment PIN_M8 -to P[6]
+set_location_assignment PIN_L7 -to P[41]
+set_location_assignment PIN_B16 -to RX_DV
+set_location_assignment PIN_G15 -to TX_EN
+set_location_assignment PIN_D15 -to ETH_COL
+set_location_assignment PIN_C15 -to ETH_CRS
+set_location_assignment PIN_D16 -to RXD[0]
+set_location_assignment PIN_F15 -to RXD[1]
+set_location_assignment PIN_F16 -to RXD[2]
+set_location_assignment PIN_F13 -to RXD[3]
+set_location_assignment PIN_T2 -to P[43]
+set_location_assignment PIN_L16 -to P[26]
+set_location_assignment PIN_N15 -to F_LED[0]
+set_location_assignment PIN_K5 -to F_LED[1]
+set_location_assignment PIN_P9 -to F_LED[2]
+set_location_assignment PIN_P15 -to F_LED[3]
+set_location_assignment PIN_R10 -to F_LED[4]
+set_location_assignment PIN_L13 -to F_LED[5]
+set_location_assignment PIN_D1 -to F_LED[6]
+set_location_assignment PIN_B1 -to F_LED[7]
+set_location_assignment PIN_B3 -to RAM_A[0]
+set_location_assignment PIN_C3 -to RAM_A[1]
+set_location_assignment PIN_B4 -to RAM_A[2]
+set_location_assignment PIN_F8 -to RAM_A[3]
+set_location_assignment PIN_D11 -to RAM_A[4]
+set_location_assignment PIN_C9 -to RAM_D[0]
+set_location_assignment PIN_D12 -to RAM_A[5]
+set_location_assignment PIN_B14 -to RAM_A[6]
+set_location_assignment PIN_A13 -to RAM_A[7]
+set_location_assignment PIN_E11 -to RAM_A[8]
+set_location_assignment PIN_A10 -to RAM_D[1]
+set_location_assignment PIN_B10 -to RAM_D[2]
+set_location_assignment PIN_A11 -to RAM_D[3]
+set_location_assignment PIN_B12 -to RAM_D[4]
+set_location_assignment PIN_D6 -to RAM_A[10]
+set_location_assignment PIN_E10 -to RAM_A[11]
+set_location_assignment PIN_B11 -to RAM_D[5]
+set_location_assignment PIN_B13 -to RAM_D[6]
+set_location_assignment PIN_A12 -to RAM_D[7]
+set_location_assignment PIN_D9 -to RAM_DM[0] #RAM_LDM
+set_location_assignment PIN_F9 -to RAM_A[12]
+set_location_assignment PIN_C8 -to RAM_DQS[0] #RAM_LDQS
+set_location_assignment PIN_D8 -to RAM_A[13]
+set_location_assignment PIN_E8 -to RAM_D[8]
+set_location_assignment PIN_D3 -to RAM_BA[1]
+set_location_assignment PIN_E7 -to RAM_D[9]
+set_location_assignment PIN_E6 -to RAM_D[10]
+set_location_assignment PIN_C6 -to RAM_CS_N
+set_location_assignment PIN_A6 -to RAM_DQS[1] #RAM_UDQS
+set_location_assignment PIN_A7 -to RAM_D[11]
+set_location_assignment PIN_B7 -to RAM_D[12]
+set_location_assignment PIN_B6 -to RAM_D[13]
+set_location_assignment PIN_B5 -to RAM_D[14]
+set_location_assignment PIN_A5 -to RAM_D[15]
+set_location_assignment PIN_D5 -to RAM_BA[0]
+set_location_assignment PIN_A4 -to RAM_DM[1] #RAM_UDM
+set_location_assignment PIN_E9 -to RAM_CKE
+set_location_assignment PIN_A2 -to RAM_CK_N
+set_location_assignment PIN_A3 -to RAM_CK_P
+set_location_assignment PIN_A14 -to RAM_A[9]
+set_location_assignment PIN_C14 -to RAM_WS_N
+set_location_assignment PIN_D14 -to RAM_CAS_N
+set_location_assignment PIN_A15 -to RAM_RAS_N
+set_location_assignment PIN_E1 -to CLK_FPGA_50M
+set_location_assignment PIN_E16 -to TX_CLK
+set_location_assignment PIN_E15 -to RX_CLK
+set_location_assignment PIN_R5 -to TEMP_SIO
+set_location_assignment PIN_T5 -to TEMP_UNUSED
+set_location_assignment PIN_F2 -to P[27]
+set_location_assignment PIN_J13 -to P[28]
+set_location_assignment PIN_M10 -to P[29]
+set_location_assignment PIN_K15 -to P[58]
+set_location_assignment PIN_J14 -to P[59]
+set_location_assignment PIN_T7 -to P[60]
+set_location_assignment PIN_H2 -to EPCS_DATA
+set_location_assignment PIN_H1 -to EPCS_DCLK
+set_location_assignment PIN_D2 -to EPCS_CSn
+set_location_assignment PIN_C1 -to EPCS_ASDI
+
+
+# PIN I/O STANDARDS
+set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[0]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[1]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[2]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[3]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[4]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[5]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[6]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[7]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[8]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[9]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[10]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[11]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[12]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_A[13]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_BA[0]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_BA[1]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_CAS_N
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_CK_N
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_CK_P
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_CKE
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_CS_N
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[0]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[1]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[2]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[3]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[4]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[5]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[6]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[7]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[8]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[9]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[10]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[11]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[12]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[13]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[14]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_D[15]
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_DM[0] #RAM_LDM
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_DQS[0] #RAM_LDQS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_RAS_N
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_DM[1] #RAM_UDM
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_DQS[1] #RAM_UDQS
+set_instance_assignment -name IO_STANDARD "1.8 V" -to RAM_WS_N
+
+
+# THE PINS THAT ARE ON THE BEMICRO SDK, BUT ARE NOT USED IN THIS DESIGN
+#set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to ETH_COL
+#set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to ETH_CRS
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to ETH_RESET_N
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING VCC" -to MDC
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to MDIO
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[0]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[1]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[2]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[3]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[4]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[5]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[6]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[7]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[8]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[9]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[10]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[11]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[12]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_A[13]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_BA[0]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_BA[1]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_CAS_N
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_CKE
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_CK_N
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_CK_P
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_CS_N
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[0]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[1]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[2]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[3]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[4]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[5]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[6]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[7]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[8]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[9]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[10]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[11]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[12]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[13]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[14]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_D[15]
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_DQS[0] #RAM_LDQS
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to RAM_DQS[1] #RAM_UDQS
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_DM[0] #RAM_LDM
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_RAS_N
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_DM[1] #RAM_UDM
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to RAM_WS_N
+#set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to RXD[0]
+#set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to RXD[1]
+#set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to RXD[2]
+#set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to RXD[3]
+#set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to RX_CLK
+#set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to RX_DV
+#set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to RX_ER
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to SD_CLK
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to SD_CMD
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to SD_DAT0
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to SD_DAT1
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to SD_DAT2
+#set_instance_assignment -name RESERVE_PIN "AS BIDIRECTIONAL" -to SD_DAT3
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to TXD[0]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to TXD[1]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to TXD[2]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to TXD[3]
+#set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to TX_EN
+#set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to TX_CLK
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to TEMP_UNUSED
+
+
+# Expansion connector
+set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING VCC" -to RESET_EXP_N
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to EXP_PRESENT
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[1]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[3]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[2]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[4]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[5]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[6]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[7]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[8]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[9]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[10]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[11]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[13]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[12]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[14]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[15]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[16]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[17]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[18]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[19]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[20]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[21]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[22]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[23]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[24]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[25]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[26]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[27]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[28]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[29]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[35]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[36]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[37]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[38]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[39]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[40]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[41]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[42]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[43]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[44]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[45]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[46]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[47]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[48]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[49]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[50]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[51]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[52]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[53]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[54]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[55]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[56]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[57]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[58]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[59]
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to P[60]
+
+# SET UP SOME OF THE CONFIGURATION PIN OPTIONS
+set_global_assignment -name CYCLONEII_RESERVE_NCEO_AFTER_CONFIGURATION "USE AS REGULAR IO"
+#set_global_assignment -name STRATIXIII_UPDATE_MODE REMOTE
+
+
+
+set_global_assignment -name GENERATE_TTF_FILE ON
+set_global_assignment -name ON_CHIP_BITSTREAM_DECOMPRESSION OFF
+set_global_assignment -name RESERVE_DATA0_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_DATA1_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_DATA7_THROUGH_DATA2_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_FLASH_NCE_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_OTHER_AP_PINS_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name CYCLONEII_RESERVE_NCEO_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_global_assignment -name OPTIMIZE_FAST_CORNER_TIMING ON
+
+set_global_assignment -name FMAX_REQUIREMENT "50.0 MHz"
+
+set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
+set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_DUPLICATION ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_ASYNCHRONOUS_SIGNAL_PIPELINING ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_RETIMING ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT EXTRA
+set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC_FOR_AREA ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_MAP_LOGIC_TO_MEMORY_FOR_AREA ON
+set_global_assignment -name ADV_NETLIST_OPT_SYNTH_WYSIWYG_REMAP ON
+set_global_assignment -name ADV_NETLIST_OPT_SYNTH_GATE_RETIME ON
+set_global_assignment -name CYCLONEII_OPTIMIZATION_TECHNIQUE AREA
+set_global_assignment -name OPTIMIZE_HOLD_TIMING "ALL PATHS"
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
+set_global_assignment -name ALLOW_SYNCH_CTRL_USAGE OFF
+

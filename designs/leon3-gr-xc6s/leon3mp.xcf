@@ -1,0 +1,30 @@
+
+NET "clk" TNM_NET = "clk";
+TIMESPEC "TS_clk" = PERIOD "clk" 20.00 ns HIGH 50 %;
+
+NET "clkm" TNM_NET = "clkm";
+TIMESPEC "TS_clkm" = PERIOD "clkm" 12.50 ns HIGH 50 %;
+
+NET "video_clk" TNM_NET = "video_clk";
+TIMESPEC "TS_video_clk" = PERIOD "video_clk" 20.00 ns HIGH 50 %;
+TIMESPEC "TS_clkm_videoclk" = FROM "clkm" TO "video_clk" TIG;
+TIMESPEC "TS_videoclk_clkm" = FROM "video_clk" TO "clkm" TIG;
+
+NET "rgmii0?tx_clk" TNM_NET = "rgmii0_tx_clk";
+TIMESPEC "TS_clkm_rgmii0_tx_clk" = FROM "clkm" TO "rgmii0_tx_clk" TIG;
+TIMESPEC "TS_rgmii0_tx_clk_clkm" = FROM "rgmii0_tx_clk" TO "clkm" TIG;
+TIMESPEC "TS_tx_clk_freq" = PERIOD rgmii0_tx_clk 8.00 ns;
+
+NET "clk50" TNM_NET = "clk50";
+TIMESPEC "TS_clk50" = PERIOD "clk" 20.00 ns HIGH 50 %;
+
+#NET "clk125" TNM_NET = "clk";
+#TIMESPEC "TS_clk125" = PERIOD "clk" 8.00 ns HIGH 50 %;
+
+NET "erx_clk" TNM_NET = "clk";
+TIMESPEC "TS_erx_clk" = PERIOD "clk" 8.00 ns HIGH 50 %;
+
+NET usb_clk period = 16.667;
+OFFSET = out : 10.000 : AFTER usb_clk ;
+OFFSET = in : 8.000 : BEFORE usb_clk ;
+

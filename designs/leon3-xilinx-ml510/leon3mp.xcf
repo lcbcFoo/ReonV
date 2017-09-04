@@ -1,0 +1,27 @@
+NET "clkm"              TNM_NET = "clkm";
+
+############################################################################
+# Enable these if you run the DDR2 controller unsynchronized from AHB clock
+#NET "clkml0"             TNM_NET = "clkml0";
+#NET "clkml1"             TNM_NET = "clkml1";
+#TIMESPEC "TS_clkm_clkml0" = FROM "clkm" TO "clkml0" TIG;
+#TIMESPEC "TS_clkm_clkml1" = FROM "clkm" TO "clkml1" TIG;
+#TIMESPEC "TS_clkml_clkm0" = FROM "clkml0" TO "clkm" TIG;
+#TIMESPEC "TS_clkml_clkm1" = FROM "clkml1" TO "clkm" TIG;
+############################################################################
+
+#NET "lock"  TIG;
+
+#NET phy_tx_data(*) TNM = gtxphypads;
+#NET "egtx_clk"  TNM_NET = "egtx_clk";
+#TIMESPEC "TS_clkm_egtx_clk" = FROM "clkm" TO "egtx_clk" TIG;
+#TIMESPEC "TS_egtx_clk_clkm" = FROM "egtx_clk" TO "clkm" TIG;
+#TIMESPEC "TSGTXOUT" = FROM "egtx_clk" TO "gtxphypads" 4.3 ns;
+#TIMESPEC "TSGRXIN" = FROM "gtxphypads" TO "eth1_e1_m1000_u0_rxclk" 10 ns;
+
+NET user_clksys period = 10.000 ;
+
+NET "sgmii_refclk" PERIOD = 8.000;
+
+#NET "ddrsp0.ddrc0/ddr_phy0/ddr_phy0/xc4v.ddr_phy0/mclkfx TNM_NET mclkfx
+

@@ -1,0 +1,18 @@
+--- ./mig/user_design/rtl/ip_top/iodelay_ctrl.v	2012-12-18 14:40:25.000000000 +0100
++++ ./mig_patch/p/a/t/c/h/mig_design/iodelay_ctrl.v	2012-12-17 07:40:31.662595674 +0100
+@@ -92,6 +92,7 @@
+    input  clk_ref_n,
+    input  clk_ref,
+    input  sys_rst,
++   output clk_200,         // single 200MHz clock for ML605
+    output iodelay_ctrl_rdy
+    );
+ 
+@@ -159,6 +160,7 @@
+      .O (clk_ref_bufg),
+      .I (clk_ref_ibufg)
+      );
++ assign clk_200 = clk_ref_bufg; // ML605 single 200MHz clock source
+ 
+   //*****************************************************************
+   // IDELAYCTRL reset

@@ -1,0 +1,195 @@
+
+NET "clk_ref_p" TNM_NET = TNM_clk_ref;
+TIMESPEC "TS_clk_ref" = PERIOD "TNM_clk_ref" 5 ns ;
+
+NET "reset" IOSTANDARD = SSTL15;
+NET "reset" LOC = "H10";
+NET "errorn" LOC = "AD24";
+
+NET "address(0)"                      LOC = "AL8";    ## 29 on U4, A1 on U27
+NET "address(1)"                      LOC = "AK8";    ## 25 on U4, B1 on U27
+NET "address(2)"                      LOC = "AC9";    ## 24 on U4, C1 on U27
+NET "address(3)"                      LOC = "AD10";   ## 23 on U4, D1 on U27
+NET "address(4)"                      LOC = "C8";     ## 22 on U4, D2 on U27
+NET "address(5)"                      LOC = "B8";     ## 21 on U4, A2 on U27
+NET "address(6)"                      LOC = "E9";     ## 20 on U4, C2 on U27
+NET "address(7)"                      LOC = "E8";     ## 19 on U4, A3 on U27
+NET "address(8)"                      LOC = "A8";     ## 8  on U4, B3 on U27
+NET "address(9)"                      LOC = "A9";     ## 7  on U4, C3 on U27
+NET "address(10)"                     LOC = "D9";     ## 6  on U4, D3 on U27
+NET "address(11)"                     LOC = "C9";     ## 5  on U4, C4 on U27
+NET "address(12)"                     LOC = "D10";    ## 4  on U4, A5 on U27
+NET "address(13)"                     LOC = "C10";    ## 3  on U4, B5 on U27
+NET "address(14)"                     LOC = "F10";    ## 2  on U4, C5 on U27
+NET "address(15)"                     LOC = "F9";     ## 1  on U4, D7 on U27
+NET "address(16)"                     LOC = "AH8";    ## 55 on U4, D8 on U27
+NET "address(17)"                     LOC = "AG8";    ## 18 on U4, A7 on U27
+NET "address(18)"                     LOC = "AP9";    ## 17 on U4, B7 on U27
+NET "address(19)"                     LOC = "AN9";    ## 16 on U4, C7 on U27
+NET "address(20)"                     LOC = "AF10";   ## 11 on U4, C8 on U27
+NET "address(21)"                     LOC = "AF9";    ## 10 on U4, A8 on U27
+NET "address(22)"                     LOC = "AL9";    ## 9  on U4, G1 on U27
+NET "address(23)"                     LOC = "AA23";   ## 26 on U4
+NET "data(0)"                      LOC = "AF24";   ## 34 on U4, F2 on U27
+NET "data(1)"                      LOC = "AF25";   ## 36 on U4, E2 on U27
+NET "data(2)"                      LOC = "W24";    ## 39 on U4, G3 on U27
+NET "data(3)"                      LOC = "V24";    ## 41 on U4, E4 on U27
+NET "data(4)"                      LOC = "H24";    ## 47 on U4, E5 on U27
+NET "data(5)"                      LOC = "H25";    ## 49 on U4, G5 on U27
+NET "data(6)"                      LOC = "P24";    ## 51 on U4, G6 on U27
+NET "data(7)"                      LOC = "R24";    ## 53 on U4, H7 on U27
+NET "data(8)"                      LOC = "G23";    ## 35 on U4, E1 on U27
+NET "data(9)"                      LOC = "H23";    ## 37 on U4, E3 on U27
+NET "data(10)"                     LOC = "N24";    ## 40 on U4, F3 on U27
+NET "data(11)"                     LOC = "N23";    ## 42 on U4, F4 on U27
+NET "data(12)"                     LOC = "F23";    ## 48 on U4, F5 on U27
+NET "data(13)"                     LOC = "F24";    ## 50 on U4, H5 on U27
+NET "data(14)"                     LOC = "L24";    ## 52 on U4, G7 on U27
+NET "data(15)"                     LOC = "M23";    ## 54 on U4, E7 on U27
+#NET "FLASH_WAIT"                    LOC = "J26";    ## 56 on U4
+NET "writen"                    LOC = "AF23";   ## 14 on U4, G8 on U27
+NET "oen"                    LOC = "AA24";   ## 32 on U4, F8 on U27
+#NET "FPGA_CCLK"                     LOC = "K8";     ##           F1 on U27
+NET "alatch"                 LOC = "AC23";   ##           H1 on U27
+NET "romsn"                    LOC = "Y24";    ## 30 on U4, B4 on U27 (U10 and switch S2.2 setting select either U4 or U27)
+##
+
+NET "erx_col"                       LOC = "AK13";   ## 114 on U80
+NET "erx_crs"                       LOC = "AL13";   ## 115 on U80
+NET "emdint"                       LOC = "AH14";   ## 32  on U80
+NET "emdc"                       LOC = "AP14";   ## 35  on U80
+NET "emdio"                      LOC = "AN14";   ## 33  on U80
+NET "erstn"                     LOC = "AH13";   ## 36  on U80
+NET "erx_clk"                     LOC = "AP11";   ## 7   on U80
+NET "erx_dv"                LOC = "AM13";   ## 4   on U80
+NET "erxd(0)"                      LOC = "AN13";   ## 3   on U80
+NET "erxd(1)"                      LOC = "AF14";   ## 128 on U80
+NET "erxd(2)"                      LOC = "AE14";   ## 126 on U80
+NET "erxd(3)"                      LOC = "AN12";   ## 125 on U80
+NET "erxd(4)"                      LOC = "AM12";   ## 124 on U80
+NET "erxd(5)"                      LOC = "AD11";   ## 123 on U80
+NET "erxd(6)"                      LOC = "AC12";   ## 121 on U80
+NET "erxd(7)"                      LOC = "AC13";   ## 120 on U80
+NET "erx_er"                      LOC = "AG12";   ## 9   on U80
+NET "etx_clk"                     LOC = "AD12";   ## 10  on U80
+NET "etx_en"                LOC = "AJ10";   ## 16  on U80
+NET "egtx_clk"                LOC = "AH12";   ## 14  on U80
+NET "etxd(0)"                      LOC = "AM11";   ## 18  on U80
+NET "etxd(1)"                      LOC = "AL11";   ## 19  on U80
+NET "etxd(2)"                      LOC = "AG10";   ## 20  on U80
+NET "etxd(3)"                      LOC = "AG11";   ## 24  on U80
+NET "etxd(4)"                      LOC = "AL10";   ## 25  on U80
+NET "etxd(5)"                      LOC = "AM10";   ## 26  on U80
+NET "etxd(6)"                      LOC = "AE11";   ## 28  on U80
+NET "etxd(7)"                      LOC = "AF11";   ## 29  on U80
+NET "etx_er"                      LOC = "AH10";   ## 13  on U80
+
+NET "dsurx"                      LOC = "J24";    ## 24  on U34
+NET "dsutx"                      LOC = "J25";    ## 25  on U34
+
+#NET "GPIO_DIP_SW1"                  LOC = "D22";    ## 1   on SW1 DIP switch (active-high)
+#NET "GPIO_DIP_SW2"                  LOC = "C22";    ## 2   on SW1 DIP switch (active-high)
+#NET "GPIO_DIP_SW3"                  LOC = "L21";    ## 3   on SW1 DIP switch (active-high)
+#NET "GPIO_DIP_SW4"                  LOC = "L20";    ## 4   on SW1 DIP switch (active-high)
+#NET "GPIO_DIP_SW5"                  LOC = "C18";    ## 5   on SW1 DIP switch (active-high)
+NET "dsubre"                  LOC = "B18";    ## 6   on SW1 DIP switch (active-high)
+#NET "GPIO_DIP_SW7"                  LOC = "K22";    ## 7   on SW1 DIP switch (active-high)
+#NET "GPIO_DIP_SW8"                  LOC = "K21";    ## 8   on SW1 DIP switch (active-high)
+##
+
+NET "led(0)"                    LOC = "AC22";   ## 2   on LED DS12, 1 on J62
+NET "led(1)"                    LOC = "AC24";   ## 2   on LED DS11, 2 on J62
+NET "led(2)"                    LOC = "AE22";   ## 2   on LED DS9,  3 on J62
+NET "led(3)"                    LOC = "AE23";   ## 2   on LED DS10, 4 on J62
+NET "led(4)"                    LOC = "AB23";   ## 2   on LED DS15, 5 on J62
+NET "led(5)"                    LOC = "AG23";   ## 2   on LED DS14, 6 on J62
+NET "led(6)"                    LOC = "AE24";   ## 2   on LED DS22, 7 on J62
+#NET "led(7)"                    LOC = "AD24";   ## 2   on LED DS21, 8 on J62
+
+NET "dvi_iic_scl"                   LOC = "AN10";   ## 2   on Q5, 15 on U38
+NET "iic_scl_main"               LOC = "AK9";    ## 2   on Q19
+#NET "IIC_SCL_SFP"                   LOC = "AA34";   ## 2   on Q23
+NET "dvi_iic_sda"                   LOC = "AP10";   ## 2   on Q6, 14 on U38
+NET "iic_sda_main"               LOC = "AE9";    ## 2   on Q20
+#NET "IIC_SDA_SFP"                   LOC = "AA33";   ## 2   on Q21
+
+NET "tft_lcd_data(0)"                        LOC = "AJ19";   ## 63 on U38 (thru series R111 47.5 ohm)
+NET "tft_lcd_data(1)"                        LOC = "AH19";   ## 62 on U38 (thru series R110 47.5 ohm)
+NET "tft_lcd_data(2)"                        LOC = "AM17";   ## 61 on U38 (thru series R109 47.5 ohm)
+NET "tft_lcd_data(3)"                        LOC = "AM16";   ## 60 on U38 (thru series R108 47.5 ohm)
+NET "tft_lcd_data(4)"                        LOC = "AD17";   ## 59 on U38 (thru series R107 47.5 ohm)
+NET "tft_lcd_data(5)"                        LOC = "AE17";   ## 58 on U38 (thru series R106 47.5 ohm)
+NET "tft_lcd_data(6)"                        LOC = "AK18";   ## 55 on U38 (thru series R105 47.5 ohm)
+NET "tft_lcd_data(7)"                        LOC = "AK17";   ## 54 on U38 (thru series R104 47.5 ohm)
+NET "tft_lcd_data(8)"                        LOC = "AE18";   ## 53 on U38 (thru series R103 47.5 ohm)
+NET "tft_lcd_data(9)"                        LOC = "AF18";   ## 52 on U38 (thru series R102 47.5 ohm)
+NET "tft_lcd_data(10)"                       LOC = "AL16";   ## 51 on U38 (thru series R101 47.5 ohm)
+NET "tft_lcd_data(11)"                       LOC = "AK16";   ## 50 on U38 (thru series R100 47.5 ohm)
+NET "tft_lcd_de"                        LOC = "AD16";   ## 2  on U38 (thru series R112 47.5 ohm)
+#NET "DVI_GPIO1_FMC_C2M_PG_LS"       LOC = "K9";     ## 18 on U32 (not wired to U38)
+NET "tft_lcd_hsync"                         LOC = "AN17";   ## 4  on U38 (thru series R113 47.5 ohm)
+NET "tft_lcd_reset_b"                LOC = "AP17";   ## 2  on U32 (DVI_RESET_B pin 13 on U38)
+NET "tft_lcd_vsync"                         LOC = "AD15";   ## 5  on U38 (thru series R114 47.5 ohm)
+NET "tft_lcd_clk_n"                    LOC = "AC17";   ## 56 on U38
+NET "tft_lcd_clk_p"                    LOC = "AC18";   ## 57 on U38
+
+#NET "SYSACE_CFGTDI"                 LOC = "AC8";    ## 81  on U19
+NET "sysace_d(0)"                     LOC = "AM15";   ## 66  on U19
+NET "sysace_d(1)"                     LOC = "AJ17";   ## 65  on U19
+NET "sysace_d(2)"                     LOC = "AJ16";   ## 63  on U19
+NET "sysace_d(3)"                     LOC = "AP16";   ## 62  on U19
+NET "sysace_d(4)"                     LOC = "AG16";   ## 61  on U19
+NET "sysace_d(5)"                     LOC = "AH15";   ## 60  on U19
+NET "sysace_d(6)"                     LOC = "AF16";   ## 59  on U19
+NET "sysace_d(7)"                     LOC = "AN15";   ## 58  on U19
+NET "sysace_mpa(0)"                  LOC = "AC15";   ## 70  on U19
+NET "sysace_mpa(1)"                  LOC = "AP15";   ## 69  on U19
+NET "sysace_mpa(2)"                  LOC = "AG17";   ## 68  on U19
+NET "sysace_mpa(3)"                  LOC = "AH17";   ## 67  on U19
+NET "sysace_mpa(4)"                  LOC = "AG15";   ## 45  on U19
+NET "sysace_mpa(5)"                  LOC = "AF15";   ## 44  on U19
+NET "sysace_mpa(6)"                  LOC = "AK14";   ## 43  on U19
+#NET "SYSACE_MPBRDY"                 LOC = "AJ15";   ## 39  on U19
+NET "sysace_mpce"                   LOC = "AJ14";   ## 42  on U19
+NET "sysace_mpirq"                  LOC = "L9";     ## 41  on U19
+NET "sysace_mpoe"                   LOC = "AL15";   ## 77  on U19
+NET "sysace_mpwe"                   LOC = "AL14";   ## 76  on U19
+NET "clk_33"              LOC = "AE16";   ## 93  on U19
+NET "clk_33" PERIOD = 30.000 ;
+OFFSET = IN : 20.000 : BEFORE clk_33 ;
+OFFSET = OUT : 20.000 : AFTER clk_33 ;
+
+
+NET "clkm" 		TNM_NET = "clkm";
+NET "clk_ddr" 		TNM_NET = "clk_ddr";
+
+TIMESPEC "TS_clkm_clk_ddr" = FROM "clkm" TO "clk_ddr" TIG;
+TIMESPEC "TS_clk_ddr_clkm" = FROM "clk_ddr" TO "clkm" TIG;
+
+NET "erx_clk" PERIOD = 8.000 ;
+OFFSET = IN : 5.000 : BEFORE erx_clk ;
+#OFFSET = IN : 2.000 : BEFORE erx_clk ;
+
+NET "etx_clk" PERIOD = 40.000 ;
+OFFSET = OUT : 15.000 : AFTER etx_clk ;
+OFFSET = IN : 8.000 : BEFORE etx_clk ;
+
+NET "etx_clk" MAXSKEW= 1.0 ns;
+NET "erx_clk" MAXSKEW= 1.0 ns;
+
+#NET "egtx_clk" PERIOD = 8.000 ;
+#OFFSET = OUT : 5.500 : AFTER egtx_clk;
+#NET "egtx_clk" CLOCK_DEDICATED_ROUTE = FALSE;
+
+NET "gmiiclk_p"                 LOC = "H6";
+NET "gmiiclk_n"                 LOC = "H5";
+NET "gmiiclk_p" PERIOD = 8.000 ;
+OFFSET = OUT : 12.000 : AFTER gmiiclk_p;
+
+////////////////////////////////////////////////////////////////////////////
+// VGA clock
+////////////////////////////////////////////////////////////////////////////
+#NET "clkvga" TNM_NET = "clkvga" | PERIOD = 15.385;
+#TIMESPEC "TSPLB_TFT25" = FROM "clkm" TO "clkvga" TIG;
+#TIMESPEC "TSPLB_TFT40" = FROM "clkvga" TO "clkm" TIG;
+

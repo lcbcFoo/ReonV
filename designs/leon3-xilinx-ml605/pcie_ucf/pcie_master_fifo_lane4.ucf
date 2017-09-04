@@ -1,0 +1,34 @@
+NET "sys_reset_n" TIG;
+NET "sys_reset_n" LOC = AE13 | IOSTANDARD = LVCMOS25 | PULLUP | NODELAY ;
+
+#NET "sys_clk_p" LOC = P6;
+#NET "sys_clk_n" LOC = P5;
+INST "pcie_mf_no_dma.EP/pcie_clk_v6.refclk_ibuf" LOC = IBUFDS_GTXE1_X0Y6;
+
+# PCIe Lane 0
+INST "pcie_mf_no_dma.EP/pcie_v6.v6_pcie_v1_7_i/pcie_2_0_i/pcie_gt_i/gtx_v6_i/GTXD[0].GTX" LOC = GTXE1_X0Y15;
+# PCIe Lane 1
+INST "pcie_mf_no_dma.EP/pcie_v6.v6_pcie_v1_7_i/pcie_2_0_i/pcie_gt_i/gtx_v6_i/GTXD[1].GTX" LOC = GTXE1_X0Y14;
+# PCIe Lane 2
+INST "pcie_mf_no_dma.EP/pcie_v6.v6_pcie_v1_7_i/pcie_2_0_i/pcie_gt_i/gtx_v6_i/GTXD[2].GTX" LOC = GTXE1_X0Y13;
+# PCIe Lane 3
+INST "pcie_mf_no_dma.EP/pcie_v6.v6_pcie_v1_7_i/pcie_2_0_i/pcie_gt_i/gtx_v6_i/GTXD[3].GTX" LOC = GTXE1_X0Y12;
+
+INST "pcie_mf_no_dma.EP/pcie_v6.v6_pcie_v1_7_i/pcie_2_0_i/pcie_block_i" LOC = PCIE_X0Y1;
+
+INST "pcie_mf_no_dma.EP/pcie_v6.v6_pcie_v1_7_i/pcie_clocking_i/mmcm_adv_i" LOC = MMCM_ADV_X0Y7;
+
+# Timing Constraints
+
+NET "pcie_mf_no_dma.EP/sys_clk_c" TNM_NET = "SYSCLK" ;
+NET "pcie_mf_no_dma.EP/pcie_v6.v6_pcie_v1_7_i/pcie_clocking_i/clk_125" TNM_NET = "CLK_125" ;
+NET "pcie_mf_no_dma.EP/pcie_v6.v6_pcie_v1_7_i/TxOutClk_bufg" TNM_NET = "TXOUTCLKBUFG";
+
+TIMESPEC "TS_SYSCLK"  = PERIOD "SYSCLK" 100 MHz HIGH 50 % PRIORITY 100 ;
+TIMESPEC "TS_CLK_125"  = PERIOD "CLK_125" TS_SYSCLK*1.25 HIGH 50 % PRIORITY 1 ;
+TIMESPEC "TS_TXOUTCLKBUFG"  = PERIOD "TXOUTCLKBUFG" 100 MHz HIGH 50 % PRIORITY 100 ;
+
+
+PIN "pcie_mf_no_dma.EP/pcie_v6.v6_pcie_v1_7_i/trn_reset_n_int_i.CLR" TIG ;
+PIN "pcie_mf_no_dma.EP/pcie_v6.v6_pcie_v1_7_i/trn_reset_n_i.CLR" TIG ;
+PIN "pcie_mf_no_dma.EP/pcie_v6.v6_pcie_v1_7_i/pcie_clocking_i/mmcm_adv_i.RST" TIG ;

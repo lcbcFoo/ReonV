@@ -1,0 +1,31 @@
+PCIEXP simple interface
+CONFIG_PCIEXP_MASTER_TARGET
+  The target-only PCI Express interface provides a interface
+  without fifos. It is small and robust, and is suitable to be used
+  for DSU communications via PCI Express.Master interface is optional.
+
+PCIEXP interface, target-only
+CONFIG_PCIEXP_SIMPLE_TARGET
+  The target-only PCI Express interface provides a simple target interface without fifos. It is small and robust, and is suitable to be used for DSU communications via PCI Express.
+
+PCIEXP interface with FIFO
+CONFIG_PCIEXP_MASTER_FIFO
+  The master-target PCI Express interface provides a high-performance 32-bit PCI Express interface with FIFOs and optional DMA channel.
+
+PCIEXP DMA controller
+CONFIG_PCIEXP_MASTER_FIFO_DMA
+  Say Y here to enable a DMA controller in the PCIEXP MASTER_FIFO core.The DMA controller can perform PCI EXPRESS<->memory data transfers independently of the processor.
+
+PCIEXP vendor id
+CONFIG_PCIEXP_VENDORID
+  Sets the PCI Express vendor ID in the PCI Express configuration area. 10EE for Xilinx. 
+
+PCIEXP device id
+CONFIG_PCIEXP_DEVICEID
+  Sets the PCI Express device ID in the PCI Express configuration area.
+
+CONFIG_LANE_WIDTH1
+  select the number of lanes 
+
+CONFIG_LANE_WIDTH_FIFO1
+  select the number of lanes

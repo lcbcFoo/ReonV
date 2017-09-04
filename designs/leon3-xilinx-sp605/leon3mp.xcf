@@ -1,0 +1,9 @@
+
+NET "clk27" TNM_NET = "clk27";
+TIMESPEC "TS_clk27" = PERIOD "clk27" 37.00 ns HIGH 50 %;
+
+NET "clk200p" TNM_NET = "clk200p";
+TIMESPEC "TS_clk200p" = PERIOD "clk200p" 5.00 ns HIGH 50 %;
+
+NET "erx_clk" TNM_NET = "erx_clk";
+TIMESPEC "TS_erx_clk" = PERIOD "erx_clk" 8.00 ns HIGH 50 %;

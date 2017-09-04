@@ -1,0 +1,204 @@
+--- ./mig/user_design/par/mig.ucf	2012-12-18 14:40:26.000000000 +0100
++++ ./mig_patch/p/a/t/c/h/mig_design/mig.ucf	2012-12-18 12:01:45.861514738 +0100
+@@ -20,16 +20,16 @@
+ # Timing constraints                                                        #
+ ############################################################################
+ 
+-NET "sys_clk_p" TNM_NET = TNM_sys_clk;
+-TIMESPEC "TS_sys_clk" = PERIOD "TNM_sys_clk" 2.5 ns;
++#NET "sys_clk_p" TNM_NET = TNM_sys_clk;
++#TIMESPEC "TS_sys_clk" = PERIOD "TNM_sys_clk" 2.5 ns;
+ 
+-NET "clk_ref_p" TNM_NET = TNM_clk_ref;
+-TIMESPEC "TS_clk_ref" = PERIOD "TNM_clk_ref" 5 ns ;
++#NET "clk_ref_p" TNM_NET = TNM_clk_ref;
++#TIMESPEC "TS_clk_ref" = PERIOD "TNM_clk_ref" 5 ns ;
+ 
+ # Constrain BUFR clocks used to synchronize data from IOB to fabric logic
+ # Note that ISE cannot infer this from other PERIOD constraints because
+ # of the use of OSERDES blocks in the BUFR clock generation path
+-NET "u_memc_ui_top/u_mem_intfc/phy_top0/clk_rsync[?]" TNM_NET = TNM_clk_rsync;
++NET "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/clk_rsync[?]" TNM_NET = TNM_clk_rsync;
+ TIMESPEC "TS_clk_rsync" = PERIOD "TNM_clk_rsync" 5 ns;
+ 
+ # Paths between DQ/DQS ISERDES.Q outputs and CLB flops clocked by falling
+@@ -44,13 +44,13 @@
+ TIMEGRP "TG_clk_rsync_rise" = RISING  "TNM_clk_rsync";
+ TIMEGRP "TG_clk_rsync_fall" = FALLING "TNM_clk_rsync";
+ TIMESPEC "TS_clk_rsync_rise_to_fall" =
+-  FROM "TG_clk_rsync_rise" TO "TG_clk_rsync_fall" "TS_sys_clk" * 2;
++  FROM "TG_clk_rsync_rise" TO "TG_clk_rsync_fall" "TS_clk_ref" * 1;
+ 
+ # Signal to select between controller and physical layer signals. Four divided by two clock
+ # cycles (4 memory clock cycles) are provided by design for the signal to settle down.
+ # Used only by the phy modules.
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_init/u_ff_phy_init_data_sel" TNM = "TNM_PHY_INIT_SEL";
+-TIMESPEC "TS_MC_PHY_INIT_SEL" = FROM "TNM_PHY_INIT_SEL" TO FFS = "TS_sys_clk"*4;
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_init/u_ff_phy_init_data_sel" TNM = "TNM_PHY_INIT_SEL";
++TIMESPEC "TS_MC_PHY_INIT_SEL" = FROM "TNM_PHY_INIT_SEL" TO FFS = "TS_clk_ref"*2;
+ ############################################################################
+ ########################################################################
+ # Controller 0
+@@ -77,14 +77,14 @@
+ NET  "ddr3_odt[*]"                              IOSTANDARD = SSTL15;
+ NET  "ddr3_cs_n[*]"                             IOSTANDARD = SSTL15;
+ NET  "ddr3_dm[*]"                               IOSTANDARD = SSTL15;
+-NET  "sys_clk_p"                                IOSTANDARD = LVDS_25;
+-NET  "sys_clk_n"                                IOSTANDARD = LVDS_25;
++#NET  "sys_clk_p"                                IOSTANDARD = LVDS_25;
++#NET  "sys_clk_n"                                IOSTANDARD = LVDS_25;
+ NET  "clk_ref_p"                                IOSTANDARD = LVDS_25;
+ NET  "clk_ref_n"                                IOSTANDARD = LVDS_25;
+-NET  "sda"                                      IOSTANDARD = LVCMOS25;
+-NET  "scl"                                      IOSTANDARD = LVCMOS25;
+-NET  "sys_rst"                                  IOSTANDARD = LVCMOS25;
+-NET  "phy_init_done"                            IOSTANDARD = LVCMOS25;
++#NET  "sda"                                      IOSTANDARD = LVCMOS25;
++#NET  "scl"                                      IOSTANDARD = LVCMOS25;
++#NET  "sys_rst"                                  IOSTANDARD = LVCMOS25;
++#NET  "phy_init_done"                            IOSTANDARD = LVCMOS25;
+ NET  "ddr3_dqs_p[*]"                            IOSTANDARD = DIFF_SSTL15_T_DCI;
+ NET  "ddr3_dqs_n[*]"                            IOSTANDARD = DIFF_SSTL15_T_DCI;
+ NET  "ddr3_ck_p[*]"                             IOSTANDARD = DIFF_SSTL15;
+@@ -93,14 +93,15 @@
+ ################################################################################
+ ##SAVE attributes to reserve the pins
+ ################################################################################
+-NET  "sda"                                      S;
+-NET  "scl"                                      S;
++#NET  "sda"                                      S;
++#NET  "scl"                                      S;
+ 
+ ###############################################################################
+ #DCI_CASCADING
+ #Syntax : CONFIG DCI_CASCADE = "<master> <slave1> <slave2> ..";
+ ###############################################################################
+-CONFIG DCI_CASCADE = "25 26";
++CONFIG DCI_CASCADE = "26 25";
++CONFIG DCI_CASCADE = "36 35";
+ 
+ 
+ ##################################################################################
+@@ -201,14 +202,14 @@
+ NET  "ddr3_dm[5]"                                LOC = "A26" ;          #Bank 25
+ NET  "ddr3_dm[6]"                                LOC = "A29" ;          #Bank 25
+ NET  "ddr3_dm[7]"                                LOC = "A31" ;          #Bank 25
+-NET  "sys_clk_p"                                 LOC = "A10" ;          #Bank 34
+-NET  "sys_clk_n"                                 LOC = "B10" ;          #Bank 34
++#NET  "sys_clk_p"                                 LOC = "A10" ;          #Bank 34
++#NET  "sys_clk_n"                                 LOC = "B10" ;          #Bank 34
+ NET  "clk_ref_p"                                 LOC = "J9" ;          #Bank 34
+ NET  "clk_ref_n"                                 LOC = "H9" ;          #Bank 34
+-NET  "sda"                                       LOC = "AA33" ;          #Bank 13
+-NET  "scl"                                       LOC = "AA34" ;          #Bank 13
+-NET  "sys_rst"                                   LOC = "H10" ;          #Bank 35
+-NET  "phy_init_done"                             LOC = "AE23" ;          #Bank 24
++#NET  "sda"                                       LOC = "AA33" ;          #Bank 13
++#NET  "scl"                                       LOC = "AA34" ;          #Bank 13
++#NET  "sys_rst"                                   LOC = "H10" ;          #Bank 35
++#NET  "phy_init_done"                             LOC = "AE23" ;          #Bank 24
+ NET  "ddr3_dqs_p[0]"                             LOC = "D12" ;          #Bank 35
+ NET  "ddr3_dqs_n[0]"                             LOC = "E12" ;          #Bank 35
+ NET  "ddr3_dqs_p[1]"                             LOC = "H12" ;          #Bank 35
+@@ -251,21 +252,21 @@
+ ######################################################################################
+ 
+ ##Site: C29 -- Bank 25
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_loop_col1.u_oserdes_rsync"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_loop_col1.u_oserdes_rsync"
+   LOC = "OLOGIC_X1Y139";
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_loop_col1.u_odelay_rsync"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_loop_col1.u_odelay_rsync"
+   LOC = "IODELAY_X1Y139";
+ 
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_loop_col1.u_bufr_rsync"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_loop_col1.u_bufr_rsync"
+   LOC = "BUFR_X1Y6";
+ 
+ ##Site: M12 -- Bank 35
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_loop_col0.u_oserdes_rsync"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_loop_col0.u_oserdes_rsync"
+   LOC = "OLOGIC_X2Y139";
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_loop_col0.u_odelay_rsync"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_loop_col0.u_odelay_rsync"
+   LOC = "IODELAY_X2Y139";
+ 
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_loop_col0.u_bufr_rsync"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_loop_col0.u_bufr_rsync"
+   LOC = "BUFR_X2Y6";
+ 
+ ##################################################################################################
+@@ -282,51 +283,51 @@
+ ######################################################################################
+ 
+ ##Site: C13 -- Bank 35
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[0].u_oserdes_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[0].u_oserdes_cpt"
+   LOC = "OLOGIC_X2Y137";
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[0].u_odelay_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[0].u_odelay_cpt"
+   LOC = "IODELAY_X2Y137";
+ 
+ ##Site: L13 -- Bank 35
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[1].u_oserdes_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[1].u_oserdes_cpt"
+   LOC = "OLOGIC_X2Y141";
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[1].u_odelay_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[1].u_odelay_cpt"
+   LOC = "IODELAY_X2Y141";
+ 
+ ##Site: K14 -- Bank 35
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[2].u_oserdes_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[2].u_oserdes_cpt"
+   LOC = "OLOGIC_X2Y143";
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[2].u_odelay_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[2].u_odelay_cpt"
+   LOC = "IODELAY_X2Y143";
+ 
+ ##Site: F21 -- Bank 26
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[3].u_oserdes_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[3].u_oserdes_cpt"
+   LOC = "OLOGIC_X1Y179";
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[3].u_odelay_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[3].u_odelay_cpt"
+   LOC = "IODELAY_X1Y179";
+ 
+ ##Site: B20 -- Bank 26
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[4].u_oserdes_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[4].u_oserdes_cpt"
+   LOC = "OLOGIC_X1Y181";
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[4].u_odelay_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[4].u_odelay_cpt"
+   LOC = "IODELAY_X1Y181";
+ 
+ ##Site: F25 -- Bank 25
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[5].u_oserdes_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[5].u_oserdes_cpt"
+   LOC = "OLOGIC_X1Y137";
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[5].u_odelay_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[5].u_odelay_cpt"
+   LOC = "IODELAY_X1Y137";
+ 
+ ##Site: C28 -- Bank 25
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[6].u_oserdes_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[6].u_oserdes_cpt"
+   LOC = "OLOGIC_X1Y141";
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[6].u_odelay_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[6].u_odelay_cpt"
+   LOC = "IODELAY_X1Y141";
+ 
+ ##Site: D24 -- Bank 25
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[7].u_oserdes_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[7].u_oserdes_cpt"
+   LOC = "OLOGIC_X1Y143";
+-INST "u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[7].u_odelay_cpt"
++INST "mig_gen.ddr3ctrl/u_memc_ui_top/u_mem_intfc/phy_top0/u_phy_read/u_phy_rdclk_gen/*gen_ck_cpt[7].u_odelay_cpt"
+   LOC = "IODELAY_X1Y143";
+ 
+ 
+@@ -334,4 +335,4 @@
+ ## MMCM_ADV CONSTRAINTS                                                             ##
+ ######################################################################################
+ 
+-INST "u_infrastructure/u_mmcm_adv"      LOC = "MMCM_ADV_X0Y8"; #Banks 16, 26, 36
++INST "mig_gen.ddr3ctrl/u_infrastructure/u_mmcm_adv"      LOC = "MMCM_ADV_X0Y8"; #Banks 16, 26, 36

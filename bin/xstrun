@@ -1,0 +1,14 @@
+#!/bin/sh
+# top-module file device
+echo set -tmpdir "xst/projnav.tmp"
+echo set -xsthdpdir "xst"
+echo run
+echo -opt_mode Speed
+echo -opt_level 2
+echo -fsm_extract no
+echo -iob true
+echo -ifn $1_files.prj
+echo -bus_delimiter "()"
+echo -ifmt mixed
+echo -p $3
+echo -top $1

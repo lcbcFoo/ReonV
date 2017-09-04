@@ -1,0 +1,21 @@
+  bool 'Enable Partial Reconfiguration  ' CONFIG_PARTIAL
+  if [ "$CONFIG_PARTIAL" = "y" ]; then
+        bool 'Enable Bitstream Verification (D2PRC-CRC mode)' CONFIG_CRC
+        if [ "$CONFIG_CRC" = "y" ]; then
+          integer 'CRC block size ' CONFIG_BLOCK 100
+        fi
+        if [ "$CONFIG_CRC" = "n" ] ; then
+          bool 'Enable Bitstream EDAC (D2PRC-SECDED mode)' CONFIG_EDAC
+          if [ "$CONFIG_EDAC" = "n" ] ; then
+            bool 'Async Mode ' CONFIG_DCM_FIFO
+          fi
+        fi
+        if [ "$CONFIG_DCM_FIFO" = "y" -o "$CONFIG_CRC" = "y" -o "$CONFIG_EDAC" = "y"]; then
+             choice 'FIFO depth' \
+	      " 64		CONFIG_DPR_FIFO64 \
+	       128		CONFIG_DPR_FIFO128 \
+	       256		CONFIG_DPR_FIFO256 \
+	       512 		CONFIG_DPR_FIFO512" 64
+        fi
+  fi
+  

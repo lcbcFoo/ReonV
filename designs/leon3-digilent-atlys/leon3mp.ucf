@@ -1,0 +1,225 @@
+# UCF file for LEON3 on Digilent Atlys board
+
+# Bank 0 => 3.3V
+# Bank 1 => 3.3V
+# Bank 2 => 3.3V or 2.5V (expansion connector)
+# Bank 3 => 1.8V (DDR2)
+
+CONFIG VCCAUX = 3.3;
+
+# ==== Board clock ====
+
+# 100 MHz
+NET "clk"       LOC = "L15" | IOSTANDARD = LVCMOS33 ;
+NET "clk"       TNM_NET = "clk" ;
+TIMESPEC "TS_clk" = PERIOD "clk" 10 ns ;
+
+# ==== Ethernet PHY timing constraints ====
+
+NET "erx_clk"   TNM_NET = "erx_clk" ;
+NET "etx_clk"   TNM_NET = "etx_clk" ;
+
+TIMESPEC "TS_erxclk" = PERIOD "erx_clk" 36 ns ;
+TIMESPEC "TS_etxclk" = PERIOD "etx_clk" 36 ns ;
+
+OFFSET = IN   8 ns VALID 15 ns BEFORE "erx_clk" ;
+OFFSET = OUT 15 ns AFTER "etx_clk" ;
+
+# ==== Internal timing constraints ====
+
+# Avoid problems with internal reset signal.
+NET "resetn"    TNM_NET = FFS "rstintff" ;
+TIMESPEC "TS_rstint_tig" = FROM "rstintff" TIG ;
+
+# Comment-out the following timing constraints if your design
+# does not use either APBVGA or SVGACTRL.
+
+# VGA pixel clock is asynchronous to system clock.
+NET "clkm"          TNM_NET = "clkm" ;
+NET "video_clk"     TNM_NET = "video_clk" ;
+TIMESPEC "TS_video_clk"     = PERIOD "video_clk" 20 ns PRIORITY 1 ;
+TIMESPEC "TS_clkm_videoclk" = FROM "clkm" TO "video_clk" 10 ns DATAPATHONLY ;
+TIMESPEC "TS_videoclk_clkm" = FROM "video_clk" TO "clkm" 10 ns DATAPATHONLY ;
+
+# TMDS signals are passed asynchronously to serializer.
+NET "video_fastclk" TNM_NET = "video_fastclk" ;
+TIMESPEC "TS_video_fastclk" = PERIOD "video_fastclk" 5 ns PRIORITY 1 ;
+TIMESPEC "TS_video_clk_fastclk" = FROM "video_clk" TO "video_fastclk" 5 ns DATAPATHONLY ;
+
+# ==== General purpose I/O ====
+
+NET "resetn"    LOC = "t15" | IOSTANDARD = LVCMOS18;
+
+NET "led<0>"    LOC = "U18" | IOSTANDARD = LVCMOS33 | SLEW = QUIETIO ;
+NET "led<1>"    LOC = "M14" | IOSTANDARD = LVCMOS33 | SLEW = QUIETIO ;
+NET "led<2>"    LOC = "N14" | IOSTANDARD = LVCMOS33 | SLEW = QUIETIO ;
+NET "led<3>"    LOC = "L14" | IOSTANDARD = LVCMOS33 | SLEW = QUIETIO ;
+NET "led<4>"    LOC = "M13" | IOSTANDARD = LVCMOS33 | SLEW = QUIETIO ;
+NET "led<5>"    LOC = "D4"  | IOSTANDARD = LVCMOS33 | SLEW = QUIETIO ;
+NET "led<6>"    LOC = "P16" | IOSTANDARD = LVCMOS33 | SLEW = QUIETIO ;
+NET "led<7>"    LOC = "N12" | IOSTANDARD = LVCMOS33 | SLEW = QUIETIO ;
+
+NET "button<0>" LOC = "N4" | IOSTANDARD = LVCMOS18 ;
+NET "button<1>" LOC = "P4" | IOSTANDARD = LVCMOS18 ;
+NET "button<2>" LOC = "P3" | IOSTANDARD = LVCMOS18 ;
+NET "button<3>" LOC = "F6" | IOSTANDARD = LVCMOS18 ;
+NET "button<4>" LOC = "F5" | IOSTANDARD = LVCMOS18 ;
+ 
+NET "switch<0>" LOC = "A10" | IOSTANDARD = LVCMOS33 ;
+NET "switch<1>" LOC = "D14" | IOSTANDARD = LVCMOS33 ;
+NET "switch<2>" LOC = "C14" | IOSTANDARD = LVCMOS33 ;
+NET "switch<3>" LOC = "P15" | IOSTANDARD = LVCMOS33 ;
+NET "switch<4>" LOC = "P12" ;
+NET "switch<5>" LOC = "R5" ;
+NET "switch<6>" LOC = "T5" ;
+NET "switch<7>" LOC = "E4" | IOSTANDARD = LVCMOS18 ;
+
+# pmoda(0) = JA-D0-N  = JA1  T3
+# pmoda(1) = JA-D0-P  = JA2  R3
+# pmoda(2) = JA-D2-N  = JA3  P6
+# pmoda(3) = JA-D2-P  = JA4  N5
+# pmoda(4) = JA-CLK-N = JA7  V9
+# pmoda(5) = JA-CLK-P = JA8  T9
+# pmoda(6) = JA-D1-N  = JA9  V4
+# pmoda(7) = JA-D1-P  = JA10 T4
+NET "pmoda<0>"  LOC = "T3";
+NET "pmoda<1>"  LOC = "R3";
+NET "pmoda<2>"  LOC = "P6";
+NET "pmoda<3>"  LOC = "N5";
+NET "pmoda<4>"  LOC = "V9";
+NET "pmoda<5>"  LOC = "T9";
+NET "pmoda<6>"  LOC = "V4";
+NET "pmoda<7>"  LOC = "T4";
+
+# ==== USB serial port J17 ====
+
+NET "rxd1"      LOC = "A16" | IOSTANDARD = LVCMOS33 ;
+NET "txd1"      LOC = "B16" | IOSTANDARD = LVCMOS33 ;
+
+# ==== DDR2 memory interface ====
+
+# NOTE: It may seem that UNTUNED_SPLIT_50 input termination could be
+# good for the ddr_dq lines but FPGA-side termination of ddr_dq causes
+# rare data corruption during long burst reads.
+# DDR_DQ MUST NOT BE TERMINATED ON FPGA SIDE.
+NET "ddr_dq(*)"  IN_TERM = NONE;
+
+NET "ddr_clk"    LOC = "g3" | IOSTANDARD = DIFF_SSTL18_II;
+NET "ddr_clkb"   LOC = "g1" | IOSTANDARD = DIFF_SSTL18_II;
+NET "ddr_cke"    LOC = "h7" | IOSTANDARD = SSTL18_I;
+NET "ddr_odt"    LOC = "k6" | IOSTANDARD = SSTL18_I;
+NET "ddr_we"     LOC = "e3" | IOSTANDARD = SSTL18_I;
+NET "ddr_ras"    LOC = "l5" | IOSTANDARD = SSTL18_I;
+NET "ddr_cas"    LOC = "k5" | IOSTANDARD = SSTL18_I;
+NET "ddr_dm(0)"  LOC = "k3" | IOSTANDARD = SSTL18_I;
+NET "ddr_dm(1)"  LOC = "k4" | IOSTANDARD = SSTL18_I; 
+NET "ddr_dqs(0)"   LOC = "l4" | IOSTANDARD = DIFF_SSTL18_II;
+NET "ddr_dqsn(0)"  LOC = "l3" | IOSTANDARD = DIFF_SSTL18_II;
+NET "ddr_dqs(1)"   LOC = "p2" | IOSTANDARD = DIFF_SSTL18_II;
+NET "ddr_dqsn(1)"  LOC = "p1" | IOSTANDARD = DIFF_SSTL18_II;
+NET "ddr_ad(0)"  LOC = "j7" | IOSTANDARD = SSTL18_I;
+NET "ddr_ad(1)"  LOC = "j6" | IOSTANDARD = SSTL18_I;
+NET "ddr_ad(2)"  LOC = "h5" | IOSTANDARD = SSTL18_I;
+NET "ddr_ad(3)"  LOC = "l7" | IOSTANDARD = SSTL18_I;
+NET "ddr_ad(4)"  LOC = "f3" | IOSTANDARD = SSTL18_I;
+NET "ddr_ad(5)"  LOC = "h4" | IOSTANDARD = SSTL18_I;
+NET "ddr_ad(6)"  LOC = "h3" | IOSTANDARD = SSTL18_I;
+NET "ddr_ad(7)"  LOC = "h6" | IOSTANDARD = SSTL18_I; 
+NET "ddr_ad(8)"  LOC = "d2" | IOSTANDARD = SSTL18_I;
+NET "ddr_ad(9)"  LOC = "d1" | IOSTANDARD = SSTL18_I; 
+NET "ddr_ad(10)" LOC = "f4" | IOSTANDARD = SSTL18_I; 
+NET "ddr_ad(11)" LOC = "d3" | IOSTANDARD = SSTL18_I; 
+NET "ddr_ad(12)" LOC = "g6" | IOSTANDARD = SSTL18_I;
+NET "ddr_ba(0)"  LOC = "f2" | IOSTANDARD = SSTL18_I;
+NET "ddr_ba(1)"  LOC = "f1" | IOSTANDARD = SSTL18_I;
+NET "ddr_ba(2)"  LOC = "e1" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(0)"  LOC = "l2" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(1)"  LOC = "l1" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(2)"  LOC = "k2" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(3)"  LOC = "k1" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(4)"  LOC = "h2" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(5)"  LOC = "h1" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(6)"  LOC = "j3" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(7)"  LOC = "j1" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(8)"  LOC = "m3" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(9)"  LOC = "m1" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(10)" LOC = "n2" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(11)" LOC = "n1" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(12)" LOC = "t2" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(13)" LOC = "t1" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(14)" LOC = "u2" | IOSTANDARD = SSTL18_I;
+NET "ddr_dq(15)" LOC = "u1" | IOSTANDARD = SSTL18_I;
+NET "ddr_rzq"    LOC = "l6" | IOSTANDARD = SSTL18_I;
+NET "ddr_zio"    LOC = "c2" | IOSTANDARD = SSTL18_I;
+
+# ==== GMII Ethernet ====
+
+NET "erst"       LOC = "G13" | IOSTANDARD = LVCMOS33 ;
+NET "egtxclk"    LOC = "L12" | IOSTANDARD = LVCMOS33 ;
+
+NET "erx_clk"    LOC = "K15" | IOSTANDARD = LVCMOS33 ;
+NET "erxd<0>"    LOC = "G16" | IOSTANDARD = LVCMOS33 ;
+NET "erxd<1>"    LOC = "H14" | IOSTANDARD = LVCMOS33 ;
+NET "erxd<2>"    LOC = "E16" | IOSTANDARD = LVCMOS33 ;
+NET "erxd<3>"    LOC = "F15" | IOSTANDARD = LVCMOS33 ;
+NET "erxd<4>"    LOC = "F14" | IOSTANDARD = LVCMOS33 ;
+NET "erxd<5>"    LOC = "E18" | IOSTANDARD = LVCMOS33 ;
+NET "erxd<6>"    LOC = "D18" | IOSTANDARD = LVCMOS33 ;
+NET "erxd<7>"    LOC = "D17" | IOSTANDARD = LVCMOS33 ;
+NET "erx_dv"     LOC = "F17" | IOSTANDARD = LVCMOS33 ;
+NET "erx_er"     LOC = "F18" | IOSTANDARD = LVCMOS33 ;
+NET "erx_col"    LOC = "C17" | IOSTANDARD = LVCMOS33 ;
+NET "erx_crs"    LOC = "C18" | IOSTANDARD = LVCMOS33 ;
+
+NET "etx_clk"    LOC = "K16" | IOSTANDARD = LVCMOS33 ;
+NET "etxd<0>"    LOC = "H16" | IOSTANDARD = LVCMOS33 ;
+NET "etxd<1>"    LOC = "H13" | IOSTANDARD = LVCMOS33 ;
+NET "etxd<2>"    LOC = "K14" | IOSTANDARD = LVCMOS33 ;
+NET "etxd<3>"    LOC = "K13" | IOSTANDARD = LVCMOS33 ;
+NET "etxd<4>"    LOC = "J13" | IOSTANDARD = LVCMOS33 ;
+NET "etxd<5>"    LOC = "G14" | IOSTANDARD = LVCMOS33 ;
+NET "etxd<6>"    LOC = "H12" | IOSTANDARD = LVCMOS33 ;
+NET "etxd<7>"    LOC = "K12" | IOSTANDARD = LVCMOS33 ;
+NET "etx_en"     LOC = "H15" | IOSTANDARD = LVCMOS33 ;
+NET "etx_er"     LOC = "G18" | IOSTANDARD = LVCMOS33 ;
+
+NET "emdc"       LOC = "F16" | IOSTANDARD = LVCMOS33 ;
+NET "emdio"      LOC = "N17" | IOSTANDARD = LVCMOS33 ;
+NET "emdint"     LOC = "L16" | IOSTANDARD = LVCMOS33 ;
+
+# ==== PS/2 mouse and keyboard ====
+
+NET "kbd_clk"    LOC = "P17" | IOSTANDARD = LVCMOS33 | PULLUP ;
+NET "kbd_data"   LOC = "N15" | IOSTANDARD = LVCMOS33 | PULLUP ;
+NET "mou_clk"    LOC = "P18" | IOSTANDARD = LVCMOS33 | PULLUP ;
+NET "mou_data"   LOC = "N18" | IOSTANDARD = LVCMOS33 | PULLUP ;
+
+# ==== SPI flash memory ====
+
+NET "spi_clk"    LOC = "R15" | IOSTANDARD = LVCMOS33 ;
+NET "spi_sel_n"  LOC = "V3"  | IOSTANDARD = LVCMOS33 ;
+NET "spi_dq0"   LOC = "T13" | IOSTANDARD = LVCMOS33 ;
+NET "spi_dq1"   LOC = "R13" | IOSTANDARD = LVCMOS33 ;
+NET "spi_dq2"   LOC = "T14" | IOSTANDARD = LVCMOS33 ;
+NET "spi_dq3"   LOC = "V14" | IOSTANDARD = LVCMOS33 ;
+
+
+# ==== HDMI ====
+
+NET "tmdstx_dat_p(0)" LOC = "D8" | IOSTANDARD = TMDS_33 | SLEW = FAST ;
+NET "tmdstx_dat_n(0)" LOC = "C8" | IOSTANDARD = TMDS_33 | SLEW = FAST ;
+NET "tmdstx_dat_p(1)" LOC = "C7" | IOSTANDARD = TMDS_33 | SLEW = FAST ;
+NET "tmdstx_dat_n(1)" LOC = "A7" | IOSTANDARD = TMDS_33 | SLEW = FAST ;
+NET "tmdstx_dat_p(2)" LOC = "B8" | IOSTANDARD = TMDS_33 | SLEW = FAST ;
+NET "tmdstx_dat_n(2)" LOC = "A8" | IOSTANDARD = TMDS_33 | SLEW = FAST ;
+NET "tmdstx_clk_p"    LOC = "B6" | IOSTANDARD = TMDS_33 | SLEW = FAST ;
+NET "tmdstx_clk_n"    LOC = "A6" | IOSTANDARD = TMDS_33 | SLEW = FAST ;
+
+# ==== Audio ====
+
+#NET "ac97_clk"   LOC = "L13";
+#NET "ac97_sdi"   LOC = "T18";
+#NET "ac97_sdo"   LOC = "N16";
+#NET "ac97_sync"  LOC = "U17";
+#NET "ac97_rst"   LOC = "T17";
+

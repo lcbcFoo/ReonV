@@ -1,0 +1,5 @@
+mainmenu_option next_comment
+    comment 'MIG 7-Series memory controller   '
+	bool 'Enable Xilinx DDR3 MIG memory controller' CONFIG_MIG_7SERIES
+        bool 'Enable fast simulation model  ' CONFIG_MIG_7SERIES_MODEL n
+endmenu

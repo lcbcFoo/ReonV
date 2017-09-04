@@ -1,0 +1,16 @@
+
+set_global_assignment -name POST_MODULE_SCRIPT_FILE "quartus_sh:qsf_pin_assign.tcl"
+
+set_global_assignment -name SIP_FILE uniphy.sip
+set_global_assignment -name QIP_FILE uniphy.qip
+
+set_global_assignment -name VHDL_FILE pll_125.vhd
+
+set_global_assignment -name SDC_FILE leon3mp_quartus.sdc
+
+#set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
+#set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_RETIMING ON
+#set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_DUPLICATION ON
+#set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT EXTRA
+#set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING ON
+#set_global_assignment -name FITTER_EFFORT "STANDARD FIT"

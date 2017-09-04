@@ -1,0 +1,22 @@
+# Date: Wed Dec  5 12:56:18 2012
+
+SET addpads = false
+SET asysymbol = true
+SET busformat = BusFormatParenNotRipped
+SET createndf = false
+SET designentry = Verilog
+SET device = xc6vlx240t
+SET devicefamily = virtex6
+SET flowvendor = Synplicity
+SET formalverification = false
+SET foundationsym = false
+SET implementationfiletype = Ngc
+SET package = ff1156
+SET removerpms = false
+SET simulationfiles = Behavioral
+SET speedgrade = -1
+SET verilogsim = true
+SET vhdlsim = false
+SET workingdirectory = ./tmp/
+
+# CRC: 59c905fa

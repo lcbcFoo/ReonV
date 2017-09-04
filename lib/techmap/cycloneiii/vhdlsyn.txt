@@ -1,0 +1,10 @@
+alt/apll.vhd alt/aclkout.vhd alt/actrlout.vhd
+alt/adqsout.vhd alt/adqout.vhd alt/admout.vhd
+#alt/adqsin.vhd
+alt/adqin.vhd
+#cycloneiii_ddr_phy.vhd
+ddr_phy_cycloneiii.vhd
+cycloneiii_clkgen.vhd
+leon3ft_cycloneiv.vhd
+grspwc2_cycloneiv.vhd
+grspw_codec_cycloneiv.vhd

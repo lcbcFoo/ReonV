@@ -1,0 +1,4 @@
+NET "clk1553" TNM_NET="clk1553";
+TIMESPEC "TS_clkm_clk1553" = FROM "clkm" TO "clk1553" 40 ns;
+TIMESPEC "TS_clk1553_clkm" = FROM "clk1553" TO "clkm" 40 ns;
+

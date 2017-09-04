@@ -1,0 +1,81 @@
+  choice 'Target technology                           ' \
+	"Inferred		CONFIG_SYN_INFERRED \
+	Actel-Axcelerator	CONFIG_SYN_AXCEL \
+	Actel-Axcelerator-DSP	CONFIG_SYN_AXDSP \
+	Actel-Proasic		CONFIG_SYN_PROASIC \
+	Actel-ProasicPlus	CONFIG_SYN_PROASICPLUS \
+	Actel-Proasic3       	CONFIG_SYN_PROASIC3 \
+	Actel-Proasic3E   	CONFIG_SYN_PROASIC3E \
+	Actel-Proasic3L   	CONFIG_SYN_PROASIC3L \
+	Actel-IGLOO/p/L	   	CONFIG_SYN_IGLOO \
+	Actel-IGLOO2	   	CONFIG_SYN_IGLOO2 \
+	Actel-SmartFusion2 	CONFIG_SYN_SF2 \
+	Actel-RTG4 	        CONFIG_SYN_RTG4 \
+	Actel-Fusion   	   	CONFIG_SYN_FUSION\
+	Aeroflex-UT025CRH	CONFIG_SYN_UT025CRH \
+	Aeroflex-UT130HBD	CONFIG_SYN_UT130HBD \
+	Aeroflex-UT90NHBD	CONFIG_SYN_UT90NHBD \
+	Altera-CycloneIII      	CONFIG_SYN_CYCLONEIII \
+	Altera-Stratix        	CONFIG_SYN_STRATIX \
+	Altera-StratixII      	CONFIG_SYN_STRATIXII \
+	Altera-StratixIII      	CONFIG_SYN_STRATIXIII \
+	Altera-StratixIV      	CONFIG_SYN_STRATIXIV \
+	Altera-StratixV      	CONFIG_SYN_STRATIXV \
+	Altera-Others         	CONFIG_SYN_ALTERA \
+	Atmel-ATC18		CONFIG_SYN_ATC18 \
+	Atmel-ATC18RHA		CONFIG_SYN_ATC18RHA \
+	Custom1        		CONFIG_SYN_CUSTOM1 \
+	DARE      		CONFIG_SYN_DARE \
+	IBM-CMOS9SF    		CONFIG_SYN_CMOS9SF \
+        Lattice-EC/ECP/XP   	CONFIG_SYN_LATTICE \
+        Quicklogic-Eclipse  	CONFIG_SYN_ECLIPSE \
+	RH-LIB18T  		CONFIG_SYN_RH_LIB18T \
+	RH-UMC     		CONFIG_SYN_RHUMC \
+	RHS65     		CONFIG_SYN_RHS65 \
+	SAED32     		CONFIG_SYN_SAED32 \
+	SMIC130   		CONFIG_SYN_SMIC13 \
+        TM65Gplus               CONFIG_SYN_TM65GPLUS \
+        TSMC90                  CONFIG_SYN_TSMC90 \
+	UMC180     		CONFIG_SYN_UMC     \
+	Xilinx-Artix7		CONFIG_SYN_ARTIX7 \
+	Xilinx-Kintex7		CONFIG_SYN_KINTEX7 \
+	Xilinx-Spartan3		CONFIG_SYN_SPARTAN3 \
+	Xilinx-Spartan3E	CONFIG_SYN_SPARTAN3E \
+	Xilinx-Spartan6		CONFIG_SYN_SPARTAN6 \
+	Xilinx-Virtex2		CONFIG_SYN_VIRTEX2 \
+	Xilinx-Virtex4		CONFIG_SYN_VIRTEX4 \
+	Xilinx-Virtex5		CONFIG_SYN_VIRTEX5 \
+	Xilinx-Virtex6		CONFIG_SYN_VIRTEX6 \
+	Xilinx-Virtex7		CONFIG_SYN_VIRTEX7 \
+	Xilinx-Zynq7000		CONFIG_SYN_ZYNQ7000" Inferred
+  if [ "$CONFIG_SYN_INFERRED" = "y" -o "$CONFIG_SYN_CUSTOM1" = "y" \
+       -o "$CONFIG_SYN_ATC18" = "y" -o "$CONFIG_SYN_TSMC90" = "y" \
+       -o "$CONFIG_SYN_UMC" = "y" \
+	-o "$CONFIG_SYN_RHUMC" = "y" -o "$CONFIG_SYN_DARE" = "y" -o "$CONFIG_SYN_SAED32" = "y" -o "$CONFIG_SYN_RHS65" = "y" -o "$CONFIG_SYN_ARTISAN" = "y"]; then
+    choice 'Memory Library                           ' \
+	"Inferred		CONFIG_MEM_INFERRED \
+	UMC18			CONFIG_MEM_UMC \
+	RH-UMC			CONFIG_MEM_RHUMC \
+	SAED32			CONFIG_MEM_SAED32 \
+	DARE			CONFIG_MEM_DARE \
+	RHS65			CONFIG_MEM_RHS65 \
+	Artisan			CONFIG_MEM_ARTISAN \
+	Custom1			CONFIG_MEM_CUSTOM1 \
+	Virage			CONFIG_MEM_VIRAGE \
+        Virage-TSMC90           CONFIG_MEM_VIRAGE90" Inferred
+  fi
+  if [ "$CONFIG_SYN_VIRTEX5" = "y" -o  "$CONFIG_SYN_VIRTEX6" = "y" -o  "$CONFIG_SYN_VIRTEX7" = "y"]; then
+	choice 'Transceiver type                           ' \
+	"GTP0		CONFIG_TRANS_GTP0 \
+	GTP1		CONFIG_TRANS_GTP1 \
+	GTX0		CONFIG_TRANS_GTX0 \
+	GTX1		CONFIG_TRANS_GTX1 \
+	GTH0		CONFIG_TRANS_GTH0 \
+	GTH1		CONFIG_TRANS_GTH1" GTP0
+  fi
+  if [ "$CONFIG_SYN_INFERRED" != "y" ]; then
+    bool 'Infer RAM' CONFIG_SYN_INFER_RAM
+    bool 'Infer pads' CONFIG_SYN_INFER_PADS
+  fi
+  bool 'Disable asynchronous reset' CONFIG_SYN_NO_ASYNC
+  bool 'Enable scan support       ' CONFIG_SYN_SCAN

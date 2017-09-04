@@ -1,0 +1,2 @@
+memory_virtex.vhd
+clkgen_virtex.vhd

@@ -1,0 +1,6 @@
+# FPGA and Dev Board used in Design
+TECHNOLOGY=zynq7000
+PART=XC7Z020
+PACKAGE=CLG484
+PROTOBOARD=zedBoard
+SPEED=1

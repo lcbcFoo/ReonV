@@ -1,0 +1,22 @@
+# Date: Wed Oct 31 15:10:31 2012
+
+SET addpads = false
+SET asysymbol = true
+SET busformat = BusFormatParenNotRipped
+SET createndf = false
+SET designentry = VHDL
+SET device = xc5vlx50t
+SET devicefamily = virtex5
+SET flowvendor = Synplicity
+SET formalverification = false
+SET foundationsym = false
+SET implementationfiletype = Ngc
+SET package = ff1136
+SET removerpms = false
+SET simulationfiles = Behavioral
+SET speedgrade = -1
+SET verilogsim = false
+SET vhdlsim = true
+SET workingdirectory = ./tmp/
+
+# CRC: 3a936cca

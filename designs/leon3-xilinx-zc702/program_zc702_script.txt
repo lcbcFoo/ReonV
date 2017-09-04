@@ -1,0 +1,11 @@
+1. 
+fpga -f C:\\cygwin64\\LEON3\\designs\\zc702\\vivado\\leon3-zc702\\leon3-zc702.runs\\impl_1\\leo
+n3mp.bit
+2.
+connect arm hw
+3. 
+source C:\\cygwin64\\LEON3\\designs\\zc702\\vivado\\leon3-zc702\\leon3-zc702.sdk\\SDK\\SDK_Export\\hw\\ps7_init.tcl
+4.
+ps7_init
+5. 
+ps7_post_config

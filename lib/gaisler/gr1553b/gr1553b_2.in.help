@@ -1,0 +1,45 @@
+Secondary 1553 controller enable
+CONFIG_GR1553B_ENABLE2
+  Say Y here to enable a second GR1553B core.
+
+  Note that a single GR1553B core supports dual-redundant buses. This
+  is only needed if you want to connect to two completely separate
+  1553 buses. 
+
+Bus Controller (BC) enable 
+CONFIG_GR1553B_BCEN2
+  If you say Y here, the second core will include support for acting 
+  as a Bus Controller, i.e. the 1553 bus master. 
+
+  Both Bus Controller and Remote Terminal support can be built
+  in. However, at run time only one of the roles can be active on the
+  bus. If you need to have a BC and RT at the same time, two instances
+  of the core must be added to the design.
+
+  Setting this option to N reduces the size of the core by around 25%
+  of it's full size.
+
+Remote Terminal (RT) enable
+CONFIG_GR1553B_RTEN2 
+  If you say Y here, the second core will include support for acting 
+  as a Remote Terminal, i.e. the 1553 bus slave.
+
+  Both Bus Controller and Remote Terminal support can be built
+  in. However, at run time only one of the roles can be active on the
+  bus. If you need to have a BC and RT at the same time, two instances
+  of the core must be added to the design.
+
+  Setting this option to N reduces the size of the core by around 20%
+  of it's full size.
+
+Bus Monitor (BM) enable
+CONFIG_GR1553B_BMEN2
+
+  If you say Y here, the second core will include support for acting 
+  as a Bus Monitor, a passive logger with no transmit ability. 
+
+  The Bus Monitor can be run by itself or run in parallel while
+  running as Bus Controller or Remote Terminal.
+
+  Setting this option to N reduces the size of the core by around 10%
+  of it's full size.

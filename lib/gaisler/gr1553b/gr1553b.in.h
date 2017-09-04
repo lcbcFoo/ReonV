@@ -1,0 +1,16 @@
+#ifndef CONFIG_GR1553B_ENABLE
+#define CONFIG_GR1553B_ENABLE 0
+#endif
+
+#ifndef CONFIG_GR1553B_BCEN
+#define CONFIG_GR1553B_BCEN 0
+#endif 
+
+#ifndef CONFIG_GR1553B_RTEN
+#define CONFIG_GR1553B_RTEN 0
+#endif 
+
+#ifndef CONFIG_GR1553B_BMEN
+#define CONFIG_GR1553B_BMEN 0
+#endif 
+

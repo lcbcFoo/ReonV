@@ -1,0 +1,42 @@
+#if defined CONFIG_PCIEXP_SIMPLE_TARGET
+#define CFG_PCIE 1
+#define CFG_PCIETYPE 1
+#define CFG_PCIEMASTER 0
+#elif defined CONFIG_PCIEXP_MASTER_TARGET
+#define CFG_PCIE 1
+#define CFG_PCIETYPE 1
+#define CFG_PCIEMASTER 1
+#elif defined CONFIG_PCIEXP_MASTER_FIFO_DMA
+#define CFG_PCIE 1
+#define CFG_PCIETYPE 3
+#define CFG_PCIEMASTER 0
+#elif defined CONFIG_PCIEXP_MASTER_FIFO
+#define CFG_PCIE 0
+#define CFG_PCIETYPE 2
+#define CFG_PCIEMASTER 0
+#else
+#define CFG_PCIE 0
+#define CFG_PCIETYPE 0
+#define CFG_PCIEMASTER 0
+#endif
+
+#ifndef CONFIG_PCIEXP_VENDORID
+#define CONFIG_PCIEXP_VENDORID 0
+#endif
+#ifndef CONFIG_PCIEXP_DEVICEID
+#define CONFIG_PCIEXP_DEVICEID 0
+#endif
+
+
+#if defined CONFIG_LANE_WIDTH1
+#define CFG_LANE_WIDTH 1
+#elif defined CONFIG_LANE_WIDTH2
+#define CFG_LANE_WIDTH 2
+#elif defined CONFIG_LANE_WIDTH4
+#define CFG_LANE_WIDTH 4
+#elif defined CONFIG_LANE_WIDTH8
+#define CFG_LANE_WIDTH 8
+#else
+#define CFG_LANE_WIDTH 1
+#endif
+

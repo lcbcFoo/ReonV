@@ -1,0 +1,30 @@
+--- /home/anandhavel/mig_37.vhd	2013-10-25 19:38:05.381163679 +0200
++++ mig_37/user_design/rtl/ip_top/mig_37.vhd	2013-10-25 19:48:18.649914855 +0200
+@@ -251,7 +251,8 @@
+       clk_ahb       : out   std_logic;
+       clk100        : out   std_logic;
+ 
+-    sys_rst        : in std_logic
++    sys_rst_13        : in std_logic;
++    sys_rst_14        : in std_logic
+     );
+ end entity mig_37;
+ 
+@@ -598,7 +599,7 @@
+       clk_ref_p        => clk_ref_p,
+       clk_ref_n        => clk_ref_n,
+       clk_ref          => clk_ref,
+-      sys_rst          => sys_rst,
++      sys_rst          => sys_rst_13,
+       clk_200          => mmcm_clk,	-- 200 MHz for ML605
+       iodelay_ctrl_rdy => iodelay_ctrl_rdy
+       );
+@@ -624,7 +625,7 @@
+       clk100           => clk100,
+       rstdiv0          => rst,
+       mmcm_clk         => mmcm_clk,
+-      sys_rst          => sys_rst,
++      sys_rst          => sys_rst_13,
+       iodelay_ctrl_rdy => iodelay_ctrl_rdy,
+       PSDONE           => pd_PSDONE,
+       PSEN             => pd_PSEN,

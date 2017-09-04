@@ -1,0 +1,1081 @@
+----------------------- Release 2017.2-b4193 ---------------------------
+
+2017-05-30	Enabled GRFPU as default in leon3-xilinx-kc705,
+		leon3-xilinx-ml605 and leon3-xilinx-vc707 template designs.
+
+2017-05-29	Added variable GRLIB_VIVADO_SOURCE_MGMT_MODE to allow definition
+		of the source_mgmt_mode variable in Vivado. If not set, the
+		default setting of Vivado is used.
+
+2017-05-26	Updated Xilinx designs for Vivado 2017.1
+
+2017-05-12	AHBSTAT: Extend to optionally support filtering and logging of 
+		multiple errors.
+
+2017-05-12	GRPCI2: Update to DMA descriptor handling.
+		Added data descriptors was not always detected by the running
+		DMA. The channel descriptor is now updated to point to the next
+		data descriptor when disabled via the APB interface.
+
+2017-05-08	LEON3/4: Bugfix for incorrect store address when MMU is enabled 
+		and TLB is disabled. Only affected designs using separate TLB 
+		with fast write option (TLB_TYPE= 2). The default value after 
+		reset for TLB is enabled and existing designs that keep the TLB 
+		enabled are not affected. This issue is present all LEON designs 
+		with TLB_TYPE = 2 since GRLIB build 2627.
+		 
+2017-05-05	LEON3/LEON4: Avoid breaking into debug mode on RETT
+		instructions because this causes incorrect behavior when
+		resuming.
+
+2017-05-03	scripts: Added file scriptgen_variable_values.tcl to pass
+		environment variables to GRLIB scripts.
+
+2017-04-19	IRQMP system test: Fix race condition in irqtest()
+
+2017-04-10	GRLIB revision numbering changed from x.y.z to yyyy.q.
+
+2017-04-10	SDCTRL64: Change decoding of chip select and bank address
+		to align with MCTRL and SDCTRL in 64-bit mode.
+
+2017-03-20	Update Ethernet Phy simulation model to simulate/check
+		interface setup/hold/clock-to-out timing.
+
+2017-03-16	Add template design for Terasic Altera DSP Development Kit,
+		Stratix V Edition (leon3-terasic-s5gs-dsp)
+
+2017-02-07	leon3-xilinx-zc702: AHB2AXI bridge in the Zynq template design
+		has been replaced with AHB2AXI3B bridge. 
+
+2017-02-07	Added template design for Digilent Anvyl board
+		(leon3-digilent-anvyl) contributed by Dag Stroman.
+
+2017-02-02	APB3CTRL: Respond with AMBA ERROR on unmapped APB area
+
+2017-01-26	Updated Xilinx designs for Vivado 2016.4
+
+2017-01-20	scripts: Corrections made to allow Quartus to run in GUI
+		mode and to allow separate generation of Microsemi scripts
+
+2016-12-30	GRCLKGATE: Move delay balancing to techmap layer. Clean up
+		scan test support.
+
+2016-12-30	APB3CTRL: Add generic to hide plug'n'play area.
+
+2016-12-02	GUIDE: Add information about MMU aliasing to data cache
+		snooping section.
+
+2016-11-21	LEON3: notag VHDL generic can no longer be used to disable
+		tagged arithmetic and CASA.
+
+2016-11-21	Add system test documentation to GRLIB user's manual
+
+2016-11-10	AHBJTAG: Restructure code to avoid issues with Vivado.
+
+2016-11-09	Add 64-bit and 128-bit wide versions of ahbrom.
+
+2016-11-04	Allow configuring MMU page size for leon_dsu_stat_base
+		subsystem.
+
+2016-11-02	GRPCI2: Add support for grlib_async_reset_enable and
+		grlib_sync_reset_enable_all from GRLIB config package.
+
+2016-10-27	AHBJTAG: Add support for grlib_sync_reset_enable_all
+		AHBROM: Add support for grlib_sync_reset_enable_all
+
+2016-10-21	AHBCTRL: Add fall-through BAR option to redirect
+		unmapped areas to specific slave.
+
+2016-09-22	Remove leon3-terasic-sockit from release
+
+2016-09-16	leon3-minimal: Updated leon3mp.vhd and testbench.vhd to
+		allow simulations to terminate.
+
+2016-09-10	LEON3: Support option for more aggressive RAM power saving
+
+		This feature requires specific memory block behavior
+		("read-hold"), and is enabled based on the
+		techmap.syncram_readhold vector, currently disabled for all
+		technologies.
+
+2016-09-10	LEON3: Instruction cache MMU and power-down improvement
+		- Use MMU cacheability setting to enable/disable caching
+		  per page when MMU is enabled. Icache used cached generic or
+		  assumed always on previously when MMU enabled.
+		- Support disabling the Icache memories when Icache is disabled.
+		  (non-trivial due to a corner case the cycle after enabling)
+
+2016-08-30	LEON3: Bugfix for DPBM functionality. Affects LEON3
+		implementations with branch prediction enabled from release
+		1.4.0 to 1.5.3 (problem introduced in GRLIB 2015-02-07),
+		build b4154-b4173.
+
+2016-08-18	AHBCTRL: Allow overlapping areas when generic shadow /= 0
+
+2015-08-11	AHBROM: pipe=1 implementation is modified in order not to
+		deassert HREADY when HSEL is low.
+
+2015-08-10	scripts: Replace parts of script generation infrastructure
+		with Tcl based solution.
+
+2016-07-08	Updated Xilinx designs for Vivado 2016.2
+
+2016-07-03	APBCTRL: Add support for grlib_async_reset_enable.
+
+2016-07-03	AHBCTRL: Add support for grlib_async_reset_enable.
+
+2016-07-03	SPICTRL: Increase to revision 6. Add support for dual and
+		quad SPI protocols. Rename 3-wire mode to 3-wire protocol.
+		Add support for grlib_async_reset_enable.
+
+2016-07-02	SPI: Remove ssn member from gaisler.spi.spi_out_type.
+
+2016-06-13	MCTRL/SDMCTRL: Add support for grlib_sync_reset_enable_all.
+
+2016-05-17	Updated Xilinx designs for Vivado 2016.1
+
+2016-04-05	RGMII Adapter: Fixed RX Valid delay bug in RGMII adapter.
+		Internal RX Valid signal was always set to '0' when delayed
+		more than 2 clock cycles
+
+2016-03-31	Techmap: Prefix constants used to select transceiver type with
+		TT_X for Xilinx and TT_M for Microsemi (GTX0 is not TT_XGTX0).
+
+2016-03-31	Add AHB2AXI - AHB to AXI bridge IP core.
+
+2016-03-24	LEON3/DSU3: Extend number of available bits in DSU time tag
+		counter and make counter available via %ASR22 - %ASR23.
+
+2016-02-28	GRGPIO: IFLAG register was automatically cleared when the
+		interrupt condition was removed. IFLAG was only set for one
+		cycle when a interrupt was edge triggered.
+
+2016-01-27	SPI2AHB: pirq was missing from APB PnP information
+
+----------------------- Release 1.5.0-b4164 ----------------------------
+
+2016-01-21	leon3-digilent-atlys: Update design, allow systest simulation
+
+2016-01-21	leon3-gr-xc6s: Update UCF used with ISE13
+
+2016-01-15	Add support for GRLIB_SIMULATOR=Questa
+
+2016-01-09	L3STAT: stati signal missing from sensitivity list could give
+		simulation mismatch.
+
+2016-01-08	Change script generation for Xilinx Vivado so that recent
+		versions of Vivado use and generate a simulation file list
+		with files in the correct order. Vivado 2014.1 reorders files
+		incorrectly while later versions incorrectly re-orders files
+		if source_mgmt_mode is set to prevent reordering(!). Current
+		script leaves source_mgmt_mode at default (All) and produces
+		correct file order with 2015.4. Vivado 2015.4 SIGSEVs during
+		elaboration when using XSim. Latest working version for
+		simulation with XSim (Vivado's built-in simulator) is 2013.4.
+
+2016-01-07	Fix xconfig and xgrlib issues after sourcing Vivado settings
+		file by unsetting LD_LIBRARY_PATH.
+
+2016-01-07	Convert Basys3, Nexys4DDR, Nexys4, Nexys Video, AC701, KC705,
+		and VC707 designs to Xilinx Vivado 2015.4.
+
+2016-01-04	Added template design for Digilent Basys3
+		(leon3-digilent-basys3)
+
+2016-01-04	Added template design for Digilent Nexys Video
+		(leon3-digilent-nexys-video)
+
+2016-01-04	LEON3: Make ics/dcs cache control register fields read-only in
+		disabled state when respective cache not implemented.
+
+2015-12-18	LEON3: Perform 2-beat read burst for LDD when cache is
+		disabled/bypassed.
+
+2015-12-18	L3STAT: AHB statistics was not available when core was
+		implemented with dsuen = 0 and nextev = 0.
+
+2015-12-17	LEON3: Add dsnoop=7 option to implement DCache snooping with
+		valid bits moved to registers and using only single-port RAMs
+		for the tags.
+
+2015-12-16	GPTIMER: Changed to only decrement the prescaler when at least
+		one timer is enabled.
+
+2015-12-03	LEON3: Add support for alternative window pointer extension
+		from SPARC V8E.
+
+2015-12-01	LEON3/IRQMP: Add support for booting up from arbitrary (8b
+		aligned) address, for monitoring error mode state of CPUs
+		and to force specified CPU into error mode via the IRQ
+		controller. Enabled via bootreg generic on IRQ controller.
+
+2015-11-30	AHBFILE: add designs/leon3-ahbfile. AHBFILE is a simulation-
+		only debug communication link that connects using a file.
+		Same protocol as AHBUART.
+
+2015-11-27	GPTIMER: Added support for Windowed Watchdog (WWD)
+
+2015-11-25	Added support for dual port APB-controller.
+
+2015-11-16	Upgrade Xilinx AC701, KC705 and VC707 template design to
+		support Vivado 2015.3.
+
+2015-11-16	LEON3: Snooping implementations that used syncram_dp blocks
+		(dsnoop=1,2,5 but not dsnoop=6) since LEON3v3 required the
+		syncram_dp to provide write-through behavior, which was not
+		guaranteed. This could result in snooping miss in a corner case.
+		Modify the syncram_dp entity in the techmap layer to emulate
+		this functionality when needed in syncram_dp, in the same way
+		as for syncram_2p.
+
+2015-11-16	LEON3: Fix undriven signal used only in dsnoop=5 configuration.
+
+2015-11-08	planAhead: Allow to set planAhead Bitgen options via
+		PLANAHEAD_BITGEN variable. Added via set_property 
+		{steps.bitgen.args.More Options} { PLANAHEAD_BITGEN }.
+
+2015-11-08	L3STAT: Workaround for Design Compiler elaboration error when
+		nmax /= 0 and ncnt > nmax.
+
+2015-11-07	scripts: Display GRLIB env variables at script generation
+
+2015-11-02	LEON3: Support CASA also for LDDEL=2
+
+2015-10-27	LEON3: Add support for LEON REX (reduced instruction set)
+
+2015-10-07	Add support for 64 interrupt sources.
+		Can be enabled via global grlib.config package.
+
+2015-10-07	LEON3: Fix asr17 value for DPBM field when branch
+		prediction is set to always enabled (bp=1)
+
+2015-10-07	Enable make ise-prog-prom target for AC701, KC705 and VC707
+		template designs.
+
+2015-10-05	LEON3: Fix for branch prediction i-cache fetch avoidance
+		feature when used in combination with local instruction RAM.
+
+2015-10-05	LEON3: Instruction cache flush while executing from local
+		instruction RAM (ILRAM) lead to wrong address being propagated
+		to RAM.
+
+2015-09-23	Removed template designs for obsolete Cyclone(I) boards
+
+2015-09-23	Removed template designs for obsolete Virtex2 boards
+
+2015-09-21	Improved GHDL simulation script
+
+2015-09-18	GRDMAC: Implement timeout timer for condition descriptors.
+		Add debug interface for internal buffer. Implement conditional
+		trigger on input signal.
+
+2015-09-14	L3STAT: Update to revision 1, change to register layout and
+		support for up to 64 counters.
+
+2015-08-27	Improved SYNCRAMBW techmap for UNISIM, IGLOO2 and RTG4
+
+2015-08-18	DPRC: Add operating mode with EDAC. Add interrupt support.
+
+2015-08-17	Include DMA controller (GRDMAC) in all releases
+
+2015-08-12	Extend IP core documentation with register reset values and
+		access attribues.
+
+2015-05-11	leon3-digilent-nexys4ddr: Update to support Vivado 2015.2
+
+2015-06-22	APBUART: Add control register bit 15 that selects one or two
+		stop bits.
+
+2015-06-21	Add script support for Mentor Graphics FormalPro (Linux only)
+
+2015-05-11	leon3-digilent-nexys4ddr: Update to support Vivado 2015.1
+
+----------------------- Release 1.4.1-b4156 ----------------------------
+
+2015-05-05	scripts: Skip secureip files in UNISIM when secureip is missing
+		from TECHLIBS
+
+2015-05-05	leon3-terasic-sockit: Simulation support updates
+
+2015-05-05	SPICTRL: Descriptions for bit 15 in event and mask registers
+		were missing.
+
+2015-05-04	leon3-xilinx-ml50x: Fix UCF file in default configuration
+
+2015-04-24	Add GRLIB_SUMULTOR=ALDEC_RWS option, see Riviera section in
+		GRLIB user's manual (doc/grlib.pdf)
+
+2015-04-24	Remove GRLIB cache of vendor simulation libraries. Simulation
+		libraries now need to be imported for each installation. See
+		the installation section in doc/grlib.pdf for instructions.
+
+2015-04-23	Xilinx ML605/ML50x/ML510 designs: Update simulation flow
+
+2015-04-23	Unisim: Add make install- targets for Xilinx verilog libs
+
+2015-04-22	Remove script support and targets for Symphony-EDA Sonata
+
+2015-04-22	Fix naming used for Xilinx 7-series (series7 to 7series)
+
+2015-04-22	Xilinx VC707: Added missing pin property for SGMII interface
+
+2015-04-22	Update simulation flow for Xilinx AC701, KC705 and VC707 designs
+
+2015-04-20	Break out Virtex techmap from techmap/unisim
+
+2015-04-20	Added techmap/virtex5 for Virtex5 SERDES
+
+2015-04-20	Added SKIP_SIM_TECHLIBS setting to avoid build of libraries
+		in tech/ to avoid collisions when using prebuilt libraries.
+
+2015-04-19	Updated Aldec Riviera-PRO project generation
+
+----------------------- Release 1.4.0-b4154 ----------------------------
+
+2015-04-10	Xilinx ML510 design: add support for second Ethernet core 
+		through SGMII connection to the PHY
+
+2015-04-10	Xilinx ML50x design: add support for alternative SGMII
+		connection to the PHY
+
+2015-04-10	Added Xilinx GTP and GTX transceiver technology mappings to the
+		SERDES component, enabling SGMII on Xilinx
+
+2015-04-10	Add L3STAT IP core (performance counters)
+
+2015-04-10	Add GRPCI2, remove GRPCI1.
+
+2015-04-08	ML501/ML50x: Updated to ISE 14.7
+
+2015-04-05	Remove designs/netcard
+
+2015-03-27	Xilinx VC707/AC701/KC705 designs: Updated to Vivado 2014.4.1
+
+2015-03-23	Added template design for Nexys4-DDR (leon3-digilent-nexys4ddr)
+
+2015-03-20	Added template design for TerASIC SoCKit (leon3-terasic-sockit)
+
+2015-03-11	GRFPU/GRFPU-lite netlists: Add netlists for Xilinx Virtex6,
+		Xilinx 7-series and Altera Cyclone V, Startix IV, Stratix V.
+
+2015-02-26	SPIMCTRL: Disable (previously experimental) support for
+		SD cards. SPIMCTRL now only support SPI Flash devices.
+
+2015-02-19	DSU3/AHBTRACE: Remove HIRQ(15:1) from trace buffer.
+
+2015-02-18	LEON3: Optimize timing to avoid slow path through nullify
+		in mmu_dcache.
+
+2015-02-18	LEON3: Optimize timing for multi-way i-cache in FPGA
+
+2015-02-18	LEON3: Alias ASI 0x18 with 0x3, alias ASI 0x19 with 0x4
+
+2015-02-09	LEON3: Add support for iTB overflow detection. 
+
+2015-02-09	LEON3/DSU3: Support filtering on LDST from alternate space
+		0x80 - 0xFF
+
+2015-02-07	Added synchronous I/O test module (SYNCIOTEST)
+
+2015-02-07	LEON3: Add optional support to block i-cache fetch for misses
+		caused by branch prediction,
+
+2015-02-07	LEON3: Support SPARC V8E partial WRPSR
+
+2015-02-07	GRGPIO: Add logical-and, -or, and -xor for DOUT, DIR, IMASK,
+		and INPEN registers. Increase core version to 3.
+
+2015-02-07	GRGPIO: Add additional bypass mode, configurable reset values,
+		optional interrupt flag register, optional input enable 
+		register and optional pulse functionality
+
+2015-02-07	SRMMU: SRMMU used fault type invalid address for translation
+		errors and internal error for AMBA ERROR responses.
+		Corrected to use FSR.FT=Translation error for AMBA ERROR
+		reponses and other errors defined as translation errors in
+		the V8 manual. MMU can no longer report FT=internal error.
+    
+2015-02-07	SRMMU: FSR and FAR could only be overwritten by FT=internal
+		error when FSR.FT=invalid address error. Changed so that all
+		errors except translation errors may be overwritten.
+
+2015-02-07	LEON3: HLOCK could get lost after SPLIT/RETRY response
+
+2015-02-07	syncram256bw: Compile fix for Cadence
+
+2015-02-07	GPTIMER: Add support for external latch and clear vectors
+
+2015-02-07	report_device: Support using custom routine for writing to
+		testmod
+
+2015-02-07	AHBJTAG: For ASIC, use both AHB and JTAG resets to reset jtagcom
+
+2015-02-07	AHBTRACE: add support for enable reset value from external
+		signal
+
+2015-01-13	SRMMU: Add support for grlib_async_reset_enable
+
+2014-10-30	LEON3: Allow use of ASI 0x1C also without MMU implemented.
+
+2014-10-28	Include simple byte, hword, word and dword test as part of
+		systest function base_test().
+
+2014-10-23	Xilinx VC707/AC701/KC705 designs: Updated to Vivado 2014.3
+
+2014-10-17	Add support for Xilinx dynamic partial reconfiguration. See
+		doc/dprc/.
+
+2014-09-15	LEON3: Small logic optimization of D-cache snooping logic
+
+2014-09-12	AHBTRACE: Add AMBA performance counter outputs
+
+2014-09-10	Xilinx VC707/AC701/KC705 designs: Updated to Vivado 2014.2 
+
+2014-09-08	LEON3: ASI 8 (user mode instruction fetch) access resulted in
+		bus access also after MMU exceptions when MMU No Fault bit was
+		set (NF=1). Changed behaviour so that bus access is prevented
+		also when SU=0,NF=1.
+
+2014-09-08	KC705: Support for Quad SPI flash added
+
+2014-08-25	SDCTRL,SDCTRL64: Add missing checks that could cause minimum
+		tRAS timings below what had been configured. Only impacts
+		90 MHz or higher frequency SDRAM operation.
+
+2014-08-12	IRQMP: Add support for interrupt remapping
+
+2014-08-05	DSU3: Do not increment trace buffer time tag when DSU is
+		disabled (dsui.enable LOW) unless timer is forced via reg i/f.
+
+2014-08-03	APBUART/DCOM_UART: Only transmit one stop bit
+
+2014-08-03	Added template design for Xilinx ZC702 Evaluation Kit
+
+2013-07-29	TECHMAP/syncram: Include test-mode bypass functionality
+		only for technologies where it's explicitly enabled (via
+		array in gencomp.vhd)
+
+2014-07-15	Moved declaration of memtest_vector to techmap.
+		Implemented memory test signal propagation for AHBTRACE.
+		Existing designs are unaffected by this change.
+
+2014-07-15	AHBTRACE: Support external time tag signal
+
+2014-07-08	LEON3/DSU3: include support for two-port instruction buffer
+
+2014-07-01	DSU3: Allow filtering instruction trace buffer for LDA/STA
+
+2014-07-01	DSU3: Include support for instruction trace buffer filtering
+
+2014-06-29	LEON3: Add npasi VHDL generic that enables SPARC V8E
+		nonprivileged ASI access.
+
+2014-06-17	GRGPRBANK: Support optional external reset and read vectors.
+
+2014-05-19	syncram: Add self-checking feature to debug memory mapping
+		(enabled via grlib.config option)
+
+2014-05-10	LEON3/LEON4: Disable ASI wrapping. ASI(7:5) must now be
+		zero to access existing ASIs.
+
+2014-05-08	Added SGMII to GMII Ethernet bridge (lib/gaisler/greth/sgmii.vhd)
+		for use with GRETH_GBIT. Technology map currently supports
+		Altera. SGMII support is also available for Xilinx through
+		Xilinx's SGMII PHY Interface, see template designs for 7-series.
+
+2014-05-05	DSU3: Add support for AHB trace buffer filtering, trace
+		force, force timer enable and wide AHB buses.
+
+2014-05-02	Vivado flow updated to ver 2014.1
+
+2014-04-30	GRETH_GBIT: Added SYNCREG for controlling transmit switch to 
+		improve timing after place and route
+
+2014-04-30	GRETH: EDCL MDIO statemachine will now be disabled by control
+		register bits edcldisable and disable duplex detection bits.
+
+2014-04-30	GRETH: Corrected clock domain for TX reset
+
+2014-04-30	RSTGEN: Added constraints to reset block to prevent synthesis 
+		to merge signals
+
+2014-04-30	KC705: Updated simulation enviroment for Ethernet
+
+2014-04-30	RGMII: Make better use of GRLIB SYNREG for CDC and added 
+		reset to output register
+
+2014-04-30	XILINX-SERIES7: Fixed byte write in fast simulation mode
+
+----------------------- Release 1.3.7-b4144 ----------------------------
+
+2014-04-16	Change default assignment of GRLIB_SIMULATOR to ModelSim
+
+2014-04-15	DDR3RAM sim model: Improve memory usage
+
+2014-04-11	RGMII: First revision of documentation for the RGMII IP   
+
+2014-04-11	SAED32-TECHMAP: Fixed Bidir mapping and corrected erroneous
+		instantiation of technology memory.
+
+2014-04-11	LEON3-ASIC: Fixed simulation for SAED32 technology library 
+		and modified design to work with base_test and greth_test 
+		in systest
+
+2014-04-10	Xilinx techmap: Assign SIM_COLLISION_CHECK generic in techmap
+		layer instead of patching UNSIM sources.
+
+2014-04-10	Disable install-unisim and install-secureip targets when
+		GRLIB_SIMULATOR is set to Xilinx.
+
+2014-04-10	Updated PlanAhead script generation to allow ISim simulation
+
+2014-04-08	Updated the leon3-digilent-xc7z020 design to working condition
+
+2014-04-04	10/100Mbit mode fix for RGMII and SGMII on Xilinx designs
+		- Fixed 10/100Mbit mode in RGMII for ref designs KC705,
+		  AC701 and GR-XC6
+		- Fixed 10/100Mbit mode in SGMII for ref designs VC707
+
+2013-04-04	PlanAhead flow updated to improve overall timing
+
+2013-04-04	GRETH/GRETH_GBIT updated to support unchanged clock speed for
+		lower bit rates
+
+2013-03-25	Remove lib/openchip
+
+2013-03-25	Add template design for Xilinx AC701 board (leon3-xilinx-ac701)
+
+2013-03-21	Set Unisim pad delays to zero to match ISE simulation model
+		behavior.
+
+2013-03-18	GPTIMER/GRTIMER: Merge GRTIMER functionality into GPTIMER.
+
+2014-03-06	DSU3: Add dsu3_mb to allow AHB trace of second AHB bus
+
+2014-03-05	LEON3v3: Rearranged and updated IP core documentation.
+
+2014-03-05	LEON3v3: Removed fast snooping option from xconfig menus,
+		default to always on.
+
+2014-03-05	LEON3v3: Added safeguard to generate error in simulation if FT
+		features are accidentally enabled on non-FT version of LEON3.
+
+2014-03-01	LEON3v3: Improve performance for d-cache in frozen state by
+		only fetching missing data instead of full d-cache line.
+
+2014-02-17	GPTIMER: Add WDOGDIS and WDOGNMI fields, see GRIP for details.
+
+2014-02-16	systest: Add -qnoambapp option if LDFLAGS variable is
+		undefined. If -qnoambapp leads to errors then these can be
+		fixed by defining LDFLAGS or installing a recent BCC version.
+
+2014-02-09	MUL32/DIV32: Add support for grlib_async_reset_enable.
+
+2014-01-18	Update documentation to warn for use of -use_new_parser yes
+		with Xilinx XST.
+
+2014-01-13	Remove planAhead make target, use only planahead.
+
+2014-01-03	Added generic DDR1, DDR2, DDR3 SDRAM simulation models
+		under lib/gaisler/sim.vhd. Updated most template designs
+		to use new models.
+
+----------------------- Release 1.3.4-b4140 ----------------------------
+
+2013-12-19	Fixed Xilinx planAhead flow for Spartan6 designs
+
+2013-12-19	Updated leon3-asic template design
+
+2013-12-19	Added techmap for Synopsys 32/28nm Generic Library (saed32)
+
+2013-12-18	Updated Xilinx VC707 and KC705 designs for Vivado 2013.3
+
+2013-12-18	Added template design for TerASIC DE4 development board
+		(designs/leon3-terasic-de4)
+
+2013-12-18	LEON3v3: Support grlib_sync_reset_enable_all from GRLIB config
+		package.
+
+2013-11-27	Added template designs for Digilent Nexys3 and Nexys4 boards.
+
+2013-11-13	AHBRAM: Add scan test support
+
+2013-11-01	Reverted techmap for IDDR2 primitive in Xilinx SPARTAN-6 and
+		added extra option in techmap library for aligning data to
+		clock edge inside SPARTAN-6 IO
+
+2013-11-01	GRETH: Chapter for CRC offloading updated since we do NOT 
+		support CRC offloading for fragmented TCP and UDP packets
+		over IPv4
+
+2013-11-01	Change DDR controllers to use dedicated in/out record type.
+		Move internal types to separate ddrintpkg package.
+
+2013-10-31	AHBCTRL: Print ERROR responses when ahbtrace is enabled
+
+2013-10-31	AHBJTAG: Add generic to select jtagcom implementation
+
+2013-09-24	MMU: testin signal propagation missing for MMU syncrams
+
+2013-09-23	Add workaround for Design Compiler bug (internal error during
+		elaboration) triggered by AHBRAM.
+
+2013-09-06	Added template design for Altera CycloneV E Development kit
+		(designs/leon3-altera-c5ekit)
+
+2013-09-06	Added async AHB-to-Avalon adapter for use with Altera DDR
+		memory controllers (AHB2AVL)
+
+----------------------- Release 1.3.1-b4135 ----------------------------
+
+2013-08-29	Fix bashisms in scripts target
+
+2013-08-28	Add SRECs to XSim (Vivado) simulation fileset
+
+2013-08-16	Corrected default value in clkgen for Xilinx Series 7
+
+2013-08-16	leon3-gr-xc6s: Fix for Ethernet
+		- Script for correcting RGMII board timing
+		- Added instructions to README file for correcting board timing 
+
+2013-08-16	Updated Vivado Flow to only support version 2013.2 and newer
+		- Supported XILINX IP now generated via VIVADO
+		- Improved support for XSIM
+		Note: This will affect all XILINX Series 7 boards
+
+2013-08-16	AHB2MIG for 7-series: support for VIVADO 2013.2
+
+2013-08-16	SGMII: Updated SGMII to support VIVADO 2013.2
+
+2013-08-16	RGMII: Re-design of to get better timing in 10/100Mbit mode
+
+2013-08-16	AHBJTAG: Reimplement jtagcom with shift registers in TCK
+		domain to allow TCK clock rates faster than AHB clock.
+
+2013-08-06	LEON3: Bring back support for cache freeze
+
+2013-07-29	Replace sdram.srec and sram.srec with ram.srec. "make soft"
+		now creates ram.srec. External designs may need to be changed
+		to take this into consideration.
+
+----------------------- Release 1.3.0-b4133 ----------------------------
+
+2013-07-24	Fix ML605 template design reset issue.
+
+2013-07-23	Re-arrange MIG files in Xilinx designs and make sure make
+		distclean removes all created files.
+
+2013-07-12	Remove deprecated ahbmst2 core (use ahbmst or ahbdma instead)
+
+2013-07-09	Update support for Aldec Riviera-PRO
+
+2013-07-02	Rename generated quartus project to $(TOP)_quartus
+
+2013-06-29	Remove deprecated DDR controllers (lib/gaisler/ddrv1)
+
+2013-06-27	Several designs require that the GRLIB_SIMULATOR variable is
+		set correctly. See doc/grlib.pdf and the template design's
+		README.txt file.
+
+2013-06-20	Update bitfiles for most template designs.
+
+2013-06-19	LEON3: Upgrade to version 3, highlights:
+		- Updated data cache, fetch full cache line on read miss
+		- Writes to %ASR16, 17, 19 - 31 are now privileged
+		- Updates to documentation
+		Note: Requires upgrade to GRMON2 2.0.38 / GRMON 1.1.59
+
+2013-06-10	Add script support for Aldec ALINT
+
+2013-05-28	Add PRECISIONOPT env variable for Mentor Precision flow
+
+2013-05-23	Updated interrupt assignments in template designs to
+		match with guidelines given in doc/guide.pdf.
+
+2013-05-20	AHBJTAG: Improve TDO generation while shifting address/data
+		to allow JTAG speeds up to 1/3 of the AHB speed.
+
+2013-05-17	AHBJTAG/TAP: Allow passing in inverted tck directly from top 
+		level instead of generating internally (for ASIC only)
+
+2013-05-15	AHBJTAG: Change sampling and synchronization of TCK/TDI into 
+		AHB clock domain to simplify ASIC constraining.
+
+2013-05-06	leon3-gr-xc6s: Change txclock delay to fix Ethernet stability
+		problems.
+
+2013-05-05	Add install/remove-unimacro targets
+
+2013-04-21	"make vsim" with ModelSim 10.2 caused endless compiles due
+		to use of vmake, which does not support new "flat" library
+		type. Fix by forcing use of "directory" library type.
+
+2013-04-19	GRGPIO systest: Allow irq test of IO[0] if pirq /= 0.
+
+2013-03-28	Updated support for Xilinx Vivado and planAhead flows
+
+2013-03-28	UNISIM techmap: Re-arrange, drop use of BUFGDLL for Virtex-5
+
+2013-03-28	AHB2MIG for 7-series: Support memories larger than 128 MiB
+
+2013-03-27	ML510 designs: Fix swapped chip-selects for DDR2 DIMM1
+
+2013-03-25	Move AG PCI files into, and under, lib/gaisler/pci
+
+2013-03-24	Fix swapped UART pins in SP605, KC705 and VC707 template
+		designs.
+
+2013-03-19	GRETH systest: Do not test EDCL if EDCL disabled on reset.
+
+2013-03-18	Add design contributed by Joris van Rantwijk for Digilent Atlys
+		board (leon3-digilent-atlys).
+
+2013-03-13	Add grlib_sync_reset_enable_all option to GRLIB configuration
+		package that enables reset of all registers in IP cores that
+		support this functionality. See GRLIB Configuration package
+		section in grlib.pdf for additional information.
+
+2013-03-08	AHBRAM: Allow values for kbytes larger than 512
+		Add larger size choices and expose pipe generic in xconfig
+
+2013-02-19	Netlist search path was not correctly set for Spartan-3A-DSP
+
+2013-02-11	SPICTRL: added support for external control - ignoring samples
+
+2013-02-01	Netlists were not automatically copied to template designs
+		for CYCLONEIV-E technology.
+
+----------------------- Release 1.2.2-b4123 ----------------------------
+
+2013-01-31	Fixed Makefile error that prevented script generation for
+		Xilinx PlanAhead when MIG DDR2 controller was enabled in design.
+
+----------------------- Release 1.2.1-b4122 ----------------------------
+
+2013-01-15	Fixed soft calibration error for MIG39 in SPARTAN6 designs
+
+2013-01-15	TECHMAP: Add support for SPARTAN-6 LVDS IOs
+
+2013-01-15	leon3-gr-xc6s: Added clock deskew PLL to improve USB HOST timing
+
+2013-01-15	Made GRLIB RGMII block technology independent
+
+2013-01-15	Corrected erroneous instantiation of mig37 in ML605 design
+
+----------------------- Release 1.2.0-b4121 ----------------------------
+
+2012-12-20	Added ISE14.3 and PlanAhead support for Virtex 6 and Spartan 6
+		template designs.
+
+2012-12-19	DDRSPA: Add phy implementation config VHDL generic (phyiconf)
+
+2012-12-17	GRETH: Support larger frames (maxsize VHDL generic added)
+
+2012-12-16	Added (experimental) support for Zynq-7000 and ZedBoard
+		(leon3-digilent-xc7z020).
+
+2012-12-16	Added support for Xilinx VC707 and KC705 development kits
+		(leon3-xilinx-vc707 and leon3-xilinx-kc705)
+
+2012-12-16	Added support for Xilinx Vivado flow
+
+2012-12-16	Added support for Xilinx 7-series FPGAs (Virtex, Kintex, Artix)
+
+2012-12-16	LEON: Fix possible pipeline hang after two consecutive DIV
+		operations. Bad sequence is not generated by compilers.
+
+2012-12-14	leon3-gr-xc6s: Remove USBDC* from template design
+
+2012-12-10	PCIPADS: Allow to select voltage and level via VHDL generics
+
+2012-12-10	GRGPIO: Add capability register and increase core revision to 2
+
+2012-12-07	DDRSPA: Fix reset delay bug in controller when pwron=0
+
+2012-11-28	SPICTRL: Use testoen to control direction in test mode
+
+2012-11-28	GRETH: Use testoen to control direction of mdio in test mode
+
+2012-11-19	GRGPIO: Use testoen to control direction in test mode.
+
+2012-11-17	Added AMBA test framework documentation to configuration guide
+
+2012-11-17	Added option to select predefined example processor
+		configurations in xconfig.
+
+2012-11-15	JTAG: Add oepol generic to control polarity of tdoen signal
+		Connect tdoen signal in the leon3-asic example design
+
+2012-11-13	Added PWM Generator (GRPWM) to COM and FT distributions
+
+2012-11-13	Added memory scrubber (MEMSCRUB) to FT distributions
+
+2012-11-06	Remove HCACHE signal from AMBA records. This change may break
+		existing external IP cores.
+
+2012-10-29	Added NAND Flash Memory Controller (NANDFCTRL) IP core
+		(to COM and FT releases).
+	
+2012-10-24	Makefile: added DESIGNER_LAYOUT_OPT to override all Designer
+		layout options.
+
+2012-10-22	Added disable during scan test handling to syncram techmap.
+		Distribute testin vector for syncrams in AMBA records.
+		Updated GRLIB documentation on scan test support.
+
+2012-10-15	Added LEON/GRLIB design and configuration guide (doc/guide.pdf)
+
+2012-10-13	Remove ATACTRL
+
+2012-10-12	LEON/SRMMU: Allow 64 TLB entries (for each TLB)
+
+2012-10-12	Update GRLIB config package with grlib_config_array constant.
+		All local copies of the global configuration package needs to
+		be updated. All cores that make use of grlib_debug_* constants
+		need to be changed to use grlib_config_array(grlib_debug_*).
+
+2012-10-11	LEON: Update IP core doc. regarding types of bus accesses
+		performed by the processors.
+
+2012-10-03      DDRSPA,DDR2SPA: Add hooks for scan test support
+
+2012-09-30	Update Aldec riviera targets to work with current versions.
+
+2012-09-27	LEON3: Part of partially filled I-cache line could get
+		incorrectly marked as valid when executing branch
+		instruction with I-cache frozen and branch prediction
+		enabled. Does not affect LEON3FT.
+
+2012-09-26	AHBRAM: Fix bug in wait state generation when pipe=1
+
+2012-09-25	GRETH: Add generic to extend MDIO output hold time to more
+                than one AMBA cycle.
+
+2012-09-25      GRCLKGATE: Add optional extra input for ungating all clocks
+
+2012-09-25      GRCLKGATE: Propagate master reset asynchronously into gated
+                resets by logical AND:ing.
+
+2012-09-24	Added IOMMU (GRIOMMU) to LEON4 relases.
+
+2012-09-23	Removed CoreMP7 to GRLIB bridge and design.
+
+2012-09-23	Removed WildCard design and WILD2AHB core.
+
+2012-09-23	Removed HAPS files.
+
+2012-09-11	AHBCTRL/AHBCTRL_MB: Treat HLOCK as coupled to specific access
+		to prevent HMASTLOCK assertion for normal accesses that receive
+		a SPLIT/RETRY response.
+
+2012-09-06	Use VERILOGSYNFILES in script generation for XST and Synplify.
+
+2012-09-06	Remove basic_passthru design
+
+2012-09-06	Remove unmaintained designs leon3-ge-hpe-mini, -lattice and
+		leon3-ge-hpe-midi-ep2s180. Also removed libraries and cores
+		that were only used in these designs. Vendor and device IDs
+		are kept and files can manually be copied from older GRLIB
+		releases.
+
+2012-08-24	SPICTRL: Core would generate one extra SCK cycle after
+		last word in queue for FACT = 1 and CPHA = 1.
+
+2012-08-24	SPICTRL: Fix transmit queue race condition introduced in
+		1.1.0-b4108 that could result in corrupted transmit data.
+
+2012-07-20	GRGPIO: irqgen=2,3,4 led to all irqmap registers getting
+		the same value on writes.
+
+2012-07-11	I-cache flush via ASI 0x10 was a no-op for systems
+		implemented without MMU.
+
+2012-06-261	DDRSPA,DDR2SPA: Move reset delay from phy to controller.
+
+2012-06-151	DDRSPA,DDR2SPA: Remove the internal fast generic, use read
+		counters to get correct behavior for all speed ratios with the
+		same controller.
+
+2012-05-10	DDRSPA,DDR2SPA: Moved ddr2spa and ddrspa components into their
+		own package ddrpkg. Make older versions of ddr controllers
+		available again under ddrv1 directory.
+
+		DDRSPA: Re-implemented to use the same structure as DDR2SPA.
+		DDRSPA: Add support for control signal timing up to DDR400.
+
+2012-04-30	SPIMCTRL: Allow user to specify address offset for SPI device.
+
+2012-04-25	leon3-gr-xc6: RGMII interface did not work with 10/100 MAC.
+
+2012-04-24	leon3-xilinx-sp601: USB/UART had swapped RX/TX signals.
+
+2012-04-12	Merged Xilinx ML505 - ML509 template designs into the design
+		leon3-xilinx-ml50x and added option to use the DDR2 MIG.
+
+2012-04-11	Added template design for TerASIC DE0-Nano board
+		(leon3-terasic-de0-nano)
+
+2012-03-19	Automatically perform "vsim-fix" when generating ModelSim
+		scripts to avoid issues with ':' in paths in Cygwin.
+
+2012-03-05	GRACECTRL: Emulate 16-bit mode for 8-bit MPU interface.
+		Enable core for Xilinx ML605 and SP605 template designs.
+
+2012-02-28	LEON3/4: Corrected documentation on cache flush ASIs.
+
+----------------------- Release 1.1.0-b4113 ----------------------------
+
+2012-01-18	Added template design for ZTEX USB-FPGA Module 1.15
+		(leon3-ztex-ufm-115). Renamed leon3-ztex-ufm-xc6slx25 to
+		leon3-ztex-ufm-111.
+
+2012-01-10	Moved I2C and SPI cores to separate directories.
+
+----------------------- Release 1.1.0-b4112 ----------------------------
+
+2012-01-02	Added template design for Xilinx SP605 board
+
+2011-12-29	Added template design for ZTEX USB-FPGA Module 1.11
+		(leon3-ztex-ufm-xc6slx25)
+
+2011-12-28	Added SPI to AHB bridge (SPI2AHB) core
+
+----------------------- Release 1.1.0-b4111 ----------------------------
+
+2011-12-19	Added RGMII interface for GR-XC6S-LX75 board.
+
+2011-11-29	Work-around for Xilinx SecureIP compilation bug
+
+2011-11-29	Added MIG wrapper to a few additional template designs
+
+2011-11-28	Added support for Xilinx ISIM simulator.
+
+2011-11-18	Improved Actel Libero script generation
+
+2011-10-14	MMU system test software: Do not use %local register in leaf
+		function. Could lead to test freeze with GCC 4.4.2.
+
+2011-10-06	DDR2SPA: Added support for registered SDRAM, and read-only
+		tech field to DDR2CFG2 register. Increased core revision to 1
+		in PnP entry.
+
+2011-09-29	SPICTRL: User was allowed to start a new transfer before SCK
+		had transitioned to idle state. If a transfer was started
+		early this could affect the clock phase for CPHA = 0.
+
+2011-09-26	Removed script support for early versions of eTools
+
+2011-09-26	Updated SPICTRL to rev 5 adding SCK filtering in slave mode
+
+2011-09-18	Added "Extending the xconfig GUI configuration" section to
+		GRLIB User's Manual (grlib.pdf).
+
+2011-09-18	Added I2C to AHB bridge (I2C2AHB) core
+
+2011-09-06	AHBCTRL: Update memory map intersection checks and clarify
+		in documentation that the AHB I/O area can be placed within
+		a slave memory area
+
+2011-08-06	Enable 16-bit FLASH interface in leon3-nuhorizon design
+
+2011-07-06	I2CMST: Added option to use dynamic filter
+
+----------------------- Release 1.1.0-b4108 ----------------------------
+
+2011-06-15	Added DDR2 MIG wrapper for template design for
+		Xilinx SP601 Spartan6 board.
+
+2011-06-13	Added template design for new Pender Spartan-6 board,
+		including a wrapper for Xilinx MIG 16-bit DDR2 controller.
+
+2011-06-13	Added template designs for Xilinx ML605 board, including
+		a wrapper for Xilinx MIG 64-bit DDR3 controller.
+
+2011-06-01	Added template design for Altera DE2 board, including
+		16-bit SDRAM controller.
+
+2011-05-18	SPICTRL: Allow use of SYNCRAM_2P for buffers
+
+2011-04-12	Expanded section "9. Extending GRLIB" of GRLIB User's Manual
+
+2011-03-17	Added AHBTRACE_MMB capable of multi-bus tracing.
+
+2011-01-31	GRFPU-lite netlists for Altera could not be synthesized
+
+2011-01-13	SPICTRL: 3-wire transfer direction order can now be configured
+
+2011-01-09	Added template design for BeMicro SDK (leon3-arrow-bemicro-sdk)
+
+2011-01-04	Hynix DDR2 model, fix spurious error messages in simulation
+
+----------------------- Release 1.1.0-b4105 ----------------------------
+
+2010-11-29	DDR2SPA: Fast acknowlege on read was one cycle too early
+
+2010-11-22	DDR2SPA: Fix data selection for AHB buses wider than 2xDDR
+
+2010-11-17	DDR2SPA: Write mode register correctly based on CAS/TWR settings
+
+2010-11-15	DDR2SPA: Add bigmem generic to enable >1GB RAM bank support
+
+2010-11-16	APBUART: Set number of scaler bits via VHDL generic
+
+2010-11-15	DDR2SPA: Separate reset generation for AHB/DDR clock domains
+
+2010-11-12	GPTIMER: Allow external watchdog enable/disable.
+
+----------------------- Release 1.1.0-b4104 ----------------------------
+
+2010-10-29	Added design for TerASIC Altera Cyclone-IV DE2-115 board
+
+2010-10-29	Improved flow for Quartus-10
+
+2010-10-14	DDR2SPA: Reimplement DDR2 controller to merge all data sizes.
+
+----------------------- Release 1.1.0-b4102 ----------------------------
+
+2010-10-12	Support for Xilinx ISE12 flow.
+
+2010-10-01	Improved generation of Actel Libero project file to avoid
+		large amount of bogus warnings.
+
+2010-09-23	DDR2SPA: Support single-ended DQS for Virtex4-6
+
+2010-09-12	GPTIMER: IP field in timer control register is now write-clear
+
+2010-08-09	GRGPIO: Add generic to specify the first interrupt line the core
+		should drive. Add support to dynamically specify the interrupt
+		line to use for each GPIO line.
+
+2010-06-28	Added Testbench framework for PCI.
+
+2010-06-28	PCI_TARGET: Added support for PCI bus in big-little mode
+		and support for byte and half word PCI accesses.
+
+2010-06-07      I2CMST/I2CSLV: Added generic that adjusts low-pass filter
+
+2010-05-19      AHBJTAG: Use bit 32 in read data to indicate if AHB access has
+                finished. Increased core version to 1.
+
+2010-05-10      SPICTRL: Extended system test with test that uses an external
+                simulation device. Function now has one additional argument.
+
+2010-05-06      XST: Remove -read_cores yes from XST script generation as yes
+                is the default read_cores setting. This allows specifying
+                -read_cores yes, no or optimize via the XSTOPT variable.
+
+2010-05-05      FPU: GRFPU and GRFPU-lite netlists in both LEON3 and LEON4
+                versions are now available for Cyclone2, Cyclone3, Stratix2,
+                Stratix3, Spartan3, Virtex2, Virtex4 and Virtex5.
+
+2010-05-05      FPU: Always use FPU netlists in distributions lacking FPU
+                source code.
+
+2010-05-05      FPU: Use EDIF netlists for FPU netlist synthesis on Xilinx
+
+2010-03-21      Improved input data filtering in serial DSU link (DCOM_UART).
+
+2010-02-15	Added template design for Xilinx SP601 Spartan6 board
+
+2010-02-01	Support for 64- and 128-bit AHB buses
+

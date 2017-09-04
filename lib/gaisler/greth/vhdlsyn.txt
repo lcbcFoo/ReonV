@@ -1,0 +1,15 @@
+ethernet_mac.vhd
+greth.vhd
+greth_mb.vhd
+greth_gbit.vhd
+greths.vhd
+greth_gbit_mb.vhd
+greths_mb.vhd
+grethm.vhd
+grethm_mb.vhd
+adapters/rgmii.vhd
+adapters/comma_detect.vhd
+adapters/sgmii.vhd
+adapters/elastic_buffer.vhd
+adapters/gmii_to_mii.vhd
+adapters/word_aligner.vhd

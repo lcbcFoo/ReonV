@@ -1,0 +1,21 @@
+diff -Naur mig_36_1.org/user_design/rtl/ddr2_infrastructure.vhd mig_36_1/user_design/rtl/ddr2_infrastructure.vhd
+--- mig_36_1.org/user_design/rtl/ddr2_infrastructure.vhd	2011-09-26 17:09:12.000000000 +0200
++++ mig_36_1/user_design/rtl/ddr2_infrastructure.vhd	2011-09-27 11:37:35.000000000 +0200
+@@ -195,7 +195,7 @@
+     -- Single ended input clock input buffers
+     --**************************************************************************
+ 
+-    SYS_CLK_INST : IBUFG
++    SYS_CLK_INST : BUFG
+       port map (
+         I  => sys_clk,
+         O  => sys_clk_ibufg
+@@ -220,7 +220,7 @@
+   end generate;
+ 
+   NOCLK200_CHECK_GND: if ( (NOCLK200 = true) and (CLK_TYPE = "SINGLE_ENDED")) generate
+-     clk200_bufg <= '0';
++     clk200_bufg <= sys_clk_ibufg;
+   end generate;
+ 
+ 

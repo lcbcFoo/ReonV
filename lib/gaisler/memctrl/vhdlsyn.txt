@@ -1,0 +1,15 @@
+memctrl.vhd 
+sdctrl.vhd 
+sdctrl64.vhd
+sdmctrl.vhd 
+srctrl.vhd 
+ssrctrl.vhd
+ftsrctrlc.vhd 
+ftsrctrl.vhd 
+ftsdctrl.vhd 
+ftsrctrl8.vhd
+ftsdmctrl.vhd
+ftmctrl.vhd
+ftsdctrl64.vhd
+spimctrl.vhd
+p8ctrl.vhd

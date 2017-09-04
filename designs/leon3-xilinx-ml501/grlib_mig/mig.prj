@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project NoOfControllers="1" >
+    <PLL>1</PLL>
+    <ModuleName>mig_36_1</ModuleName>
+    <TwoByteSel>0</TwoByteSel>
+    <dci_inouts_inputs>1</dci_inouts_inputs>
+    <dci_outputs>0</dci_outputs>
+    <Class>Class II</Class>
+    <Debug_En>Disable</Debug_En>
+    <TargetFPGA>xc5vlx50-ff676/-1</TargetFPGA>
+    <Version>3.6.1</Version>
+    <SystemClock>Single-Ended</SystemClock>
+    <PinSelectionFlag>FALSE</PinSelectionFlag>
+    <IODelayHighPerformanceMode>HIGH</IODelayHighPerformanceMode>
+    <Controller number="0" >
+        <MemoryDevice>DDR2_SDRAM/SODIMMs/MT4HTF3264HY-40E</MemoryDevice>
+        <TimePeriod>5000</TimePeriod>
+        <DataWidth>64</DataWidth>
+        <DeepMemory>1</DeepMemory>
+        <DataMask>1</DataMask>
+        <CustomPart>FALSE</CustomPart>
+        <NewPartName></NewPartName>
+        <RowAddress>13</RowAddress>
+        <ColAddress>10</ColAddress>
+        <BankAddress>2</BankAddress>
+        <TimingParameters>
+            <Parameters tdsa="400" tjit="100" tdsb="150" twtr="10" tis="600" twr="15" trtp="7.5" tdha="400" trfc="105" trp="15" tdhb="275" tmrd="2" tih="600" tras="40" trcd="15" tac="600" />
+        </TimingParameters>
+        <ECC>ECC Disabled</ECC>
+        <BankSelection>
+            <Bank Control="1" SysClk="0" Data="1" name="11" Address="1" wasso="38" />
+            <Bank Control="1" SysClk="0" Data="1" name="13" Address="1" wasso="38" />
+            <Bank Control="1" SysClk="0" Data="1" name="15" Address="1" wasso="38" />
+            <Bank Control="1" SysClk="0" Data="1" name="17" Address="1" wasso="38" />
+            <Bank Control="1" SysClk="0" Data="1" name="21" Address="1" wasso="38" />
+            <Bank Control="0" SysClk="1" Data="0" name="3" Address="0" wasso="19" />
+            <Bank Control="0" SysClk="1" Data="0" name="4" Address="0" wasso="19" />
+        </BankSelection>
+        <mrBurstLength name="Burst Length" >4(010)</mrBurstLength>
+        <mrBurstType name="Burst Type" >sequential(0)</mrBurstType>
+        <mrCasLatency name="CAS Latency" >3(011)</mrCasLatency>
+        <mrMode name="Mode" >normal(0)</mrMode>
+        <mrDllReset name="DLL Reset" >no(0)</mrDllReset>
+        <mrPdMode name="PD Mode" >fast exit(0)</mrPdMode>
+        <mrWriteRecovery name="Write Recovery" >3(010)</mrWriteRecovery>
+        <emrDllEnable name="DLL Enable" >Enable-Normal(0)</emrDllEnable>
+        <emrOutputDriveStrength name="Output Drive Strength" >Fullstrength(0)</emrOutputDriveStrength>
+        <emrRTT name="RTT (nominal) - ODT" >75ohms(01)</emrRTT>
+        <emrPosted name="Additive Latency (AL)" >0(000)</emrPosted>
+        <emrOCD name="OCD Operation" >OCD Exit(000)</emrOCD>
+        <emrDQS name="DQS# Enable" >Enable(0)</emrDQS>
+        <emrRDQS name="RDQS Enable" >Disable(0)</emrRDQS>
+        <emrOutputs name="Outputs" >Enable(0)</emrOutputs>
+        <PortInterface>NATIVE</PortInterface>
+    </Controller>
+</Project>

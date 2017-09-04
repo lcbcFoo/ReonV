@@ -1,0 +1,10 @@
+clkgen_stratixiii.vhd
+alt/apll.vhd alt/aclkout.vhd alt/actrlout.vhd
+alt/adqsout.vhd alt/adqout.vhd alt/admout.vhd
+alt/adqsin.vhd alt/adqin.vhd
+adq_dqs/dq_dqs_inst.vhd
+adq_dqs/bidir_dq_iobuf_inst.vhd
+adq_dqs/output_dqs_iobuf_inst.vhd
+adq_dqs/bidir_dqs_iobuf_inst.vhd
+ddr_phy_stratixiii.vhd
+serdes_stratixiii.vhd

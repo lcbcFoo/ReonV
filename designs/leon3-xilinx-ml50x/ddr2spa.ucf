@@ -1,0 +1,18 @@
+NET "clkml" 		TNM_NET = "clkml";
+TIMESPEC "TS_clkm_clkml" = FROM "clkm" TO "clkml" 5 ns DATAPATHONLY;
+TIMESPEC "TS_clkml_clkm" = FROM "clkml" TO "clkm" 5 ns DATAPATHONLY;
+
+#NET "lock"  TIG;
+#NET "ddrsp0.ddrc0/nftphy.ddr_phy0/ddr_phy0/xc4v.ddr_phy0/dqsclk(*)" TNM_NET = "dqsclk"; 
+#TIMEGRP "dqsclk_rise" = FALLING "dqsclk";
+#TIMEGRP "clkml_rise" = RISING "clkml";
+#TIMESPEC "TS_dqsclk_clkml_rise" = FROM "dqsclk_rise" TO "clkml_rise" 3.500;
+
+#INST "ddrsp0.ddrc0/nftphy.ddr_phy0/ddr_phy0/xc4v.ddr_phy0/idelctrl.0.u" LOC = "IDELAYCTRL_X0Y0";
+#INST "ddrsp0.ddrc0/nftphy.ddr_phy0/ddr_phy0/xc4v.ddr_phy0/idelctrl.1.u" LOC = "IDELAYCTRL_X0Y1";
+#INST "ddrsp0.ddrc0/nftphy.ddr_phy0/ddr_phy0/xc4v.ddr_phy0/idelctrl.2.u" LOC = "IDELAYCTRL_X0Y5";
+#INST "ddrsp0.ddrc0/nftphy.ddr_phy0/ddr_phy0/xc4v.ddr_phy0/idelctrl[0].u" LOC = "IDELAYCTRL_X0Y0";
+#INST "ddrsp0.ddrc0/nftphy.ddr_phy0/ddr_phy0/xc4v.ddr_phy0/idelctrl[1].u" LOC = "IDELAYCTRL_X0Y1";
+#INST "ddrsp0.ddrc0/nftphy.ddr_phy0/ddr_phy0/xc4v.ddr_phy0/idelctrl[2].u" LOC = "IDELAYCTRL_X0Y5";
+
+

@@ -1,0 +1,49 @@
+##############################################################
+#
+# Xilinx Core Generator version 14.4
+# Date: Tue Jan 15 12:55:41 2013
+#
+##############################################################
+#
+#  This file contains the customisation parameters for a
+#  Xilinx CORE Generator IP GUI. It is strongly recommended
+#  that you do not manually alter this file as it may cause
+#  unexpected and unsupported behavior.
+#
+##############################################################
+#
+#  Generated from component: xilinx.com:ip:mig:3.92
+#
+##############################################################
+#
+# BEGIN Project Options
+SET addpads = false
+SET asysymbol = true
+SET busformat = BusFormatParenNotRipped
+SET createndf = false
+SET designentry = Verilog
+SET device = xc6vlx240t
+SET devicefamily = virtex6
+SET flowvendor = Synplicity
+SET formalverification = false
+SET foundationsym = false
+SET implementationfiletype = Ngc
+SET package = ff1156
+SET removerpms = false
+SET simulationfiles = Behavioral
+SET speedgrade = -1
+SET verilogsim = true
+SET vhdlsim = false
+# END Project Options
+# BEGIN Select
+SELECT MIG_Virtex-6_and_Spartan-6 family Xilinx,_Inc. 3.92
+# END Select
+# BEGIN Parameters
+CSET component_name=mig
+CSET xml_input_file=./mig39.prj
+# END Parameters
+# BEGIN Extra information
+MISC pkg_timestamp=2012-10-13T03:35:42Z
+# END Extra information
+GENERATE
+# CRC: 1dbe8904

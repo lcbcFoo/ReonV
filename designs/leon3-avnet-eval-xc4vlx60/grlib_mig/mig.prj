@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project NoOfControllers="1" >
+    <DCM>1</DCM>
+    <ModuleName>mig_36_1</ModuleName>
+    <dci_inouts_inputs>1</dci_inouts_inputs>
+    <dci_outputs>0</dci_outputs>
+    <Class>Class I</Class>
+    <Debug_En>Disable</Debug_En>
+    <TargetFPGA>xc4vlx60-ff668/-10</TargetFPGA>
+    <Version>3.6.1</Version>
+    <SystemClock>Differential</SystemClock>
+    <Controller number="0" >
+        <MemoryDevice>DDR_SDRAM/Components/MT46V16M16XX-75</MemoryDevice>
+        <Clocking>Direct Clocking</Clocking>
+        <CCCheck>1</CCCheck>
+        <TimePeriod>10000</TimePeriod>
+        <DataWidth>16</DataWidth>
+        <DataMask>1</DataMask>
+        <CustomPart>FALSE</CustomPart>
+        <NewPartName></NewPartName>
+        <RowAddress>13</RowAddress>
+        <ColAddress>9</ColAddress>
+        <BankAddress>2</BankAddress>
+        <TimingParameters>
+            <Parameters twtr="1" tjit="150" tdh="500" tis="900" twr="15" trfc="75" trp="20" tds="500" tmrd="15" tih="900" tac="750" tras="40" trc="65" trcd="20" />
+        </TimingParameters>
+        <BankSelection>
+            <Bank Control="0" SysClk="1" Data="0" name="3" Address="0" wasso="15" />
+            <Bank Control="0" SysClk="1" Data="0" name="4" Address="0" wasso="15" />
+            <Bank Control="1" SysClk="0" Data="1" name="5" Address="1" wasso="60" />
+            <Bank Control="1" SysClk="0" Data="1" name="7" Address="1" wasso="60" />
+            <Bank Control="1" SysClk="0" Data="1" name="9" Address="1" wasso="60" />
+        </BankSelection>
+        <mrBurstLength name="Burst Length" >8(011)</mrBurstLength>
+        <mrBurstType name="Burst Type" >sequential(0)</mrBurstType>
+        <mrCasLatency name="CAS Latency" >2(010)</mrCasLatency>
+        <mrMode name="Operating Mode" >normal(00000)</mrMode>
+        <emrDllEnable name="DLL Enable" >Enable-Normal(0)</emrDllEnable>
+        <emrOutputDriveStrength name="Output Drive Strength" >Normal(0)</emrOutputDriveStrength>
+        <PortInterface>NATIVE</PortInterface>
+    </Controller>
+</Project>

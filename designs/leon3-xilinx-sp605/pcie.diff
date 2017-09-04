@@ -1,0 +1,41 @@
+diff -Naur pcie.org/s6_pcie_v1_4/simulation/dsport/gtx_wrapper_v6.vhd pcie/s6_pcie_v1_4/simulation/dsport/gtx_wrapper_v6.vhd
+--- pcie.org/s6_pcie_v1_4/simulation/dsport/gtx_wrapper_v6.vhd	2012-07-13 18:07:04.000000000 +0200
++++ pcie/s6_pcie_v1_4/simulation/dsport/gtx_wrapper_v6.vhd	2012-07-13 18:10:34.594835383 +0200
+@@ -512,7 +512,7 @@
+          generic map (
+             TX_DRIVE_MODE             => "PIPE",
+             TX_CLK_SOURCE             => "RXPLL",
+-            POWER_SAVE                => "0000100100",
++            POWER_SAVE                => "0000110100",
+             CM_TRIM                   => "01",
+             PMA_CDR_SCAN              => x"640404C",
+             PMA_CFG                   => x"0040000040000000003",
+diff -Naur pcie.org/s6_pcie_v1_4/simulation/tests/tests.vhd  pcie/s6_pcie_v1_4/simulation/tests/tests.vhd --- pcie.org/s6_pcie_v1_4/simulation/tests/tests.vhd	2012-07-13 18:07:03.000000000 +0200
++++ pcie/s6_pcie_v1_4/simulation/tests/tests.vhd	2012-07-13 18:16:32.111410578 +0200
+@@ -230,13 +230,24 @@
+             write (Lglobal, String'("Testing PIO Mem32 Space BAR "));
+             hwrite(Lglobal, std_logic_vector(to_unsigned(i, 4)));
+             writeline (output, Lglobal);
++            
++-- initial page 
++            DATA_STORE(0) := X"00";
++            DATA_STORE(1) := X"00";
++            DATA_STORE(2) := X"00";
++            DATA_STORE(3) := X"40";
+ 
++            PROC_TX_MEMORY_WRITE_32 (
++              X"02", "000", "0000000001", x"10100000", X"0", X"F",'0',
++              trn_td_c, trn_tsof_n, trn_teof_n , trn_trem_n_c, trn_tsrc_rdy_n, trn_terrfwd_n,
++              trn_lnk_up_n, trn_tdst_rdy_n, trn_clk);
++
++-- write and read test
+             DATA_STORE(0) := X"01";
+             DATA_STORE(1) := X"02";
+             DATA_STORE(2) := X"03";
+             DATA_STORE(3) := X"04";
+ 
+-
+             PROC_TX_MEMORY_WRITE_32 (
+               X"02", "000", "0000000001", BAR(i)(31 downto 0), X"0", X"F",'0',
+               trn_td_c, trn_tsof_n, trn_teof_n , trn_trem_n_c, trn_tsrc_rdy_n, trn_terrfwd_n,
+

@@ -1,0 +1,20 @@
+NET sys_reset_n      LOC = J7  | IOSTANDARD = LVCMOS25 | PULLUP | NODELAY;
+NET  sys_clk_n       LOC = B10;
+NET  sys_clk_p       LOC = A10;
+
+# PCIe Lane 0
+INST pcie_mt.EP/s6_pcie_v1_4_i/GT_i/tile0_gtpa1_dual_wrapper_i/gtpa1_dual_i LOC = GTPA1_DUAL_X0Y0;
+
+NET   pci_exp_txp  LOC = B6;
+NET   pci_exp_txn  LOC = A6;
+NET   pci_exp_rxp  LOC = D7;
+NET   pci_exp_rxn  LOC = C7;
+
+NET sys_reset_n TIG;
+
+NET pcie_mt.EP/sys_clk_c PERIOD = 8ns;
+
+NET pcie_mt.EP/s6_pcie_v1_4_i/gt_refclk_out(0) TNM_NET = GT_REFCLK_OUT;
+TIMESPEC TS_GT_REFCLK_OUT = PERIOD GT_REFCLK_OUT 8ns HIGH 50 % ;
+
+

@@ -1,0 +1,17 @@
+#include "config.h"
+#include "tkconfig.h"
+-----------------------------------------------------------------------------
+--  LEON4 Demonstration design test bench configuration
+--  Copyright (C) 2010 Aeroflex Gaisler
+------------------------------------------------------------------------------
+
+
+library techmap;
+use techmap.gencomp.all;
+
+package config is
+
+#include "config.vhd.h"
+
+
+end;

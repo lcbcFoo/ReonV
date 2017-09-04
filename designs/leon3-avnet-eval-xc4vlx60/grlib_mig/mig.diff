@@ -1,0 +1,17 @@
+diff -Naur mig_36_1.org/user_design/rtl/mig_36_1_infrastructure.vhd mig_36_1/user_design/rtl/mig_36_1_infrastructure.vhd
+--- mig_36_1.org/user_design/rtl/mig_36_1_infrastructure.vhd	2011-11-19 22:36:33.000000000 +0100
++++ mig_36_1/user_design/rtl/mig_36_1_infrastructure.vhd	2011-11-21 22:59:00.843954000 +0100
+@@ -127,10 +127,11 @@
+   
+   DIFF_ENDED_CLKS_INST : if(CLK_TYPE = "DIFFERENTIAL") generate
+   begin
+-    SYS_CLK_INST : IBUFGDS_LVPECL_25
++--    SYS_CLK_INST : IBUFGDS_LVPECL_25
++    SYS_CLK_INST : IBUFG
+       port map (
+         I  => sys_clk_p,
+-        IB => sys_clk_n,
++--        IB => sys_clk_n,
+         O  => sys_clk_in
+         );
+     

@@ -1,0 +1,20 @@
+556c556,557
+<   `else `define sg25                        // sg25 is equivalent to the JEDEC DDR3-800E (6-6-6) speed bin
+---
+>   `else 
+>     `define sg25                        // sg25 is equivalent to the JEDEC DDR3-800E (6-6-6) speed bin
+784c785,786
+<   `else `define x16
+---
+>   `else 
+>     `define x16
+1504c1506,1507
+<   `else `define sg25                        // sg25 is equivalent to the JEDEC DDR3-800E (6-6-6) speed bin
+---
+>   `else 
+>     `define sg25                        // sg25 is equivalent to the JEDEC DDR3-800E (6-6-6) speed bin
+1732c1735,1736
+<   `else `define x16
+---
+>   `else 
+>     `define x16

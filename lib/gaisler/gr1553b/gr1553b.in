@@ -1,0 +1,6 @@
+    bool 'Enable GR1553B interface               ' CONFIG_GR1553B_ENABLE
+    if [ "$CONFIG_GR1553B_ENABLE" = "y" ]; then
+      bool 'Bus Controller support                  ' CONFIG_GR1553B_BCEN
+      bool 'Remote Terminal support                 ' CONFIG_GR1553B_RTEN
+      bool 'Bus Monitor support                     ' CONFIG_GR1553B_BMEN      
+    fi

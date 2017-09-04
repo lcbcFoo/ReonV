@@ -1,0 +1,41 @@
+--- mig39/mig_39/user_design/rtl/mig_39.vhd	2012-12-20 09:21:58.000000000 +0100
++++ mig39_copy/mig_39/user_design/rtl/mig_39.vhd	2012-12-20 09:24:32.951784727 +0100
+@@ -65,7 +65,7 @@
+ --*****************************************************************************
+ library ieee;
+ use ieee.std_logic_1164.all;
+-entity mig_39 is
++entity mig_37 is
+ generic
+   (
+             C3_P0_MASK_SIZE           : integer := 4;
+@@ -118,7 +118,7 @@
+    mcb3_dram_udm                           : out std_logic;
+    c3_sys_clk_p                            : in  std_logic;
+    c3_sys_clk_n                            : in  std_logic;
+-   c3_sys_rst_i                            : in  std_logic;
++   c3_sys_rst_n                            : in  std_logic;
+    c3_calib_done                           : out std_logic;
+    c3_clk0                                 : out std_logic;
+    c3_rst0                                 : out std_logic;
+@@ -151,9 +151,9 @@
+    c3_p0_rd_overflow                       : out std_logic;
+    c3_p0_rd_error                          : out std_logic
+   );
+-end mig_39;
++end mig_37;
+ 
+-architecture arc of mig_39 is
++architecture arc of mig_37 is
+ 
+  
+ 
+@@ -449,7 +449,7 @@
+    sys_clk_p                       => c3_sys_clk_p,
+    sys_clk_n                       => c3_sys_clk_n,
+    sys_clk                         => c3_sys_clk,
+-   sys_rst_i                       => c3_sys_rst_i,
++   sys_rst_i                       => c3_sys_rst_n,
+    clk0                            => c3_clk0,
+    rst0                            => c3_rst0,
+    async_rst                       => c3_async_rst,

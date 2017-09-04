@@ -1,0 +1,22 @@
+# Date: Sun Jun 12 20:54:28 2011
+
+SET addpads = false
+SET asysymbol = true
+SET busformat = BusFormatParenNotRipped
+SET createndf = false
+SET designentry = VHDL
+SET device = xc6slx16
+SET devicefamily = spartan6
+SET flowvendor = Synplicity
+SET formalverification = false
+SET foundationsym = false
+SET implementationfiletype = Ngc
+SET package = csg324
+SET removerpms = false
+SET simulationfiles = Behavioral
+SET speedgrade = -2
+SET verilogsim = false
+SET vhdlsim = true
+SET workingdirectory = ./tmp/
+
+# CRC: 6263b4e5

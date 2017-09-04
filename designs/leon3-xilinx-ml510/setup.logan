@@ -1,0 +1,20 @@
+pci_arb_req0_4 5
+pci_arb_gnt0_4 5
+pcii_int 4
+pcii_pci66 1
+pcii_host 1
+pcii_par 1
+pcii_serr 1
+pcii_perr 1
+pcii_lock 1
+pcii_stop 1
+pcii_devsel 1
+pcii_trdy 1
+pcii_irdy 1
+pcii_frame 1
+pcii_cbe 4
+pcii_ad 32
+pcii_idsel 1
+pcii_gnt 1
+pcii_rst 1
+

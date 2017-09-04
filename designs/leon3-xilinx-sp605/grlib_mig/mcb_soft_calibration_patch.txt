@@ -1,0 +1,1049 @@
+--- ./mig39/mig_39//user_design/rtl/mcb_soft_calibration.vhd	2013-01-15 15:13:18.000000000 +0100
++++ ./p/a/t/c/h/mig39/mig_39//user_design/rtl/mcb_soft_calibration.vhd	2013-01-15 15:19:15.608793398 +0100
+@@ -94,15 +94,7 @@
+ --       3.7:  04/26/10:  Added DDR2 Initialization fix to meet 400 ns wait as outlined in step d) of JEDEC DDR2 spec .
+ --       3.8:  05/05/10:  Added fixes for the CR# 559092 (updated Mult_Divide function) and 555416 (added IOB attribute to DONE_SOFTANDHARD_CAL).
+ --       3.9:  05/24/10:  Added 200us Wait logic to control CKE_Train. The 200us Wait counter assumes UI_CLK freq not higher than 100 MHz.
+---       3.10  10/22/10:  Fixed PERFORM_START_DYN_CAL_AFTER_SELFREFRESH logic.		
+---       3.11  2/14/11:   Apply a different skkew for the P and N inputs for the differential LDQS and UDQS signals to provide more noise immunity.
+---       4.1   03/08/12:  Fixed SELFREFRESH_MCB_REQ logic. It should not need depend on the SM STATE so that
+---                        MCB can come out of selfresh mode. SM requires refresh cycle to update the DQS value. 
+---       4.2   05/10/12:  All P/N terms of input and bidir memory pins are initialized with value of ZERO. TZQINIT_MAXCNT
+---                        are set to 8 for LPDDR,DDR and DDR2 interface .
+---                        Keep the UICMDEN in assertion state when SM is in RST_DELAY state so that MCB will not start doing
+---                        Premable detection until the second deassertion of MCB_SYSRST. 
+-                        
++--       3.10  10/22/10:  Fixed PERFORM_START_DYN_CAL_AFTER_SELFREFRESH logic.
+ 
+ -- End Revision
+ --**********************************************************************************
+@@ -157,17 +149,17 @@
+       MCB_UIADDR            : out std_logic_vector(4 downto 0) := "00000";  -- to MCB's UIADDR port (gets passed to IODRP2_MCB's AUXADDR port
+       MCB_UICMDEN           : out std_logic := '1'; -- set to 1 to take control of UI interface - removes control from internal calib block
+       MCB_UIDONECAL         : out std_logic := '0'; -- set to 0 to "tell" controller that it's still in a calibrate state
+-      MCB_UIDQLOWERDEC      : out std_logic ;
+-      MCB_UIDQLOWERINC      : out std_logic ;
+-      MCB_UIDQUPPERDEC      : out std_logic ;
+-      MCB_UIDQUPPERINC      : out std_logic ;
++      MCB_UIDQLOWERDEC      : out std_logic := '0';
++      MCB_UIDQLOWERINC      : out std_logic := '0';
++      MCB_UIDQUPPERDEC      : out std_logic := '0';
++      MCB_UIDQUPPERINC      : out std_logic := '0';
+       MCB_UILDQSDEC         : out std_logic := '0';
+       MCB_UILDQSINC         : out std_logic := '0';
+       MCB_UIREAD            : out std_logic;        -- enables read w/o writing by turning on a SDO->SDI loopback inside the IODRP2_MCBs (doesn't exist in 
+                                                     --  regular IODRP2).  IODRPCTRLR_R_WB becomes don't-care.
+       MCB_UIUDQSDEC         : out std_logic := '0';
+       MCB_UIUDQSINC         : out std_logic := '0';
+-      MCB_RECAL             : out std_logic ; -- future hook to drive MCB's RECAL pin - initiates a hard re-calibration sequence when high
++      MCB_RECAL             : out std_logic := '0'; -- future hook to drive MCB's RECAL pin - initiates a hard re-calibration sequence when high
+       MCB_UICMD             : out std_logic;
+       MCB_UICMDIN           : out std_logic;
+       MCB_UIDQCOUNT         : out std_logic_vector(3 downto 0);
+@@ -234,50 +226,31 @@
+    constant WAIT5                     : std_logic_vector(5 downto 0) := "001111";
+    constant BROADCAST_NTERM           : std_logic_vector(5 downto 0) := "010000";
+    constant WAIT6                     : std_logic_vector(5 downto 0) := "010001";
+-
+-   constant LDQS_CLK_WRITE_P_TERM     : std_logic_vector(5 downto 0) := "010010";
+-   constant LDQS_CLK_P_TERM_WAIT      : std_logic_vector(5 downto 0) := "010011";
+-   constant LDQS_CLK_WRITE_N_TERM     : std_logic_vector(5 downto 0) := "010100";
+-   constant LDQS_CLK_N_TERM_WAIT      : std_logic_vector(5 downto 0) := "010101";
+-   constant LDQS_PIN_WRITE_P_TERM     : std_logic_vector(5 downto 0) := "010110";
+-   constant LDQS_PIN_P_TERM_WAIT      : std_logic_vector(5 downto 0) := "010111";
+-   constant LDQS_PIN_WRITE_N_TERM     : std_logic_vector(5 downto 0) := "011000";
+-   constant LDQS_PIN_N_TERM_WAIT      : std_logic_vector(5 downto 0) := "011001";
+-   constant UDQS_CLK_WRITE_P_TERM     : std_logic_vector(5 downto 0) := "011010";
+-   constant UDQS_CLK_P_TERM_WAIT      : std_logic_vector(5 downto 0) := "011011";
+-   constant UDQS_CLK_WRITE_N_TERM     : std_logic_vector(5 downto 0) := "011100";
+-   constant UDQS_CLK_N_TERM_WAIT      : std_logic_vector(5 downto 0) := "011101";
+-   constant UDQS_PIN_WRITE_P_TERM     : std_logic_vector(5 downto 0) := "011110";
+-   constant UDQS_PIN_P_TERM_WAIT      : std_logic_vector(5 downto 0) := "011111";
+-   constant UDQS_PIN_WRITE_N_TERM     : std_logic_vector(5 downto 0) := "100000";
+-   constant UDQS_PIN_N_TERM_WAIT      : std_logic_vector(5 downto 0) := "100001"; 
+-   
+-   constant OFF_RZQ_PTERM             : std_logic_vector(5 downto 0) := "100010";
+-   constant WAIT7                     : std_logic_vector(5 downto 0) := "100011";
+-   constant OFF_ZIO_NTERM             : std_logic_vector(5 downto 0) := "100100";
+-   constant WAIT8                     : std_logic_vector(5 downto 0) := "100101";
+-   constant RST_DELAY                 : std_logic_vector(5 downto 0) := "100110";
+-   constant START_DYN_CAL_PRE         : std_logic_vector(5 downto 0) := "100111";
+-   constant WAIT_FOR_UODONE           : std_logic_vector(5 downto 0) := "101000";
+-   constant LDQS_WRITE_POS_INDELAY    : std_logic_vector(5 downto 0) := "101001";
+-   constant LDQS_WAIT1                : std_logic_vector(5 downto 0) := "101010";
+-   constant LDQS_WRITE_NEG_INDELAY    : std_logic_vector(5 downto 0) := "101011";
+-   constant LDQS_WAIT2                : std_logic_vector(5 downto 0) := "101100";
+-   constant UDQS_WRITE_POS_INDELAY    : std_logic_vector(5 downto 0) := "101101";
+-   constant UDQS_WAIT1                : std_logic_vector(5 downto 0) := "101110";
+-   constant UDQS_WRITE_NEG_INDELAY    : std_logic_vector(5 downto 0) := "101111";
+-   constant UDQS_WAIT2                : std_logic_vector(5 downto 0) := "110000";
+-   constant START_DYN_CAL             : std_logic_vector(5 downto 0) := "110001";
+-   constant WRITE_CALIBRATE           : std_logic_vector(5 downto 0) := "110010";
+-   constant WAIT9                     : std_logic_vector(5 downto 0) := "110011";
+-   constant READ_MAX_VALUE            : std_logic_vector(5 downto 0) := "110100";
+-   constant WAIT10                    : std_logic_vector(5 downto 0) := "110101";
+-   constant ANALYZE_MAX_VALUE         : std_logic_vector(5 downto 0) := "110110";
+-   constant FIRST_DYN_CAL             : std_logic_vector(5 downto 0) := "110111";
+-   constant INCREMENT                 : std_logic_vector(5 downto 0) := "111000";
+-   constant DECREMENT                 : std_logic_vector(5 downto 0) := "111001"; 
+-   constant DONE                      : std_logic_vector(5 downto 0) := "111010";
+-   --constant INCREMENT_TA             : std_logic_vector(5 downto 0) := "111011";
++   constant OFF_RZQ_PTERM             : std_logic_vector(5 downto 0) := "010010";
++   constant WAIT7                     : std_logic_vector(5 downto 0) := "010011";
++   constant OFF_ZIO_NTERM             : std_logic_vector(5 downto 0) := "010100";
++   constant WAIT8                     : std_logic_vector(5 downto 0) := "010101";
++   constant RST_DELAY                 : std_logic_vector(5 downto 0) := "010110";
++   constant START_DYN_CAL_PRE         : std_logic_vector(5 downto 0) := "010111";
++   constant WAIT_FOR_UODONE           : std_logic_vector(5 downto 0) := "011000";
++   constant LDQS_WRITE_POS_INDELAY    : std_logic_vector(5 downto 0) := "011001";
++   constant LDQS_WAIT1                : std_logic_vector(5 downto 0) := "011010";
++   constant LDQS_WRITE_NEG_INDELAY    : std_logic_vector(5 downto 0) := "011011";
++   constant LDQS_WAIT2                : std_logic_vector(5 downto 0) := "011100";
++   constant UDQS_WRITE_POS_INDELAY    : std_logic_vector(5 downto 0) := "011101";
++   constant UDQS_WAIT1                : std_logic_vector(5 downto 0) := "011110";
++   constant UDQS_WRITE_NEG_INDELAY    : std_logic_vector(5 downto 0) := "011111";
++   constant UDQS_WAIT2                : std_logic_vector(5 downto 0) := "100000";
++   constant START_DYN_CAL             : std_logic_vector(5 downto 0) := "100001";
++   constant WRITE_CALIBRATE           : std_logic_vector(5 downto 0) := "100010";
++   constant WAIT9                     : std_logic_vector(5 downto 0) := "100011";
++   constant READ_MAX_VALUE            : std_logic_vector(5 downto 0) := "100100";
++   constant WAIT10                    : std_logic_vector(5 downto 0) := "100101";
++   constant ANALYZE_MAX_VALUE         : std_logic_vector(5 downto 0) := "100110";
++   constant FIRST_DYN_CAL             : std_logic_vector(5 downto 0) := "100111";
++   constant INCREMENT                 : std_logic_vector(5 downto 0) := "101000";
++   constant DECREMENT                 : std_logic_vector(5 downto 0) := "101001"; 
++   constant DONE                      : std_logic_vector(5 downto 0) := "101010";
+ 
+    constant RZQ                       : std_logic_vector(1 downto 0) := "00";
+    constant ZIO                       : std_logic_vector(1 downto 0) := "01";
+@@ -315,12 +288,10 @@
+    constant DIV                       : integer := 4;
+ 
+    constant PNSKEW                    : std_logic := '1'; -- Default is 1'b1. Change to 1'b0 if PSKEW and NSKEW are not required
+-   constant PNSKEWDQS                 : std_logic := '1';
+-   
+-   constant MULT_S                    : integer  := 9;
+-   constant DIV_S                     : integer  := 8;
+-   constant MULT_W                    : integer  := 7;
+-   constant DIV_W                     : integer  := 8;
++   constant PSKEW_MULT                : integer  := 9;
++   constant PSKEW_DIV                 : integer  := 8;
++   constant NSKEW_MULT                : integer  := 7;
++   constant NSKEW_DIV                 : integer  := 8;
+ 
+    constant DQS_NUMERATOR             : integer  := 3;
+    constant DQS_DENOMINATOR           : integer  := 8;
+@@ -329,23 +300,11 @@
+                                                           -- 3 for three eighths
+ 
+    constant RST_CNT                   : std_logic_vector(9 downto 0) := "0000010000";
++   constant TZQINIT_MAXCNT            : std_logic_vector(9 downto 0) := C_MEM_TZQINIT_MAXCNT + RST_CNT;
+  
+    constant IN_TERM_PASS             : std_logic := '0';
+    constant DYN_CAL_PASS             : std_logic := '1';
+ 
+-   function TZQINIT_MAXCNT_W return std_logic_vector is
+-     variable temp : std_logic_vector(9 downto 0) := (others=>'0');
+-   begin
+-      if (C_MEM_TYPE = "DDR3") then
+-         temp := C_MEM_TZQINIT_MAXCNT + RST_CNT;
+-      else
+-         temp := 8 + RST_CNT;
+-      end if;
+-         return temp(9 downto 0);
+-   end function;
+-
+-   constant TZQINIT_MAXCNT            : std_logic_vector(9 downto 0) := TZQINIT_MAXCNT_W;
+-
+    component iodrp_mcb_controller is
+       port (
+          memcell_address           : in std_logic_vector(7 downto 0);
+@@ -387,15 +346,11 @@
+    end component;
+    
+    signal P_Term                       : std_logic_vector(5 downto 0) := "000000";  
+-   signal N_Term                       : std_logic_vector(6 downto 0) := "0000000";   
+-   signal P_Term_s                       : std_logic_vector(5 downto 0) := "000000";  
+-   signal N_Term_s                       : std_logic_vector(6 downto 0) := "0000000"; 
+-   signal P_Term_w                       : std_logic_vector(5 downto 0) := "000000";  
+-   signal N_Term_w                       : std_logic_vector(6 downto 0) := "0000000"; 
++   signal N_Term                       : std_logic_vector(6 downto 0) := "0000000"; 
+    signal P_Term_Prev                  : std_logic_vector(5 downto 0) := "000000";  
+    signal N_Term_Prev                  : std_logic_vector(6 downto 0) := "0000000"; 
+ 
+-   signal STATE                        : std_logic_vector(5 downto 0);
++   signal STATE                        : std_logic_vector(5 downto 0) := START;
+    signal IODRPCTRLR_MEMCELL_ADDR      : std_logic_vector(7 downto 0);              
+    signal IODRPCTRLR_WRITE_DATA        : std_logic_vector(7 downto 0);              
+    signal Active_IODRP                 : std_logic_vector(1 downto 0);
+@@ -411,7 +366,7 @@
+    signal count                        : std_logic_vector(5 downto 0) := "000000";  -- counter for adding 18 extra clock cycles after setting Calibrate bit
+    signal counter_en                   : std_logic := '0';                          -- counter enable for "count"
+    signal First_Dyn_Cal_Done           : std_logic := '0';                          -- flag - high after the very first dynamic calibration is done
+-   signal START_BROADCAST              : std_logic ;                          -- Trigger to start Broadcast to IODRP2_MCBs to set Input Impedance - 
++   signal START_BROADCAST              : std_logic := '1';                          -- Trigger to start Broadcast to IODRP2_MCBs to set Input Impedance - 
+                                                                                     --  state machine will wait for this to be high
+    signal DQS_DELAY_INITIAL            : std_logic_vector(7 downto 0) := "00000000";
+    signal DQS_DELAY                    : std_logic_vector(7 downto 0);              -- contains the latest values written to LDQS and UDQS Input Delays
+@@ -474,24 +429,15 @@
+    signal MCB_UISDI_xilinx11           : std_logic;
+    signal MCB_UICS_xilinx6             : std_logic;
+    signal MCB_UIBROADCAST_xilinx4      : std_logic;
+-   signal MCB_UIADDR_int           : std_logic_vector(4 downto 0);
++   signal MCB_UIADDR_xilinx3           : std_logic_vector(4 downto 0);
+    signal MCB_UIDONECAL_xilinx7        : std_logic;
+    signal MCB_UIREAD_xilinx10          : std_logic;
+    signal SELFREFRESH_MODE_xilinx11    : std_logic;
+    signal Max_Value_int                : std_logic_vector(7 downto 0);
+    signal Rst_condition1               : std_logic;
+-   --signal Rst_condition2               : std_logic;
++   signal Rst_condition2               : std_logic;
+    signal non_violating_rst            : std_logic;
+    signal WAIT_200us_COUNTER           : std_logic_vector(15 downto 0);
+-   signal WaitTimer                    : std_logic_vector(7 downto 0);
+-   signal WarmEnough                   : std_logic;
+-   signal WaitCountEnable : std_logic;
+-   signal State_Start_DynCal_R1 : std_logic;
+-   signal State_Start_DynCal : std_logic;
+-   
+-   signal pre_sysrst_minpulse_width_ok : std_logic;
+-   signal pre_sysrst_cnt : std_logic_vector(3 downto 0);
+-
+    -- This function multiplies by a constant MULT and then divides by the DIV constant
+    function Mult_Divide (Input : std_logic_vector(7 downto 0); MULT : integer ; DIV : integer ) return std_logic_vector is
+      variable Result : integer := 0;
+@@ -505,19 +451,9 @@
+      return temp(7 downto 0);
+    end function Mult_Divide;
+ 
+-
+-
+    attribute syn_preserve : boolean;
+    attribute syn_preserve of P_Term                  : signal is TRUE;
+    attribute syn_preserve of N_Term                  : signal is TRUE;
+-   attribute syn_preserve of P_Term_s                  : signal is TRUE;
+-   attribute syn_preserve of N_Term_s                  : signal is TRUE;
+-   attribute syn_preserve of P_Term_w                  : signal is TRUE;
+-   attribute syn_preserve of N_Term_w                  : signal is TRUE;
+-   
+-   
+-   
+-   
+    attribute syn_preserve of P_Term_Prev             : signal is TRUE;
+    attribute syn_preserve of N_Term_Prev             : signal is TRUE;
+    attribute syn_preserve of IODRPCTRLR_MEMCELL_ADDR : signal is TRUE;
+@@ -530,18 +466,6 @@
+ 
+ begin
+ 
+-
+--- move the default assignment here to make FORMALITY happy.
+-
+-   START_BROADCAST  <= '1';
+-   MCB_RECAL        <= '0';
+-   MCB_UIDQLOWERDEC <= '0';
+-   MCB_UIADDR       <= MCB_UIADDR_int;
+-   MCB_UIDQLOWERINC <= '0';
+-   MCB_UIDQUPPERDEC <= '0';
+-   MCB_UIDQUPPERINC <= '0';
+-  
+-  
+    Max_Value        <= Max_Value_int;
+    -- Drive referenced outputs
+    IODRP_ADD        <= IODRP_ADD_xilinx0;
+@@ -550,6 +474,7 @@
+    MCB_UISDI        <= MCB_UISDI_xilinx11;
+    MCB_UICS         <= MCB_UICS_xilinx6;
+    MCB_UIBROADCAST  <= MCB_UIBROADCAST_xilinx4;
++   MCB_UIADDR       <= MCB_UIADDR_xilinx3;
+    MCB_UIDONECAL    <= MCB_UIDONECAL_xilinx7;
+    MCB_UIREAD       <= MCB_UIREAD_xilinx10;
+    SELFREFRESH_MODE <= SELFREFRESH_MODE_xilinx11;
+@@ -607,7 +532,7 @@
+          cmd_valid        => MCB_CMD_VALID,
+          rdy_busy_n       => MCB_RDY_BUSY_N,
+          use_broadcast    => MCB_USE_BKST,
+-         drp_ioi_addr     => MCB_UIADDR_int,
++         drp_ioi_addr     => MCB_UIADDR_xilinx3,
+          sync_rst         => RST_reg,
+          DRP_CLK          => UI_CLK,
+          DRP_CS           => MCB_UICS_xilinx6,
+@@ -618,13 +543,10 @@
+          MCB_UIREAD       => MCB_UIREAD_xilinx10
+       );
+       
++   init_sequence: if (C_SIMULATION = "FALSE") generate      
+       process (UI_CLK, RST) begin
+          if (RST = '1') then
+-           if (C_SIMULATION = "TRUE") then
+-             WAIT_200us_COUNTER <= X"7FF0";
+-           else
+              WAIT_200us_COUNTER <= (others => '0');
+-           end if;
+          elsif (UI_CLK'event and UI_CLK = '1') then
+             if (WAIT_200us_COUNTER(15) = '1') then
+                  WAIT_200us_COUNTER <= WAIT_200us_COUNTER;
+@@ -633,15 +555,16 @@
+             end if;
+          end if;
+       end process;
++   end generate;
+ 
+- --  init_sequence_skip: if (C_SIMULATION = "TRUE") generate
+- --     WAIT_200us_COUNTER <= X"FFFF";
+- --     process
+- --     begin
+- --        report "The 200 us wait period required before CKE goes active has been skipped in Simulation";
+- --        wait;
+- --     end process;
+- --  end generate;
++   init_sequence_skip: if (C_SIMULATION = "TRUE") generate
++      WAIT_200us_COUNTER <= X"FFFF";
++      process
++      begin
++         report "The 200 us wait period required before CKE goes active has been skipped in Simulation";
++         wait;
++      end process;
++   end generate;
+             
+       
+    gen_CKE_Train_a: if (C_MEM_TYPE = "DDR2") generate 
+@@ -653,8 +576,6 @@
+               CKE_Train <= '0';
+          elsif (WAIT_200us_COUNTER(15) = '1' and MCB_UODONECAL = '0') then
+               CKE_Train <= '1';
+-         else
+-              CKE_Train <= '0';
+          end if;
+       end if;
+    end process;       
+@@ -671,20 +592,19 @@
+ --********************************************
+ -- PLL_LOCK and RST signals
+ --********************************************
+-   --MCB_SYSRST <= Pre_SYSRST or RST_reg;               -- Pre_SYSRST is generated from the STATE state machine, and is OR'd with RST_reg input to drive MCB's
++   MCB_SYSRST <= Pre_SYSRST or RST_reg;               -- Pre_SYSRST is generated from the STATE state machine, and is OR'd with RST_reg input to drive MCB's
+                                                       --  SYSRST pin (MCB_SYSRST)
+-   
+    rst_tmp <= not(SELFREFRESH_MODE_xilinx11) and not(PLL_LOCK_R2); -- rst_tmp becomes 1 if you lose Lock and the device is not in SUSPEND 
+ 
+    process (UI_CLK, RST) begin
+      if (RST = '1') then
+-       --Block_Reset <= '0';
+-       --RstCounter  <= (others => '0');
+-     --elsif (UI_CLK'event and UI_CLK = '1') then  
+-       -- if (rst_tmp = '1') then                     -- this is to deal with not allowing the user-reset "RST" to violate TZQINIT_MAXCNT (min time between resets to DDR3)
++       Block_Reset <= '0';
++       RstCounter  <= (others => '0');
++     elsif (UI_CLK'event and UI_CLK = '1') then  
++        if (rst_tmp = '1') then                     -- this is to deal with not allowing the user-reset "RST" to violate TZQINIT_MAXCNT (min time between resets to DDR3)
+           Block_Reset <= '0';
+           RstCounter  <= (others => '0');
+-     elsif (UI_CLK'event and UI_CLK = '1') then  
++        else
+           Block_Reset <= '0';                      -- default to allow STATE to move out of RST_DELAY state
+           if (Pre_SYSRST = '1') then
+             RstCounter  <= RST_CNT;                -- whenever STATE wants to reset the MCB, set RstCounter to h10
+@@ -695,14 +615,11 @@
+             end if;
+           end if;
+         end if;
+-     --end if;
++     end if;
+    end process;
+- 
+-  -- Rst_contidtion1 is to make sure RESET will not happen again within TZQINIT_MAXCNT
+-  non_violating_rst <= RST and Rst_condition1;
+-  MCB_SYSRST <= Pre_SYSRST;
+ 
+-  process (UI_CLK) begin
++  non_violating_rst <= RST and Rst_condition1;
++   process (UI_CLK) begin
+     if (UI_CLK'event and UI_CLK = '1') then
+        if (RstCounter >= TZQINIT_MAXCNT) then
+           Rst_condition1 <= '1';
+@@ -712,31 +629,18 @@
+     end if;
+   end process;
+   
+--- -- non_violating_rst asserts whenever (system-level reset) RST is asserted but must be after TZQINIT_MAXCNT is reached (min-time between resets for DDR3)
+--- -- After power stablizes, we will hold MCB in reset state for at least 200us before beginning initialization  process.   
+--- -- If the PLL loses lock during normal operation, no ui_clk will be present because mcb_drp_clk is from a BUFGCE which
+---    is gated by pll's lock signal.   When the PLL locks again, the RST_reg stays asserted for at least 200 us which
+---    will cause MCB to reset and reinitialize the memory afterwards.
+--- -- During SUSPEND operation, the PLL will lose lock but non_violating_rst remains low (de-asserted) and WAIT_200us_COUNTER stays at 
+---    its terminal count.  The PLL_LOCK input does not come direct from PLL, rather it is driven by gated_pll_lock from mcb_raw_wrapper module
+---    The gated_pll_lock in the mcb_raw_wrapper does not de-assert during SUSPEND operation, hence PLL_LOCK will not de-assert, and the soft calibration 
+---    state machine will not reset during SUSPEND.
+--- -- RST_reg is the control signal that resets the mcb_soft_calibration's State Machine. The MCB_SYSRST is now equal to 
+---    Pre_SYSRST. When State Machine is performing "INPUT Termination Calibration", it holds the MCB in reset by assertign MCB_SYSRST. 
+---    It will deassert the MCB_SYSRST so that it can grab the bus to broadcast the P and N term value to all of the DQ pins. Once the calibrated INPUT 
+---    termination is set, the State Machine will issue another short MCB_SYSRST so that MCB will use the tuned input termination during DQS preamble calibration.
+   
+ 
+-   --process (UI_CLK) begin
+-   -- if (UI_CLK'event and UI_CLK = '1') then
+-   --  
+-   --    if (RstCounter < RST_CNT) then
+-   --       Rst_condition2 <= '1';
+-   --    else
+-   --       Rst_condition2 <= '0';
+-   --    end if;
+-   -- end if;
+-   --end process;
++   process (UI_CLK) begin
++    if (UI_CLK'event and UI_CLK = '1') then
++     
++       if (RstCounter < RST_CNT) then
++          Rst_condition2 <= '1';
++       else
++          Rst_condition2 <= '0';
++       end if;
++    end if;
++  end process;
+   
+    process (UI_CLK, non_violating_rst) begin
+      if (non_violating_rst = '1') then
+@@ -745,47 +649,18 @@
+        if (WAIT_200us_COUNTER(15) = '0')  then
+         RST_reg <= '1';
+        else
+-        --RST_reg <= Rst_condition2 or rst_tmp;                                  -- insures RST_reg is at least h10 pulses long
+-        RST_reg <= rst_tmp;                                  -- insures RST_reg is at least h10 pulses long
++        RST_reg <= Rst_condition2 or rst_tmp;                                  -- insures RST_reg is at least h10 pulses long
+        end if;
+      end if;
+    end process;
+    
+---*************************************************************
+--- Stretching the pre_sysrst to satisfy the minimum pulse width
+---*************************************************************
+-
+-process (UI_CLK) begin
+-if (UI_CLK'event and UI_CLK = '1') then 
+-  if (STATE = START_DYN_CAL_PRE) then
+-    pre_sysrst_cnt <= pre_sysrst_cnt + '1';
+-  else
+-    pre_sysrst_cnt <= (others=>'0');
+-  end if;
+-end if;
+-end process;
+-
+-pre_sysrst_minpulse_width_ok <= pre_sysrst_cnt(3);
+-
++     
+ --********************************************
+ -- SUSPEND Logic
+ --********************************************
+-   process (UI_CLK,RST)
++   process (UI_CLK)
+    begin
+-      if (RST = '1') then
+-
+-         SELFREFRESH_MCB_MODE_R1 <= '0';
+-         SELFREFRESH_MCB_MODE_R2 <= '0';
+-         SELFREFRESH_MCB_MODE_R3 <= '0';
+-
+-         SELFREFRESH_REQ_R1      <= '0';
+-         SELFREFRESH_REQ_R2      <= '0';
+-         SELFREFRESH_REQ_R3      <= '0';
+-         
+-         PLL_LOCK_R1             <= '0';
+-         PLL_LOCK_R2             <= '0';
+-
+-      elsif (UI_CLK'event and UI_CLK = '1') then
++      if (UI_CLK'event and UI_CLK = '1') then
+          -- SELFREFRESH_MCB_MODE is clocked by sysclk_2x_180
+          SELFREFRESH_MCB_MODE_R1 <= SELFREFRESH_MCB_MODE;
+          SELFREFRESH_MCB_MODE_R2 <= SELFREFRESH_MCB_MODE_R1;
+@@ -810,10 +685,9 @@
+       if (UI_CLK'event and UI_CLK = '1') then
+          if (RST = '1') then
+             SELFREFRESH_MCB_REQ <= '0';
+-         --elsif ((PLL_LOCK_R2 = '1') and (SELFREFRESH_REQ_R3 = '0') and (STATE = START_DYN_CAL)) then
+-         elsif ((PLL_LOCK_R2 = '1') and (SELFREFRESH_REQ_R3 = '0')) then
++         elsif ((PLL_LOCK_R2 = '1') and (SELFREFRESH_REQ_R1 = '0') and (STATE = START_DYN_CAL)) then
+             SELFREFRESH_MCB_REQ <=  '0';
+-         elsif ((STATE = START_DYN_CAL) and (SELFREFRESH_REQ_R3 = '1')) then  
++         elsif ((STATE = START_DYN_CAL) and (SELFREFRESH_REQ_R1 = '1')) then  
+             SELFREFRESH_MCB_REQ <= '1';
+          end if;
+       end if;
+@@ -859,10 +733,6 @@
+ 
+ -- SELFREFRESH_MCB_MODE deasserted status is hold off
+ -- until Soft_Calib has at least done one loop of DQS update.
+--- New logic WarmeEnough is added to make sure PLL_Lock is lockec and all IOs stable before 
+--- deassert the status of MCB's SELFREFRESH_MODE.  This is to ensure all IOs are stable before
+--- user logic sending new commands to MCB.
+-   
+    process (UI_CLK)
+    begin
+       if (UI_CLK'event and UI_CLK = '1') then
+@@ -870,76 +740,12 @@
+             SELFREFRESH_MODE_xilinx11 <= '0';
+          elsif (SELFREFRESH_MCB_MODE_R2 = '1') then
+             SELFREFRESH_MODE_xilinx11 <=  '1';
+-         elsif (WarmEnough = '1') then
+-            SELFREFRESH_MODE_xilinx11 <= '0';
+-         end if;
+-      end if;
+-   end process;
+-
+-
+-
+-
+-   process (UI_CLK)
+-   begin
+-      if (UI_CLK'event and UI_CLK = '1') then
+-         if (RST = '1') then
+-           WaitCountEnable <= '0';
+-         elsif (SELFREFRESH_REQ_R2 = '0' and SELFREFRESH_REQ_R1 = '1') then  
+-           WaitCountEnable <= '0';
+          elsif ((PERFORM_START_DYN_CAL_AFTER_SELFREFRESH = '0') and (PERFORM_START_DYN_CAL_AFTER_SELFREFRESH_R1 = '1')) then  
+-           WaitCountEnable <= '1';
+-         else
+-           WaitCountEnable <=  WaitCountEnable;
++            SELFREFRESH_MODE_xilinx11 <= '0';
+          end if;
+       end if;
+    end process;
+ 
+-
+-   process (UI_CLK)
+-   begin
+-      if (UI_CLK'event and UI_CLK = '1') then
+-         if (RST = '1') then
+-           State_Start_DynCal <= '0';
+-         elsif (STATE = START_DYN_CAL) then  
+-           State_Start_DynCal <= '1';
+-         else
+-           State_Start_DynCal <= '0';
+-         end if;
+-       end if;
+-     end process;
+-
+-   process (UI_CLK)
+-   begin
+-      if (UI_CLK'event and UI_CLK = '1') then
+-         if (RST = '1') then
+-           State_Start_DynCal_R1 <= '0';
+-        else 
+-           State_Start_DynCal_R1 <= State_Start_DynCal;
+-         end if;
+-       end if;
+-     end process;
+-
+-
+-   process (UI_CLK)
+-   begin
+-      if (UI_CLK'event and UI_CLK = '1') then
+-         if (RST = '1') then
+-            WaitTimer <= (others => '0');
+-            WarmEnough <= '1';
+-          elsif ((SELFREFRESH_REQ_R2 = '0') and (SELFREFRESH_REQ_R1 = '1'))  then
+-            WaitTimer <= (others => '0');
+-            WarmEnough <= '0';
+-          elsif (WaitTimer = X"04") then 
+-            WaitTimer <= WaitTimer ;
+-            WarmEnough <= '1';
+-          elsif (WaitCountEnable  = '1') then
+-            WaitTimer <= WaitTimer + '1';
+-          else
+-            WaitTimer <= WaitTimer ;
+-          end if;  
+-        end if;
+-      end process;
+-
+ --********************************************
+ --Comparitor for Dynamic Calibration circuit
+ --********************************************
+@@ -1014,7 +820,7 @@
+       if (UI_CLK'event and UI_CLK = '1') then
+          if (RST_reg = '1') then                         -- Synchronous reset
+             MCB_CMD_VALID           <= '0';
+-            MCB_UIADDR_int      <= "00000";          -- take control of UI/UO port
++            MCB_UIADDR_xilinx3      <= "00000";          -- take control of UI/UO port
+             MCB_UICMDEN             <= '1';              -- tells MCB that it is in Soft Cal.
+             MCB_UIDONECAL_xilinx7   <= '0';
+             MCB_USE_BKST            <= '0';
+@@ -1027,11 +833,6 @@
+             IODRPCTRLR_USE_BKST     <= '0';
+             P_Term                  <= "000000";
+             N_Term                  <= "0000000";
+-            P_Term_s                <= "000000";
+-            N_Term_w                <= "0000000";
+-            P_Term_w                <= "000000";
+-            N_Term_s                <= "0000000";
+-            
+             P_Term_Prev             <= "000000";
+             N_Term_Prev             <= "0000000";
+             Active_IODRP            <= RZQ;
+@@ -1079,10 +880,7 @@
+                   Pre_SYSRST            <= '1';          -- keeps MCB in reset
+                   LastPass_DynCal       <= IN_TERM_PASS;
+                   if (SKIP_IN_TERM_CAL = 1) then
+-                     --STATE <= WRITE_CALIBRATE;
+-                     STATE <= WAIT_FOR_START_BROADCAST;
+-                     P_Term                <= "000000";
+-                     N_Term                <= "0000000";
++                     STATE <= WRITE_CALIBRATE;
+                   elsif (IODRPCTRLR_RDY_BUSY_N = '1') then
+                      STATE <= LOAD_RZQ_NTERM;
+                   else
+@@ -1135,8 +933,7 @@
+                   STATE <= LOAD_RZQ_PTERM;
+ 
+                when MULTIPLY_DIVIDE =>  -- h06 
+-                  -- 13/4/2011 compensate the added sync FF
+-                  P_Term <= Mult_Divide(("00" & (P_Term - '1')),MULT,DIV)(5 downto 0);
++                  P_Term <= Mult_Divide(("00" & P_Term),MULT,DIV)(5 downto 0);
+                   STATE  <= LOAD_ZIO_PTERM;
+ 
+                when LOAD_ZIO_PTERM =>           --h07
+@@ -1188,13 +985,8 @@
+                   STATE  <= LOAD_ZIO_NTERM;             
+ 
+                when SKEW =>     -- h0C
+-               
+-                  P_Term_s <= Mult_Divide(("00" & P_Term), MULT_S, DIV_S)(5 downto 0);
+-                  N_Term_w <= Mult_Divide(('0' & (N_Term-'1')),  MULT_W, DIV_W)(6 downto 0);
+-                  P_Term_w <= Mult_Divide(("00" & P_Term), MULT_W, DIV_W)(5 downto 0);
+-                  N_Term_s <= Mult_Divide(('0' & (N_Term-'1')),  MULT_S, DIV_S)(6 downto 0);
+-                  P_Term <= Mult_Divide(("00" & P_Term), MULT_S, DIV_S)(5 downto 0);
+-                  N_Term <= Mult_Divide(('0' & (N_Term-'1')), MULT_W, DIV_W)(6 downto 0);
++                  P_Term <= Mult_Divide(("00" & P_Term), PSKEW_MULT, PSKEW_DIV)(5 downto 0);
++                  N_Term <= Mult_Divide(('0' & N_Term), NSKEW_MULT, NSKEW_DIV)(6 downto 0);
+                   STATE  <= WAIT_FOR_START_BROADCAST;
+ 
+                when WAIT_FOR_START_BROADCAST => --h0D
+@@ -1202,7 +994,7 @@
+                                            --  keeping the MCB in calibration mode
+                   Active_IODRP <= MCB_PORT;
+                   if ((START_BROADCAST and IODRPCTRLR_RDY_BUSY_N) = '1') then
+-                    if ((P_Term /= P_Term_Prev) or (SKIP_IN_TERM_CAL = 1)) then
++                    if (P_Term /= P_Term_Prev) then
+                       STATE       <= BROADCAST_PTERM;
+                       P_Term_Prev <= P_Term;
+                     elsif (N_Term /= N_Term_Prev) then
+@@ -1272,184 +1064,10 @@
+                       STATE <= WAIT6;   -- wait for a Refresh cycle
+                     end if;
+                   else
+-                    -- if (PNSKEWDQS = '1') then
+-                       STATE <= LDQS_CLK_WRITE_P_TERM;
+-                   --  else
+-                   --    STATE <= OFF_RZQ_PTERM;
+-                   --  end if;
+-                  end if;
+-
+--- *********************
+-               when LDQS_CLK_WRITE_P_TERM =>    -- h12
+-                  IODRPCTRLR_MEMCELL_ADDR <= PTerm;
+-                  IODRPCTRLR_R_WB         <= WRITE_MODE;
+-                  IODRPCTRLR_WRITE_DATA   <= "00" & P_Term_w;
+-                  MCB_UIADDR_int              <= IOI_LDQS_CLK;
+-                  MCB_CMD_VALID           <= '1';
+-                  if (MCB_RDY_BUSY_N  = '1') then
+-                    STATE <= LDQS_CLK_WRITE_P_TERM;
+-                  else
+-                    STATE <= LDQS_CLK_P_TERM_WAIT;
+-                  end if;
+-                
+-        
+-               when LDQS_CLK_P_TERM_WAIT =>    --7'h13  
+-                 if (MCB_RDY_BUSY_N  = '0') then
+-                   STATE   <= LDQS_CLK_P_TERM_WAIT;
+-                 else 
+-                   STATE   <= LDQS_CLK_WRITE_N_TERM;
+-                 end if;        
+-        
+-               when  LDQS_CLK_WRITE_N_TERM =>  --7'h14
+-                  IODRPCTRLR_MEMCELL_ADDR <= NTerm;
+-                  IODRPCTRLR_R_WB         <= WRITE_MODE;
+-                  IODRPCTRLR_WRITE_DATA   <= '0' & N_Term_s;
+-                  MCB_UIADDR_int              <= IOI_LDQS_CLK;
+-                  MCB_CMD_VALID           <= '1';
+-                  if (MCB_RDY_BUSY_N  = '1') then
+-                    STATE <= LDQS_CLK_WRITE_N_TERM;
+-                  else
+-                    STATE <= LDQS_CLK_N_TERM_WAIT;
+-                  end if;
+-        
+-   --**     
+-               when  LDQS_CLK_N_TERM_WAIT =>   --7'h15
+-                  if (MCB_RDY_BUSY_N  = '0') then
+-                    STATE <= LDQS_CLK_N_TERM_WAIT;
+-                  else 
+-                    STATE           <= LDQS_PIN_WRITE_P_TERM;
+-                 end if;
+-                
+-                
+-               when   LDQS_PIN_WRITE_P_TERM => --7'h16
+-                  IODRPCTRLR_MEMCELL_ADDR <= PTerm;
+-                  IODRPCTRLR_R_WB         <= WRITE_MODE;
+-                  IODRPCTRLR_WRITE_DATA   <= "00" & P_Term_s;
+-                  MCB_UIADDR_int              <= IOI_LDQS_PIN;
+-                  MCB_CMD_VALID           <= '1';
+-                  if (MCB_RDY_BUSY_N  = '1')  then
+-                    STATE <= LDQS_PIN_WRITE_P_TERM;
+-                  else
+-                    STATE <= LDQS_PIN_P_TERM_WAIT;
+-                  end if;
+-                
+-                
+-               when  LDQS_PIN_P_TERM_WAIT =>   --7'h17
+-                  if (MCB_RDY_BUSY_N  = '0')  then
+-                    STATE <= LDQS_PIN_P_TERM_WAIT;
+-                  else 
+-                    STATE    <= LDQS_PIN_WRITE_N_TERM;
+-                  end if;
+-               
+-                
+-                when  LDQS_PIN_WRITE_N_TERM => --7'h18
+-                  IODRPCTRLR_MEMCELL_ADDR <= NTerm;
+-                  IODRPCTRLR_R_WB         <= WRITE_MODE;
+-                  IODRPCTRLR_WRITE_DATA   <= '0' & N_Term_w;
+-                  MCB_UIADDR_int              <= IOI_LDQS_PIN;
+-                  MCB_CMD_VALID           <= '1';
+-                  if (MCB_RDY_BUSY_N  = '1')  then
+-                    STATE <= LDQS_PIN_WRITE_N_TERM;
+-                  else
+-                    STATE <= LDQS_PIN_N_TERM_WAIT;
+-                  end if;
+-                
+-                
+-               when  LDQS_PIN_N_TERM_WAIT =>  --7'h19
+-                  if (MCB_RDY_BUSY_N  = '0')  then
+-                    STATE <= LDQS_PIN_N_TERM_WAIT;
+-                  else 
+-                    STATE           <= UDQS_CLK_WRITE_P_TERM;
+-                  end if;
+-               
+-                
+-                
+-               when  UDQS_CLK_WRITE_P_TERM => --7'h1A
+-                  IODRPCTRLR_MEMCELL_ADDR <= PTerm;
+-                  IODRPCTRLR_R_WB         <= WRITE_MODE;
+-                  IODRPCTRLR_WRITE_DATA   <= "00" & P_Term_w;
+-                  MCB_UIADDR_int              <= IOI_UDQS_CLK;
+-                  MCB_CMD_VALID           <= '1';
+-                  if (MCB_RDY_BUSY_N  = '1')  then
+-                    STATE <= UDQS_CLK_WRITE_P_TERM;
+-                  else
+-                    STATE <= UDQS_CLK_P_TERM_WAIT;
+-                  end if;
+-                
+-                
+-               when  UDQS_CLK_P_TERM_WAIT => --7'h1B
+-                  if (MCB_RDY_BUSY_N  = '0')  then
+-                    STATE <= UDQS_CLK_P_TERM_WAIT;
+-                  else 
+-                    STATE           <= UDQS_CLK_WRITE_N_TERM;
+-                  end if;
+-                
+-                
+-               when  UDQS_CLK_WRITE_N_TERM => --7'h1C
+-                  IODRPCTRLR_MEMCELL_ADDR <= NTerm;
+-                  IODRPCTRLR_R_WB         <= WRITE_MODE;
+-                  IODRPCTRLR_WRITE_DATA   <= '0' & N_Term_s;
+-                  MCB_UIADDR_int              <= IOI_UDQS_CLK;
+-                  MCB_CMD_VALID           <= '1';
+-                  if (MCB_RDY_BUSY_N  = '1')  then
+-                    STATE <= UDQS_CLK_WRITE_N_TERM;
+-                  else
+-                    STATE <= UDQS_CLK_N_TERM_WAIT;
+-                  end if;
+-                
+-               when UDQS_CLK_N_TERM_WAIT => --7'h1D
+-                  if (MCB_RDY_BUSY_N  = '0') then
+-                    STATE <= UDQS_CLK_N_TERM_WAIT;
+-                  else 
+-                    STATE           <= UDQS_PIN_WRITE_P_TERM;
+-                  end if;
+-                
+-                
+-                
+-                when  UDQS_PIN_WRITE_P_TERM => --7'h1E
+-                  IODRPCTRLR_MEMCELL_ADDR <= PTerm;
+-                  IODRPCTRLR_R_WB         <= WRITE_MODE;
+-                  IODRPCTRLR_WRITE_DATA   <= "00" & P_Term_s;
+-                  MCB_UIADDR_int              <= IOI_UDQS_PIN;
+-                  MCB_CMD_VALID           <= '1';
+-                  if (MCB_RDY_BUSY_N = '1')  then
+-                    STATE <= UDQS_PIN_WRITE_P_TERM;
+-                  else
+-                    STATE <= UDQS_PIN_P_TERM_WAIT;
+-                  end if;
+-                
+-                
+-               when UDQS_PIN_P_TERM_WAIT =>  --7'h1F
+-                  if (MCB_RDY_BUSY_N = '0')  then
+-                    STATE <= UDQS_PIN_P_TERM_WAIT;
+-                  else 
+-                    STATE           <= UDQS_PIN_WRITE_N_TERM;
+-                  end if;
+-                
+-                when  UDQS_PIN_WRITE_N_TERM =>  --7'h20
+-                  IODRPCTRLR_MEMCELL_ADDR <= NTerm;
+-                  IODRPCTRLR_R_WB         <= WRITE_MODE;
+-                  IODRPCTRLR_WRITE_DATA   <= '0' & N_Term_w;
+-                  MCB_UIADDR_int              <= IOI_UDQS_PIN;
+-                  MCB_CMD_VALID           <= '1';
+-                  if (MCB_RDY_BUSY_N = '1')  then
+-                    STATE <= UDQS_PIN_WRITE_N_TERM;
+-                  else
+-                    STATE <= UDQS_PIN_N_TERM_WAIT;
+-                  end if;
+-                
+-                
+-                when  UDQS_PIN_N_TERM_WAIT =>   --7'h21
+-                  if (MCB_RDY_BUSY_N = '0')  then
+-                    STATE <= UDQS_PIN_N_TERM_WAIT;
+-                  else 
+-                    STATE           <= OFF_RZQ_PTERM;
++                     STATE <= OFF_RZQ_PTERM;
+                   end if;
+-               
+--- *********************
+ 
+-
+-               when OFF_RZQ_PTERM =>    -- h22
++               when OFF_RZQ_PTERM =>    -- h12
+                   Active_IODRP            <= RZQ;
+                   IODRPCTRLR_CMD_VALID    <= '1';
+                   IODRPCTRLR_MEMCELL_ADDR <= PTerm;
+@@ -1464,14 +1082,14 @@
+                      STATE <= WAIT7;
+                   end if;
+ 
+-               when WAIT7 =>    -- h23
++               when WAIT7 =>    -- h13
+                   if ((not(IODRPCTRLR_RDY_BUSY_N)) = '1') then
+                      STATE <= WAIT7;
+                   else
+                      STATE <= OFF_ZIO_NTERM;
+                   end if;
+ 
+-               when OFF_ZIO_NTERM =>    -- h24
++               when OFF_ZIO_NTERM =>    -- h14
+                   Active_IODRP            <= ZIO;
+                   IODRPCTRLR_CMD_VALID    <= '1';
+                   IODRPCTRLR_MEMCELL_ADDR <= NTerm;
+@@ -1483,7 +1101,7 @@
+                      STATE <= WAIT8;
+                   end if;
+ 
+-               when WAIT8 =>    -- h25
++               when WAIT8 =>    -- h15
+                   if (IODRPCTRLR_RDY_BUSY_N = '0') then
+                      STATE <= WAIT8;
+                   else   
+@@ -1494,8 +1112,8 @@
+                      end if;
+                   end if;   
+ 
+-              when RST_DELAY =>      -- h26
+-                --MCB_UICMDEN <= '0';          -- release control of UI/UO port      
++              when RST_DELAY =>      -- h16
++                MCB_UICMDEN <= '0';          -- release control of UI/UO port      
+                 if (Block_Reset = '1') then  -- this ensures that more than 512 clock cycles occur since the last reset after MCB_WRITE_CALIBRATE ???
+                  STATE <= RST_DELAY;
+                else 
+@@ -1505,18 +1123,18 @@
+ --***************************
+ --DYNAMIC CALIBRATION PORTION
+ --***************************
+-               when START_DYN_CAL_PRE =>        -- h27
++               when START_DYN_CAL_PRE =>        -- h17
+                   LastPass_DynCal       <= IN_TERM_PASS;
+                   MCB_UICMDEN           <= '0';          -- release UICMDEN
+                   MCB_UIDONECAL_xilinx7 <= '1';          -- release UIDONECAL - MCB will now initialize.
+                   Pre_SYSRST            <= '1';          -- SYSRST pulse
+                   if (CALMODE_EQ_CALIBRATION = '0') then -- if C_MC_CALIBRATION_MODE is set to NOCALIBRATION
+                     STATE       <= START_DYN_CAL;        -- we'll skip setting the DQS delays manually
+-                  elsif (pre_sysrst_minpulse_width_ok = '1') then
++                  else 
+                     STATE       <= WAIT_FOR_UODONE;
+                   end if;
+ 
+-               when WAIT_FOR_UODONE =>          -- h28
++               when WAIT_FOR_UODONE =>          -- h18
+                  Pre_SYSRST    <= '0';                   -- SYSRST pulse
+                  if ((IODRPCTRLR_RDY_BUSY_N and MCB_UODONECAL) = '1')then --IODRP Controller needs to be ready, & MCB needs to be done with hard calibration
+                    MCB_UICMDEN         <= '1';           -- grab UICMDEN
+@@ -1526,11 +1144,11 @@
+                    STATE               <= WAIT_FOR_UODONE;
+                  end if;
+ 
+-               when LDQS_WRITE_POS_INDELAY =>   -- h29 
++               when LDQS_WRITE_POS_INDELAY =>   -- h19 
+                  IODRPCTRLR_MEMCELL_ADDR <= PosEdgeInDly;
+                  IODRPCTRLR_R_WB         <= WRITE_MODE;
+                  IODRPCTRLR_WRITE_DATA   <= DQS_DELAY_INITIAL;
+-                 MCB_UIADDR_int     <= IOI_LDQS_CLK;
++                 MCB_UIADDR_xilinx3      <= IOI_LDQS_CLK;
+                  MCB_CMD_VALID           <= '1';
+                  if (MCB_RDY_BUSY_N = '1') then 
+                    STATE <= LDQS_WRITE_POS_INDELAY;
+@@ -1538,18 +1156,18 @@
+                    STATE <= LDQS_WAIT1;
+                  end if;
+ 
+-               when LDQS_WAIT1 =>       -- h2A
++               when LDQS_WAIT1 =>       -- h1A
+                  if (MCB_RDY_BUSY_N = '0')then
+                    STATE <= LDQS_WAIT1;
+                  else
+                    STATE <= LDQS_WRITE_NEG_INDELAY;      
+                  end if;
+ 
+-              when LDQS_WRITE_NEG_INDELAY =>    -- h2B
++              when LDQS_WRITE_NEG_INDELAY =>    -- h1B
+                 IODRPCTRLR_MEMCELL_ADDR <= NegEdgeInDly;
+                 IODRPCTRLR_R_WB         <= WRITE_MODE;
+                 IODRPCTRLR_WRITE_DATA   <= DQS_DELAY_INITIAL;
+-                MCB_UIADDR_int      <= IOI_LDQS_CLK;
++                MCB_UIADDR_xilinx3      <= IOI_LDQS_CLK;
+                 MCB_CMD_VALID           <= '1';
+                 if (MCB_RDY_BUSY_N = '1')then 
+                   STATE <= LDQS_WRITE_NEG_INDELAY;
+@@ -1557,18 +1175,18 @@
+                   STATE <= LDQS_WAIT2;
+                 end if;
+ 
+-               when LDQS_WAIT2 =>           -- 7'h2C
++               when LDQS_WAIT2 =>           -- 7'h1C
+                  if(MCB_RDY_BUSY_N = '0')then
+                    STATE <= LDQS_WAIT2;
+                  else
+                    STATE <= UDQS_WRITE_POS_INDELAY;
+                  end if;
+ 
+-               when  UDQS_WRITE_POS_INDELAY =>  -- 7'h2D
++               when  UDQS_WRITE_POS_INDELAY =>  -- 7'h1D
+                  IODRPCTRLR_MEMCELL_ADDR <= PosEdgeInDly;
+                  IODRPCTRLR_R_WB         <= WRITE_MODE;
+                  IODRPCTRLR_WRITE_DATA   <= DQS_DELAY_INITIAL;
+-                 MCB_UIADDR_int      <= IOI_UDQS_CLK;
++                 MCB_UIADDR_xilinx3      <= IOI_UDQS_CLK;
+                  MCB_CMD_VALID           <= '1';
+                  if (MCB_RDY_BUSY_N = '1')then
+                    STATE <= UDQS_WRITE_POS_INDELAY;
+@@ -1576,18 +1194,18 @@
+                    STATE <= UDQS_WAIT1;
+                  end if;
+ 
+-               when UDQS_WAIT1 =>           -- 7'h2E
++               when UDQS_WAIT1 =>           -- 7'h1E
+                  if (MCB_RDY_BUSY_N = '0')then
+                    STATE <= UDQS_WAIT1;
+                  else 
+                    STATE <= UDQS_WRITE_NEG_INDELAY;
+                  end if;
+ 
+-               when UDQS_WRITE_NEG_INDELAY => -- 7'h2F
++               when UDQS_WRITE_NEG_INDELAY => -- 7'h1F
+                  IODRPCTRLR_MEMCELL_ADDR <= NegEdgeInDly;
+                  IODRPCTRLR_R_WB         <= WRITE_MODE;
+                  IODRPCTRLR_WRITE_DATA   <= DQS_DELAY_INITIAL;
+-                 MCB_UIADDR_int     <= IOI_UDQS_CLK;
++                 MCB_UIADDR_xilinx3      <= IOI_UDQS_CLK;
+                  MCB_CMD_VALID           <= '1';
+                  if (MCB_RDY_BUSY_N = '1')then
+                    STATE <= UDQS_WRITE_NEG_INDELAY;
+@@ -1595,7 +1213,7 @@
+                   STATE <= UDQS_WAIT2;
+                 end if;
+ 
+-               when UDQS_WAIT2 => -- 7'h30
++               when UDQS_WAIT2 => -- 7'h20
+                  if (MCB_RDY_BUSY_N = '0')then
+                    STATE <= UDQS_WAIT2;
+                  else 
+@@ -1604,7 +1222,7 @@
+                     STATE             <= START_DYN_CAL;
+                 end if;
+ 
+-               when START_DYN_CAL =>    -- h31
++               when START_DYN_CAL =>    -- h21
+                   Pre_SYSRST  <= '0';                    -- SYSRST not driven
+                   counter_inc <= (others => '0');
+                   counter_dec <= (others => '0');
+@@ -1624,7 +1242,7 @@
+                      STATE     <= START_DYN_CAL;
+                   end if;
+ 
+-               when WRITE_CALIBRATE =>          -- h32
++               when WRITE_CALIBRATE =>          -- h22
+                   Pre_SYSRST              <= '0';
+                   IODRPCTRLR_CMD_VALID    <= '1';
+                   IODRPCTRLR_MEMCELL_ADDR <= DelayControl;
+@@ -1637,7 +1255,7 @@
+                      STATE <= WAIT9;
+                   end if;               
+ 
+-               when WAIT9 =>    -- h33
++               when WAIT9 =>    -- h23
+                   counter_en <= '1';
+                   if (count < "100110") then             -- this adds approximately 22 extra clock cycles after WRITE_CALIBRATE
+                      STATE <= WAIT9;
+@@ -1645,7 +1263,7 @@
+                      STATE <= READ_MAX_VALUE;
+                   end if;
+ 
+-               when READ_MAX_VALUE =>           -- h34
++               when READ_MAX_VALUE =>           -- h24
+                   IODRPCTRLR_CMD_VALID    <= '1';
+                   IODRPCTRLR_MEMCELL_ADDR <= MaxValue;
+                   IODRPCTRLR_R_WB         <= READ_MODE;
+@@ -1656,7 +1274,7 @@
+                      STATE <= WAIT10;
+                   end if;               
+ 
+-               when WAIT10 =>           -- h35   
++               when WAIT10 =>           -- h25   
+                   if (IODRPCTRLR_RDY_BUSY_N = '0') then
+                      STATE <= WAIT10;
+                   else
+@@ -1669,7 +1287,7 @@
+                     end if;
+                   end if;
+ 
+-               when ANALYZE_MAX_VALUE =>        -- h36      only do a Inc or Dec during a REFRESH cycle.
++               when ANALYZE_MAX_VALUE =>        -- h26      only do a Inc or Dec during a REFRESH cycle.
+                  if (First_Dyn_Cal_Done = '0')then
+                    STATE <= FIRST_DYN_CAL;
+                  elsif ((Max_Value_int < Max_Value_Previous) and (Max_Value_Delta_Dn >= INCDEC_THRESHOLD)) then
+@@ -1684,11 +1302,11 @@
+                     STATE            <= START_DYN_CAL;
+                  end if; 
+ 
+-               when FIRST_DYN_CAL =>            -- h37
++               when FIRST_DYN_CAL =>            -- h27
+                   First_Dyn_Cal_Done <= '1';             -- set flag that the First Dynamic Calibration has been completed
+                   STATE              <= START_DYN_CAL;
+ 
+-               when INCREMENT =>        -- h38
++               when INCREMENT =>        -- h28
+                   STATE         <= START_DYN_CAL;        -- Default case: Inc is not high or no longer in REFRSH
+                   MCB_UILDQSINC <= '0';                  -- Default case: no inc or dec
+                   MCB_UIUDQSINC <= '0';                  -- Default case: no inc or dec
+@@ -1712,7 +1330,7 @@
+                         STATE         <= START_DYN_CAL;
+                   end case;
+ 
+-               when DECREMENT =>                -- h39
++               when DECREMENT =>                -- h29
+                   STATE         <= START_DYN_CAL;        -- Default case: Dec is not high or no longer in REFRSH
+                   MCB_UILDQSINC <= '0';                  -- Default case: no inc or dec
+                   MCB_UIUDQSINC <= '0';                  -- Default case: no inc or dec
+@@ -1738,7 +1356,7 @@
+                      end case;
+                   end if;
+ 
+-               when DONE =>     -- h3A
++               when DONE =>     -- h2A
+                   Pre_SYSRST  <= '0';                    -- SYSRST cleared
+                   MCB_UICMDEN <= '0';                    -- release UICMDEN
+                   STATE       <= DONE;

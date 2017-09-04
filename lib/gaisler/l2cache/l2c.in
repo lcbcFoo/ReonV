@@ -1,0 +1,41 @@
+mainmenu_option next_comment
+  comment 'L2 Cache'
+
+     bool 'Enable L2 Cache                      ' CONFIG_L2_ENABLE
+#    if [ "$CONFIG_GPT_ENABLE" = "y" ]; then
+      choice 'Associativity (ways)            ' \
+	"1		CONFIG_L2_ASSO1 \
+	2		CONFIG_L2_ASSO2 \
+	3		CONFIG_L2_ASSO3 \
+	4		CONFIG_L2_ASSO4" 1
+     choice 'Way size (kbytes/way)' \
+	"1		CONFIG_L2_SZ1 \
+	2		CONFIG_L2_SZ2 \
+	4		CONFIG_L2_SZ4 \
+	8		CONFIG_L2_SZ8 \
+	16		CONFIG_L2_SZ16 \
+	32		CONFIG_L2_SZ32 \
+	64		CONFIG_L2_SZ64 \
+	128		CONFIG_L2_SZ128 \
+	256		CONFIG_L2_SZ256 \
+	512		CONFIG_L2_SZ512" 64
+      choice 'Line size (bytes)            ' \
+	"32		CONFIG_L2_LINE32 \
+	64		CONFIG_L2_LINE64" 32
+
+      bool 'Use HPROT information                ' CONFIG_L2_HPROT
+      bool 'Enable L2 cache at power-on          ' CONFIG_L2_PEN
+      bool 'Enable write-through at power-on     ' CONFIG_L2_WT
+      bool 'Random replacement (LRU default)     ' CONFIG_L2_RAN
+      if [ "$CONFIG_L2_ASSO1" != "1" ]; then
+        bool 'Shared RAM for multi-way caches      ' CONFIG_L2_SHARE
+      fi
+      hex  'Cacheability map                     ' CONFIG_L2_MAP 00F0
+      int  'Number of MTRR registers             ' CONFIG_L2_MTRR 0
+      bool 'Enable EDAC                          ' CONFIG_L2_EDAC 
+      bool 'AXI backend interface                ' CONFIG_L2_AXI 
+
+#      fi
+#    fi
+endmenu
+

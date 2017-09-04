@@ -1,0 +1,13 @@
+# Timing constraints for GRETH 1G
+
+NET phy_tx_data(*) TNM = gtxphypads;
+NET "egtx_clk" 	TNM_NET = "egtx_clk";
+TIMESPEC "TS_egtx_clk" = PERIOD "egtx_clk" 5.0 ns HIGH 50 %;
+TIMESPEC "TS_clkm_egtx_clk" = FROM "clkm" TO "egtx_clk" TIG;
+TIMESPEC "TS_egtx_clk_clkm" = FROM "egtx_clk" TO "clkm" TIG;
+NET phy_tx_data(*) TNM = gtxphypads;
+TIMESPEC "TSGTXOUT" = FROM "egtx_clk" TO "gtxphypads" 4.8 ns;
+NET phy_gtx_clk TNM = phy_gtx_clkpad;
+TIMESPEC "TSGTXOUT2" = FROM "egtx_clk" TO "phy_gtx_clkpad" 4.8 ns;
+NET "egtx_clk" MAXSKEW= 1.0 ns;
+

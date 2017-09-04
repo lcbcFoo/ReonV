@@ -1,0 +1,35 @@
+if [ "$CONFIG_SYN_VIRTEX6" = "y" -o "$CONFIG_SYN_SPARTAN6" = "y" -o "$CONFIG_BOARD_ML505" = "y" ]; then  
+	bool 	'simple interface      '  CONFIG_PCIEXP_MASTER_TARGET
+  if [ "$CONFIG_PCIEXP_MASTER_TARGET" = "y" ]; then
+	bool 	'interface, target-only     '  CONFIG_PCIEXP_SIMPLE_TARGET
+  fi
+	if [ "$CONFIG_PCIEXP_MASTER_TARGET" != "y" ]; then
+	bool 	'interface with FIFO      '  CONFIG_PCIEXP_MASTER_FIFO
+  	if [ "$CONFIG_PCIEXP_MASTER_FIFO" = "y" ]; then
+		bool 	'DMA controller     '  CONFIG_PCIEXP_MASTER_FIFO_DMA
+  	fi
+  fi
+
+  if [ "$CONFIG_PCIEXP_MASTER_TARGET" = "y" -o "$CONFIG_PCIEXP_MASTER_FIFO" = "y" ]; then
+    hex 'vendor ID'   CONFIG_PCIEXP_VENDORID 10EE
+    hex 'device ID'   CONFIG_PCIEXP_DEVICEID 0009
+  fi
+
+  if [ "$CONFIG_PCIEXP_MASTER_TARGET" = "y" -o "$CONFIG_PCIEXP_MASTER_FIFO" = "y" ]; then  
+    if [ "$CONFIG_SYN_VIRTEX6" = "y" ] then
+      if [ "$CONFIG_PCIEXP_MASTER_TARGET" = "y" ]; then
+          choice 'Lane Width            ' \
+	    "1		CONFIG_LANE_WIDTH1 \
+	    2		CONFIG_LANE_WIDTH2 \
+	    4		CONFIG_LANE_WIDTH4 \
+	    8		CONFIG_LANE_WIDTH8" 1
+      fi 
+  	  if [ "$CONFIG_PCIEXP_MASTER_FIFO" = "y" ]; then 
+          choice 'Lane Width FIFO            ' \
+	    "1		CONFIG_LANE_WIDTH1 \
+	    2		CONFIG_LANE_WIDTH2 \
+	    4		CONFIG_LANE_WIDTH4" 1
+      fi     
+    fi
+  fi
+fi

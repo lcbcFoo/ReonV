@@ -1,0 +1,145 @@
+diff -Naur mig.org/mig_38/user_design/rtl/memc3_infrastructure.vhd mig38/mig_38/user_design/rtl/memc3_infrastructure.vhd
+--- mig.org/mig_38/user_design/rtl/memc3_infrastructure.vhd	2011-12-30 20:07:53.000000000 +0100
++++ mig38/mig_38/user_design/rtl/memc3_infrastructure.vhd	2012-01-02 14:05:44.000000000 +0100
+@@ -95,7 +95,9 @@
+     mcb_drp_clk     : out std_logic;
+     pll_ce_0        : out std_logic;
+     pll_ce_90       : out std_logic;
+-    pll_lock        : out std_logic
++    pll_lock        : out std_logic;
++    clk_125         : out std_logic;
++    clk_50          : out std_logic
+   
+ );
+ end entity;
+@@ -121,6 +123,8 @@
+   signal   clk0_bufg_in        : std_logic;
+   signal   mcb_drp_clk_bufg_in : std_logic;
+   signal   clkfbout_clkfbin    : std_logic;
++  signal   clkfbout_clkfbin2   : std_logic;
++  signal   clk_50i, clk_125i   : std_logic;
+   signal   rst_tmp             : std_logic;
+   signal   sys_clk_ibufg       : std_logic;
+   signal   sys_rst             : std_logic;
+@@ -330,5 +334,73 @@
+   LOCK           => bufpll_mcb_locked 
+   );
+ 
++
++  -- second PLL to generate 125 MHz for giga-bit MAC and 50 MHz for VGA
++    u_pll_adv2 : PLL_ADV 
++    generic map 
++        (
++         BANDWIDTH          => "OPTIMIZED",
++         CLKIN1_PERIOD      => CLK_PERIOD_NS,
++         CLKIN2_PERIOD      => CLK_PERIOD_NS,
++         CLKOUT0_DIVIDE     => 8,  -- 125 MHz
++         CLKOUT1_DIVIDE     => 20, -- 50 MHz
++         CLKOUT2_DIVIDE     => C_CLKOUT2_DIVIDE,
++         CLKOUT3_DIVIDE     => C_CLKOUT3_DIVIDE,
++         CLKOUT4_DIVIDE     => 1,
++         CLKOUT5_DIVIDE     => 1,
++         CLKOUT0_PHASE      => 0.000,
++         CLKOUT1_PHASE      => 0.000,
++         CLKOUT2_PHASE      => 0.000,
++         CLKOUT3_PHASE      => 0.000,
++         CLKOUT4_PHASE      => 0.000,
++         CLKOUT5_PHASE      => 0.000,
++         CLKOUT0_DUTY_CYCLE => 0.500,
++         CLKOUT1_DUTY_CYCLE => 0.500,
++         CLKOUT2_DUTY_CYCLE => 0.500,
++         CLKOUT3_DUTY_CYCLE => 0.500,
++         CLKOUT4_DUTY_CYCLE => 0.500,
++         CLKOUT5_DUTY_CYCLE => 0.500,
++	 SIM_DEVICE         => "SPARTAN6",
++         COMPENSATION       => "INTERNAL",
++         DIVCLK_DIVIDE      => 1,
++         CLKFBOUT_MULT      => 5, -- 1000 MHz
++         CLKFBOUT_PHASE     => 0.0,
++         REF_JITTER         => 0.005000
++         )
++        port map
++          (
++           CLKFBIN          => clkfbout_clkfbin2,
++           CLKINSEL         => '1',
++           CLKIN1           => sys_clk_ibufg,
++           CLKIN2           => '0',
++           DADDR            => (others => '0'),
++           DCLK             => '0',
++           DEN              => '0',
++           DI               => (others => '0'),
++           DWE              => '0',
++           REL              => '0',
++           RST              => sys_rst,
++           CLKFBDCM         => open,
++           CLKFBOUT         => clkfbout_clkfbin2,
++           CLKOUTDCM0       => open,
++           CLKOUTDCM1       => open,
++           CLKOUTDCM2       => open,
++           CLKOUTDCM3       => open,
++           CLKOUTDCM4       => open,
++           CLKOUTDCM5       => open,
++           CLKOUT0          => clk_125i,
++           CLKOUT1          => clk_50i,
++           CLKOUT2          => open,
++           CLKOUT3          => open,
++           CLKOUT4          => open,
++           CLKOUT5          => open,
++           DO               => open,
++           DRDY             => open,
++           LOCKED           => open
++           );
++
++    U_BUFG_125 : BUFG port map ( O => clk_125, I => clk_125i);
++    U_BUFG_50  : BUFG port map ( O => clk_50,  I => clk_50i);
++
+ end architecture syn;
+ 
+diff -Naur mig.org/mig_38/user_design/rtl/mig_38.vhd mig38/mig_38/user_design/rtl/mig_38.vhd
+--- mig.org/mig_38/user_design/rtl/mig_38.vhd	2011-12-30 20:07:53.000000000 +0100
++++ mig38/mig_38/user_design/rtl/mig_38.vhd	2012-01-02 12:42:40.000000000 +0100
+@@ -165,7 +165,9 @@
+    c3_p2_rd_empty                          : out std_logic;
+    c3_p2_rd_count                          : out std_logic_vector(6 downto 0);
+    c3_p2_rd_overflow                       : out std_logic;
+-   c3_p2_rd_error                          : out std_logic
++   c3_p2_rd_error                          : out std_logic;
++   clk_125                                 : out std_logic;
++   clk_50                                  : out std_logic
+   );
+ end mig_38;
+ 
+@@ -198,8 +200,9 @@
+       pll_ce_0                               : out   std_logic;
+       pll_ce_90                              : out   std_logic;
+       pll_lock                               : out   std_logic;
+-      mcb_drp_clk                            : out   std_logic
+-
++      mcb_drp_clk                            : out std_logic;
++      clk_125                                : out std_logic;
++      clk_50                                 : out std_logic
+       );
+   end component;
+ 
+@@ -363,8 +366,8 @@
+    constant C3_CLKOUT1_DIVIDE       : integer := 1; 
+    constant C3_CLKOUT2_DIVIDE       : integer := 16; 
+    constant C3_CLKOUT3_DIVIDE       : integer := 8; 
+-   constant C3_CLKFBOUT_MULT        : integer := 2; 
+-   constant C3_DIVCLK_DIVIDE        : integer := 1; 
++   constant C3_CLKFBOUT_MULT        : integer := 2*5; 
++   constant C3_DIVCLK_DIVIDE        : integer := 1*3; 
+    constant C3_INCLK_PERIOD         : integer := ((C3_MEMCLK_PERIOD * C3_CLKFBOUT_MULT) / (C3_DIVCLK_DIVIDE * C3_CLKOUT0_DIVIDE * 2)); 
+    constant C3_ARB_NUM_TIME_SLOTS   : integer := 12; 
+    constant C3_ARB_TIME_SLOT_0      : bit_vector(5 downto 0) := o"02"; 
+@@ -485,7 +488,9 @@
+    pll_ce_0                        => c3_pll_ce_0,
+    pll_ce_90                       => c3_pll_ce_90,
+    pll_lock                        => c3_pll_lock,
+-   mcb_drp_clk                     => c3_mcb_drp_clk
++   mcb_drp_clk                     => c3_mcb_drp_clk,
++   clk_125                         => clk_125,
++   clk_50                          => clk_50
+    );
+ 
+  

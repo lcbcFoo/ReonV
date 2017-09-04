@@ -1,0 +1,148 @@
+SpaceWire routing switch
+CONFIG_SPWRTR_ENABLE
+  Say Y here to enable the SpaceWire routing switch.
+
+Receiver input architecture
+CONFIG_SPWRTR_INPUT
+  Selects the input architecture for the SpaceWire link receiver in
+  SpaceWire ports. 
+  SDR = Single Data Rate sampling.
+  DDR = Double Data Rate sampling.
+  XOR = Xor gate generated clock from data and strobe.
+  AFLEX = Interface to external Aeroflex UT200SpWPHY01 component.
+
+Transmitter output architecture
+CONFIG_SPWRTR_OUTPUT
+  Selects the output architecture for the SpaceWire link transmitter in
+  SpaceWire ports. 
+  SDR = Single Data Rate output. Bitrate will be the same as txclk input
+        frequency.
+  DDR = Double Data Rate output. Bitrate will be twiche the txclk input
+        frequency.
+  AFLEX = Interface to external Aeroflex UT200SpWPHY01 component.
+        
+Same clock for SpaceWire receiver and transmitter in SpaceWire ports
+CONFIG_SPWRTR_RTSAME            
+  Say Y here if the same clock is connected to both the receiver
+  and transmitter used in the SpaceWire ports. This will remove two
+  asynchronous resets and some synchronization logic. This is only
+  applicable for the SDR and DDR inputs modes.   
+
+Receiver and transmitter FIFO depth
+CONFIG_SPWRTR_RXFIFO16
+  Select the receiver and transmitter FIFO deptha (in Spw characters) 
+  for all ports.  
+
+Technology specific RAM blocks
+CONFIG_SPWRTR_TECHFIFO
+  Say Y to enable technology specific RAM blocks to be used for
+  the routing table and port FIFOs.      
+
+Spacewire router FT
+CONFIG_SPWRTR_FT_NOFT
+  Select fault-tolernace against SEU errors in RAM blocks.
+  NOFT = Fault-tolerance disabled
+  PAR  = Parity
+  TMR  = Triple Modular redundancy
+
+Enable SpaceWire ports
+CONFIG_SPWRTR_SPWEN
+  Enable SpaceWire ports.
+
+Enable AMBA ports
+CONFIG_SPWRTR_AMBAEN
+  Enable AMBA ports.
+
+Enable FIFO ports
+CONFIG_SPWRTR_FIFOEN
+  Enable FIFO ports.
+
+Number of Spacewire ports
+CONFIG_SPWRTR_SPWPORTS
+  Select the number of SpaceWire link ports to implement 
+  in the router.
+
+Number of AMBA ports
+CONFIG_SPWRTR_AMBAPORTS
+  Select the number of AMBA ports to implement 
+  in the router. Each port will have an AHB master and an
+  APB slave interface.
+
+Number of FIFO ports
+CONFIG_SPWRTR_FIFOPORTS
+  Select the number of FIFO ports to implement 
+  in the router. 
+
+Arbitration
+CONFIG_SPWRTR_ARB
+  Select arbitration priority type. Currently unused.
+
+RMAP protocol
+CONFIG_SPWRTR_RMAP
+  Enable hardware target support for the RMAP protocol in
+  the AMBA ports.
+
+RMAP CRC
+CONFIG_SPWRTR_RMAPCRC
+  Enable hardware calculation of the RMAP CRC checksum in the
+  AMBA ports. RMAP CRC is always enabled when the RMAP hardware 
+  target is enabled so this parameter will have no effect in that 
+  case.
+
+AHB FIFO depth
+CONFIG_SPWRTR_FIFO2_4
+  Select the AHB FIFO depth (in 32-bit words) for the
+  AMBA ports.
+
+FIFO port almost full/empty indications
+CONFIG_SPWRTR_ALMOST
+  Sets the range from the full and empty conditions for 
+  which the almost full/empty signal will be set for
+  FIFO ports. For example the value 8 will cause the
+  almost full signal to be set when the FIFO has 
+  fifosize-8 or more characters.
+
+Rx unaligned
+CONFIG_SPWRTR_RXUNAL
+  Enable support for byte writes used for non word-aligned 
+  receiver buffer addresses for the AMBA ports. Without this 
+  enabled data will still be written at the correct location 
+  but complete words will always be written so data outside 
+  the intended boundaries might be overwritten.
+
+RMAP Buffer depth
+CONFIG_SPWRTR_RMAPBUF2
+  Select the size of the RMAP buffer (in bytes) for the 
+  AMBA ports.
+
+DMA channels
+CONFIG_SPWRTR_DMACHAN
+  Set the number of DMA channels for the AMBA ports.
+
+Configuration port AHB slave interface
+CONFIG_SPWRTR_AHBSLVEN
+  Enable the AHB slave interface to the router configuration
+  port.       
+  
+Number of timer bits.
+CONFIG_SPWRTR_TIMERBITS
+  Set the number of bits to implement in the timer prescaler.
+  Setting this to zero disables the timer functionality. 
+
+
+SpaceWire PnP
+CONFIG_SPWRTR_PNP
+  Say Y here to enable support for the SpaceWire Plug and Play
+  protocol. This an experimental feature as the PnP protocol is
+  not standardized yet.        
+
+
+Auto-scrubbing
+CONFIG_SPWRTR_AUTOSCRUB
+  Say Y here to enable Auto-scrubbing of the routing table.
+
+
+
+
+
+

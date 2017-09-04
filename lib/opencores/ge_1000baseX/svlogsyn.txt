@@ -1,0 +1,6 @@
+ge_1000baseX.v
+ge_1000baseX_an.v
+ge_1000baseX_mdio.v
+ge_1000baseX_rx.v
+ge_1000baseX_sync.v
+ge_1000baseX_tx.v

@@ -1,0 +1,26 @@
+TECHNOLOGY=Virtex4
+PACKAGE=ff1513
+ifeq ("$(CONFIG_FPGA_LX100)","y")
+PART=xc4vlx100
+MGCPART=4vlx100$(PACKAGE)
+else
+ifeq ("$(CONFIG_FPGA_LX160)","y")
+PART=xc4vlx160
+MGCPART=4vlx160$(PACKAGE)
+else
+ifeq ("$(CONFIG_FPGA_LX200)","y")
+PART=xc4vlx200
+MGCPART=4vlx200$(PACKAGE)
+else
+PART=xc4vlx100
+MGCPART=4vlx100$(PACKAGE)
+endif
+endif
+endif
+SYNFREQ=60
+PROMGENPAR=-x xcf32p xcf32p -u 0 $(TOP).bit -p mcs -w -o gr-cpci-xc4v
+MANUFACTURER=Xilinx
+MGCTECHNOLOGY=VIRTEX-4
+MGCPACKAGE=$(PACKAGE)
+SPEED=-10
+

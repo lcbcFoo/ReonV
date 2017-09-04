@@ -1,0 +1,100 @@
+
+# LEON3 configuration written in linux configuration language
+#
+# Written by Jiri Gaisler, Gaisler Research
+#
+# Comments and bug reports to support@gaisler.com
+#
+#
+
+#define_bool CONFIG_MCTRL_RMW y
+define_bool CONFIG_HAS_SHARED_GRFPU y
+
+mainmenu_name "LEON3MP Design Configuration"
+
+mainmenu_option next_comment
+  comment 'Synthesis      '
+  source lib/techmap/gencomp/tech.in
+  choice 'Target selection                                      ' \
+	"Virtex5-QV	CONFIG_DEVICE_XQR5V \
+        Virtex5-Commercial		CONFIG_DEVICE_COMMERCIAL" CONFIG_DEVICE_XQR5V
+endmenu
+
+mainmenu_option next_comment
+  comment 'Clock generation'
+  source lib/techmap/clocks/clkgen.in
+endmenu
+
+source lib/gaisler/subsys/leon_dsu_stat_base.in
+source lib/gaisler/l2cache/l2c.in
+source lib/grlib/amba/amba.in
+
+mainmenu_option next_comment
+  comment 'Debug Link           '
+  source lib/gaisler/uart/dcom.in
+  source lib/gaisler/jtag/jtag.in
+  source lib/gaisler/net/edcl.in
+endmenu
+
+mainmenu_option next_comment
+comment 'Peripherals             '
+
+  mainmenu_option next_comment
+  comment 'Memory controller             '
+    source lib/esa/memoryctrl/mctrl.in
+    source lib/gaisler/memctrl/ftmctrl.in
+    source lib/gaisler/ddr/ddr2sp.in
+    source lib/gaisler/misc/ahbstat.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'On-chip RAM/ROM                 '
+    source lib/gaisler/misc/ahbrom.in
+    source lib/gaisler/misc/ahbram.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'Ethernet             '
+    source lib/gaisler/greth/greth.in
+    source lib/gaisler/greth/greth2.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'UART, timer, I/O port, IRQ controller, statistics'
+    source lib/gaisler/uart/uart1.in
+    source lib/gaisler/irqmp/irqmp.in
+    source lib/gaisler/misc/gptimer.in
+    source lib/gaisler/misc/grgpio.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'I2C and SPI '
+    source lib/gaisler/i2c/i2c.in
+    source lib/gaisler/spi/spictrl.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'PCI              '
+    mainmenu_option next_comment
+    comment 'GRPCI2         '
+      source lib/gaisler/pci/grpci2/grpci2.in
+    endmenu
+    source lib/esa/pci/pci_arb.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'VGA interface'
+    source lib/gaisler/misc/svgactrl.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'System ACE and System Monitor'
+    source lib/gaisler/misc/gracectrl.in
+    source lib/gaisler/misc/grsysmon.in
+  endmenu
+endmenu
+
+mainmenu_option next_comment
+comment 'VHDL Debugging        '
+  source lib/grlib/util/debug.in
+endmenu

@@ -1,0 +1,20 @@
+////////////////////////////////////////////////////////////////////////////
+// VGA clocks
+////////////////////////////////////////////////////////////////////////////
+NET "clkvga" TNM_NET = "clkvga" | PERIOD = 15.385;
+NET "clk25" TNM_NET = "clk25" | PERIOD = 40.000;
+NET "clk40" TNM_NET = "clk40" | PERIOD = 25.000;
+NET "clk65" TNM_NET = "clk65" | PERIOD = 15.385;
+TIMESPEC "TSPLB_TFT25" = FROM "clkm" TO "clk25" TIG;
+TIMESPEC "TSPLB_TFT40" = FROM "clkm" TO "clk40" TIG;
+TIMESPEC "TSPLB_TFT65" = FROM "clkm" TO "clk65" TIG;
+TIMESPEC "TSTFT25_PLB" = FROM "clk25" TO "clkm" TIG;
+TIMESPEC "TSTFT25_TFT40" = FROM "clk25" TO "clk40" TIG;
+TIMESPEC "TSTFT25_TFT65" = FROM "clk25" TO "clk65" TIG;
+TIMESPEC "TSTFT40_PLB" = FROM "clk40" TO "clkm" TIG;
+TIMESPEC "TSTFT40_TFT25" = FROM "clk40" TO "clk25" TIG;
+TIMESPEC "TSTFT40_TFT65" = FROM "clk40" TO "clk65" TIG;
+TIMESPEC "TSTFT65_PLB" = FROM "clk65" TO "clkm" TIG;
+TIMESPEC "TSTFT65_TFT25" = FROM "clk65" TO "clk25" TIG;
+TIMESPEC "TSTFT65_TFT40" = FROM "clk65" TO "clk40" TIG;
+////////////////////////////////////////////////////////////////////////////

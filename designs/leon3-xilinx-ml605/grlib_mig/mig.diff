@@ -1,0 +1,416 @@
+diff -Naur mig37/mig_37/user_design/rtl/ip_top/infrastructure.vhd /home/jiri/ibm/vhdl/grlib/lib/work/ml605/rtl/ip_top/infrastructure.vhd
+--- mig37/mig_37/user_design/rtl/ip_top/infrastructure.vhd	2011-06-13 18:01:50.000000000 +0200
++++ /home/jiri/ibm/vhdl/grlib/lib/work/ml605/rtl/ip_top/infrastructure.vhd	2011-03-22 23:26:00.000000000 +0100
+@@ -94,7 +94,8 @@
+    DIVCLK_DIVIDE      : integer := 1;              -- write PLL VCO divisor
+    CLKOUT_DIVIDE      : integer := 2;              -- VCO output divisor for fast
+                                                 -- (memory) clocks
+-   RST_ACT_LOW        : integer := 1
++   RST_ACT_LOW        : integer := 1;
++   CLKOUT_DIVIDE4     : integer := 10              -- VCO output divisor for AHB clock
+    );
+   port (
+    -- Clock inputs
+@@ -107,6 +108,8 @@
+    clk_mem            : out std_logic;  -- 2x logic clock
+    clk                : out std_logic;  -- 1x logic clock
+    clk_rd_base        : out std_logic;  -- 2x base read clock
++   clk_ahb            : out std_logic;  -- AHB clock
++   clk100             : out std_logic;  -- 100 MHz clock 
+    -- Reset outputs
+    rstdiv0            : out std_logic;  -- Reset CLK and CLKDIV logic (incl I/O)
+    -- Phase Shift Interface
+@@ -159,6 +162,8 @@
+                                 -- synthesis syn_maxfan = 10
+   signal rst_tmp              : std_logic;
+   signal sys_rst_act_hi       : std_logic;
++  signal clkout4              : std_logic;
++  signal clkout5              : std_logic;
+ 
+   attribute syn_maxfan : integer;
+   attribute syn_maxfan of rstdiv0_sync_r : signal is 10 ;
+@@ -280,12 +285,12 @@
+       CLKOUT3_USE_FINE_PS   => FALSE,
+ 
+       CLKOUT4_CASCADE       => FALSE,
+-      CLKOUT4_DIVIDE        => 1,
++      CLKOUT4_DIVIDE        => CLKOUT_DIVIDE4,
+       CLKOUT4_DUTY_CYCLE    => 0.500,
+       CLKOUT4_PHASE         => 0.000,
+       CLKOUT4_USE_FINE_PS   => FALSE,
+ 
+-      CLKOUT5_DIVIDE        => 1,
++      CLKOUT5_DIVIDE        => 12,
+       CLKOUT5_DUTY_CYCLE    => 0.500,
+       CLKOUT5_PHASE         => 0.000,
+       CLKOUT5_USE_FINE_PS   => FALSE,
+@@ -308,8 +313,8 @@
+        CLKOUT2B     => open,
+        CLKOUT3      => open,   -- Performance path for outer columns
+        CLKOUT3B     => open,
+-       CLKOUT4      => open,
+-       CLKOUT5      => open,
++       CLKOUT4      => clkout4,
++       CLKOUT5      => clkout5,
+        CLKOUT6      => open,
+        DO           => open,
+        DRDY         => open,
+@@ -343,6 +348,18 @@
+      I => clk_pll
+      );
+ 
++  u_bufg_clkdiv4 : BUFG
++    port map (
++     O => clk_ahb,
++     I => clkout4
++     );
++
++  u_bufg_clkdiv5 : BUFG
++    port map (
++     O => clk100,
++     I => clkout5
++     );
++
+   --***************************************************************************
+   -- RESET SYNCHRONIZATION DESCRIPTION:
+   --  Various resets are generated to ensure that:
+diff -Naur mig37/mig_37/user_design/rtl/ip_top/iodelay_ctrl.vhd /home/jiri/ibm/vhdl/grlib/lib/work/ml605/rtl/ip_top/iodelay_ctrl.vhd
+--- mig37/mig_37/user_design/rtl/ip_top/iodelay_ctrl.vhd	2011-06-13 18:01:50.000000000 +0200
++++ /home/jiri/ibm/vhdl/grlib/lib/work/ml605/rtl/ip_top/iodelay_ctrl.vhd	2011-03-22 23:26:00.000000000 +0100
+@@ -96,6 +96,7 @@
+     clk_ref_n        : in  std_logic;
+     clk_ref          : in  std_logic;
+     sys_rst          : in  std_logic;
++    clk_200          : out  std_logic;
+     iodelay_ctrl_rdy : out std_logic
+     );
+ end entity iodelay_ctrl;
+@@ -171,6 +172,8 @@
+       I  => clk_ref_ibufg
+       );
+ 
++  clk_200 <= clk_ref_bufg;  -- Added for ML605
++
+   --*****************************************************************
+   -- IDELAYCTRL reset
+   -- This assumes an external clock signal driving the IDELAYCTRL
+diff -Naur mig37/mig_37/user_design/rtl/ip_top/memc_ui_top.vhd /home/jiri/ibm/vhdl/grlib/lib/work/ml605/rtl/ip_top/memc_ui_top.vhd
+--- mig37/mig_37/user_design/rtl/ip_top/memc_ui_top.vhd	2011-06-13 18:01:50.000000000 +0200
++++ /home/jiri/ibm/vhdl/grlib/lib/work/ml605/rtl/ip_top/memc_ui_top.vhd	2011-03-22 23:26:00.000000000 +0100
+@@ -132,7 +132,7 @@
+                                         -- # = "0", "CL-1", "CL-2".
+                                         -- DDR2 SDRAM:
+                                         -- Additive Latency (Extended Mode Register).
+-    BURST_MODE              : string := "8";
++    BURST_MODE              : string := "OTF";
+                                         -- DDR3 SDRAM:
+                                         -- Burst Length (Mode Register 0).
+                                         -- # = "8", "4", "OTF".
+@@ -213,17 +213,19 @@
+     REG_CTRL                : string := "OFF";
+                                         -- # = "ON" - RDIMMs,
+                                         --   = "OFF" - Components, SODIMMs, UDIMMs.
+-    nDQS_COL0               : integer :=6;
++    nDQS_COL0               : integer := 3; --6;
+                                         -- Number of DQS groups in I/O column #1.
+-    nDQS_COL1               : integer := 2;
++    nDQS_COL1               : integer := 5; --2;
+                                         -- Number of DQS groups in I/O column #2.
+     nDQS_COL2               : integer := 0;
+                                         -- Number of DQS groups in I/O column #3.
+     nDQS_COL3               : integer := 0;
+                                         -- Number of DQS groups in I/O column #4.
+-    DQS_LOC_COL0            : std_logic_vector(47 downto 0) := X"050403020100";
++--    DQS_LOC_COL0            : std_logic_vector(47 downto 0) := X"050403020100";
++    DQS_LOC_COL0          : std_logic_vector(23 downto 0) := X"020100";
+                                         -- DQS groups in column #1.
+-    DQS_LOC_COL1            : std_logic_vector(15 downto 0) := X"0706";
++--    DQS_LOC_COL1            : std_logic_vector(15 downto 0) := X"0706";
++    DQS_LOC_COL1          : std_logic_vector(39 downto 0) := X"0706050403";
+                                         -- DQS groups in column #2.
+     DQS_LOC_COL2            : std_logic_vector(0 downto 0) := "0";
+                                         -- DQS groups in column #3.
+@@ -260,7 +262,7 @@
+                                         -- Mapping of Ranks.
+     SLOT_1_CONFIG           : std_logic_vector(7 downto 0) := X"00";
+                                         -- Mapping of Ranks.
+-    DEBUG_PORT              : string := "ON";
++    DEBUG_PORT              : string := "OFF";
+                                         -- # = "ON" Enable debug signals/controls.
+                                         --   = "OFF" Disable debug signals/controls.
+     ADDR_WIDTH              : integer := 27;
+@@ -364,7 +366,7 @@
+     "mig_v3_7_ddr3_V6, Coregen 13.1";
+ 
+   attribute CORE_GENERATION_INFO : string;
+-  attribute CORE_GENERATION_INFO of arch_memc_ui_top : ARCHITECTURE IS "ddr3_V6,mig_v3_7,{LANGUAGE=VHDL, SYNTHESIS_TOOL=synplicity, LEVEL=CONTROLLER, AXI_ENABLE=0, NO_OF_CONTROLLERS=1, INTERFACE_TYPE=DDR3, CLK_PERIOD=2500, MEMORY_TYPE=SODIMM, MEMORY_PART=mt4jsf6464hy-1g1, DQ_WIDTH=64, ECC=OFF, DATA_MASK=1, BURST_MODE=8, BURST_TYPE=SEQ, OUTPUT_DRV=HIGH, RTT_NOM=60, REFCLK_FREQ=200, MMCM_ADV_BANDWIDTH=OPTIMIZED, CLKFBOUT_MULT_F=6, CLKOUT_DIVIDE=3, DEBUG_PORT=ON, IODELAY_HP_MODE=ON, INTERNAL_VREF=0, DCI_INOUTS=1, CLASS_ADDR=I, INPUT_CLK_TYPE=DIFFERENTIAL}";
++  attribute CORE_GENERATION_INFO of arch_memc_ui_top : ARCHITECTURE IS "ddr3_V6,mig_v3_7,{LANGUAGE=VHDL, SYNTHESIS_TOOL=synplicity, LEVEL=CONTROLLER, AXI_ENABLE=0, NO_OF_CONTROLLERS=1, INTERFACE_TYPE=DDR3, CLK_PERIOD=2500, MEMORY_TYPE=SODIMM, MEMORY_PART=mt4jsf6464hy-1g1, DQ_WIDTH=64, ECC=OFF, DATA_MASK=1, BURST_MODE=OTF, BURST_TYPE=SEQ, OUTPUT_DRV=HIGH, RTT_NOM=60, REFCLK_FREQ=200, MMCM_ADV_BANDWIDTH=OPTIMIZED, CLKFBOUT_MULT_F=6, CLKOUT_DIVIDE=3, DEBUG_PORT=OFF, IODELAY_HP_MODE=ON, INTERNAL_VREF=0, DCI_INOUTS=1, CLASS_ADDR=II, INPUT_CLK_TYPE=DIFFERENTIAL}";
+   function XWIDTH return integer is
+   begin
+     if(CS_WIDTH = 1) then
+@@ -404,8 +406,10 @@
+ 
+ --  constant PAYLOAD_WIDTH = (ECC_TEST == "OFF") ? DATA_WIDTH : DQ_WIDTH;
+ 
+-  constant DLC0_zeros : std_logic_vector(143 downto 47+1) := (others => '0');
+-  constant DLC1_zeros : std_logic_vector(143 downto 15+1) := (others => '0');
++--  constant DLC0_zeros : std_logic_vector(143 downto 47+1) := (others => '0');
++  constant DLC0_zeros : std_logic_vector(143 downto 23+1) := (others => '0');
++--  constant DLC1_zeros : std_logic_vector(143 downto 15+1) := (others => '0');
++  constant DLC1_zeros : std_logic_vector(143 downto 39+1) := (others => '0');
+   constant DLC2_zeros : std_logic_vector(143 downto 0+1) := (others => '0');
+   constant DLC3_zeros : std_logic_vector(143 downto 0+1) := (others => '0');
+ 
+diff -Naur mig37/mig_37/user_design/rtl/ip_top/mig_37.vhd /home/jiri/ibm/vhdl/grlib/lib/work/ml605/rtl/ip_top/mig_37.vhd
+--- mig37/mig_37/user_design/rtl/ip_top/mig_37.vhd	2011-06-13 18:01:50.000000000 +0200
++++ /home/jiri/ibm/vhdl/grlib/lib/work/ml605/rtl/ip_top/mig_37.vhd	2011-03-22 23:26:00.000000000 +0100
+@@ -92,7 +92,7 @@
+                                      -- MMCM programming algorithm
+      CLKFBOUT_MULT_F       : integer := 6;
+                                      -- write PLL VCO multiplier.
+-     DIVCLK_DIVIDE         : integer := 2;
++     DIVCLK_DIVIDE         : integer := 1;  --2;  ML605 fix
+                                      -- write PLL VCO divisor.
+      CLKOUT_DIVIDE         : integer := 3;
+                                      -- VCO output divisor for fast (memory) clocks.
+@@ -102,7 +102,7 @@
+      tCK                   : integer := 2500;
+                                      -- memory tCK paramter.
+                                      -- # = Clock Period.
+-     DEBUG_PORT            : string := "ON";
++     DEBUG_PORT            : string := "OFF";
+                                      -- # = "ON" Enable debug signals/controls.
+                                      --   = "OFF" Disable debug signals/controls.
+      SIM_BYPASS_INIT_CAL   : string := "OFF";
+@@ -137,7 +137,7 @@
+                                      -- # of DQS/DQS# bits.
+      ROW_WIDTH             : integer := 13;
+                                      -- # of memory Row Address bits.
+-     BURST_MODE            : string := "8";
++     BURST_MODE            : string := "OTF";
+                                      -- Burst Length (Mode Register 0).
+                                      -- # = "8", "4", "OTF".
+      BM_CNT_WIDTH          : integer := 2;
+@@ -169,17 +169,19 @@
+      REG_CTRL              : string := "OFF";
+                                      -- # = "ON" - RDIMMs,
+                                      --   = "OFF" - Components, SODIMMs, UDIMMs.
+-     nDQS_COL0             : integer := 6;
++     nDQS_COL0             : integer := 3; --6;
+                                      -- Number of DQS groups in I/O column #1.
+-     nDQS_COL1             : integer := 2;
++     nDQS_COL1             : integer := 5; --2;
+                                      -- Number of DQS groups in I/O column #2.
+      nDQS_COL2             : integer := 0;
+                                      -- Number of DQS groups in I/O column #3.
+      nDQS_COL3             : integer := 0;
+                                      -- Number of DQS groups in I/O column #4.
+-     DQS_LOC_COL0          : std_logic_vector(47 downto 0) := X"050403020100";
++--     DQS_LOC_COL0          : std_logic_vector(47 downto 0) := X"050403020100";
++     DQS_LOC_COL0          : std_logic_vector(23 downto 0) := X"020100";
+                                      -- DQS groups in column #1.
+-     DQS_LOC_COL1          : std_logic_vector(15 downto 0) := X"0706";
++--     DQS_LOC_COL1          : std_logic_vector(15 downto 0) := X"0706";
++     DQS_LOC_COL1          : std_logic_vector(39 downto 0) := X"0706050403";
+                                      -- DQS groups in column #2.
+      DQS_LOC_COL2          : std_logic_vector(0 downto 0) := "0";
+                                      -- DQS groups in column #3.
+@@ -199,18 +201,20 @@
+      DATA_WIDTH            : integer := 64;
+      PAYLOAD_WIDTH         : integer := 64;
+    
+-    RST_ACT_LOW             : integer := 1;
++    RST_ACT_LOW             : integer := 0;
+                                        -- =1 for active low reset,
+                                        -- =0 for active high.
+     INPUT_CLK_TYPE          : string  := "DIFFERENTIAL";
+                                        -- input clock type DIFFERENTIAL or SINGLE_ENDED
+-    STARVE_LIMIT            : integer := 2
++    STARVE_LIMIT            : integer := 2;
+                                        -- # = 2,3,4.
++    CLKOUT_DIVIDE4          : integer := 2
+     );
+   port(
+ 
+-      sys_clk_p     : in    std_logic;
+-      sys_clk_n     : in    std_logic;
++-- remove for ML605
++--      sys_clk_p     : in    std_logic;
++--      sys_clk_n     : in    std_logic;
+       clk_ref_p     : in    std_logic;
+       clk_ref_n     : in    std_logic;
+       ddr3_dq       : inout std_logic_vector(DQ_WIDTH-1 downto 0);
+@@ -228,8 +232,8 @@
+       ddr3_dqs_n    : inout std_logic_vector(DQS_WIDTH-1 downto 0);
+       ddr3_ck_p     : out   std_logic_vector(CK_WIDTH-1 downto 0);
+       ddr3_ck_n     : out   std_logic_vector(CK_WIDTH-1 downto 0);
+-      sda           : inout std_logic;
+-      scl           : out   std_logic;
++--      sda           : inout std_logic;
++--      scl           : out   std_logic;
+       app_wdf_wren  : in    std_logic;
+       app_wdf_data  : in    std_logic_vector((4*PAYLOAD_WIDTH)-1 downto 0);
+       app_wdf_mask  : in    std_logic_vector((4*PAYLOAD_WIDTH)/8-1 downto 0);
+@@ -244,6 +248,8 @@
+       tb_rst        : out   std_logic;
+       tb_clk        : out   std_logic;
+       phy_init_done : out   std_logic;
++      clk_ahb       : out   std_logic;
++      clk100        : out   std_logic;
+ 
+     sys_rst        : in std_logic
+     );
+@@ -282,6 +288,7 @@
+       clk_ref_n        : in  std_logic;
+       clk_ref          : in  std_logic;
+       sys_rst          : in  std_logic;
++      clk_200          : out  std_logic;
+       iodelay_ctrl_rdy : out std_logic
+       );
+   end component iodelay_ctrl;
+@@ -295,12 +302,15 @@
+      CLKFBOUT_MULT_F    : integer;
+      DIVCLK_DIVIDE      : integer;
+      CLKOUT_DIVIDE      : integer;
+-     RST_ACT_LOW        : integer
++     RST_ACT_LOW        : integer;
++     CLKOUT_DIVIDE4     : integer := 10              -- VCO output divisor for AHB clock
+      );
+     port (
+      clk_mem          : out std_logic;
+      clk              : out std_logic;
+      clk_rd_base      : out std_logic;
++     clk_ahb          : out std_logic;  -- AHB clock
++     clk100           : out std_logic;  -- 100 MHz clock
+      rstdiv0          : out std_logic;
+      mmcm_clk         : in  std_logic;
+      sys_rst          : in  std_logic;
+@@ -343,8 +353,10 @@
+       nDQS_COL1             : integer;
+       nDQS_COL2             : integer;
+       nDQS_COL3             : integer;
+-      DQS_LOC_COL0          : std_logic_vector(47 downto 0);
+-      DQS_LOC_COL1          : std_logic_vector(15 downto 0);
++--      DQS_LOC_COL0          : std_logic_vector(47 downto 0);
++      DQS_LOC_COL0          : std_logic_vector(23 downto 0);
++--      DQS_LOC_COL1          : std_logic_vector(15 downto 0);
++      DQS_LOC_COL1          : std_logic_vector(39 downto 0);
+       DQS_LOC_COL2          : std_logic_vector(0 downto 0);
+       DQS_LOC_COL3          : std_logic_vector(0 downto 0);
+       tCK                   : integer;
+@@ -533,8 +545,8 @@
+   signal ddr3_cs4_sync_out     : std_logic_vector(31 downto 0);
+ 
+   attribute keep : string;
+-  attribute keep of sda_i               : signal is "true";
+-  attribute keep of scl_i               : signal is "true";
++--  attribute keep of sda_i               : signal is "true";
++--  attribute keep of scl_i               : signal is "true";
+ 
+ begin
+ 
+@@ -543,36 +555,36 @@
+   app_hi_pri                  <= '0';
+   tb_clk                      <= clk;
+   tb_rst                      <= rst;
+-  scl_inst : MUXCY
+-    port map (
+-      O  => scl,
+-      CI => scl_i,
+-      DI => '0',
+-      S  => '1'
+-      );
+-
+-  sda_inst : MUXCY
+-    port map (
+-      O  => sda,
+-      CI => sda_i,
+-      DI => '0',
+-      S  => '1'
+-      );
++--  scl_inst : MUXCY
++--    port map (
++--      O  => scl,
++--      CI => scl_i,
++--      DI => '0',
++--      S  => '1'
++--      );
++
++--  sda_inst : MUXCY
++--    port map (
++--      O  => sda,
++--      CI => sda_i,
++--      DI => '0',
++--      S  => '1'
++--      );
+   clk_ref                     <= '0';
+   sys_clk                     <= '0';
+ 
+ 
+-  u_clk_ibuf : clk_ibuf
+-    generic map(
+-      INPUT_CLK_TYPE => INPUT_CLK_TYPE
+-      )
+-    port map(
+-      sys_clk_p => sys_clk_p,
+-      sys_clk_n => sys_clk_n,
+-      sys_clk   => sys_clk,
+-      mmcm_clk  => mmcm_clk
+-      );
+-
++-- Remove for ML605
++--  u_clk_ibuf : clk_ibuf
++--    generic map(
++--      INPUT_CLK_TYPE => INPUT_CLK_TYPE
++--      )
++--    port map(
++--      sys_clk_p => sys_clk_p,
++--      sys_clk_n => sys_clk_n,
++--      sys_clk   => sys_clk,
++--      mmcm_clk  => mmcm_clk
++--      );
+ 
+ 
+   u_iodelay_ctrl : iodelay_ctrl
+@@ -587,11 +599,11 @@
+       clk_ref_n        => clk_ref_n,
+       clk_ref          => clk_ref,
+       sys_rst          => sys_rst,
++      clk_200          => mmcm_clk,	-- 200 MHz for ML605
+       iodelay_ctrl_rdy => iodelay_ctrl_rdy
+       );
+    
+ 
+-
+   u_infrastructure : infrastructure
+     generic map(
+       TCQ                => TCQ,
+@@ -601,12 +613,15 @@
+       CLKFBOUT_MULT_F    => CLKFBOUT_MULT_F,
+       DIVCLK_DIVIDE      => DIVCLK_DIVIDE,
+       CLKOUT_DIVIDE      => CLKOUT_DIVIDE,
+-      RST_ACT_LOW        => RST_ACT_LOW
++      RST_ACT_LOW        => RST_ACT_LOW,
++      CLKOUT_DIVIDE4     => CLKOUT_DIVIDE4
+       )
+     port map(
+       clk_mem          => clk_mem,
+       clk              => clk,
+       clk_rd_base      => clk_rd_base,
++      clk_ahb          => clk_ahb,
++      clk100           => clk100,
+       rstdiv0          => rst,
+       mmcm_clk         => mmcm_clk,
+       sys_rst          => sys_rst,
+diff -Naur mig37/mig_37/user_design/rtl/phy/phy_top.vhd /home/jiri/ibm/vhdl/grlib/lib/work/ml605/rtl/phy/phy_top.vhd
+--- mig37/mig_37/user_design/rtl/phy/phy_top.vhd	2011-06-13 18:01:50.000000000 +0200
++++ /home/jiri/ibm/vhdl/grlib/lib/work/ml605/rtl/phy/phy_top.vhd	2011-03-22 23:26:00.000000000 +0100
+@@ -295,7 +295,7 @@
+     "mig_v3_7_ddr3_V6, Coregen 13.1";
+ 
+   attribute CORE_GENERATION_INFO : string;
+-  attribute CORE_GENERATION_INFO of arch : ARCHITECTURE IS "ddr3_V6_phy,mig_v3_7,{LANGUAGE=VHDL, SYNTHESIS_TOOL=synplicity, LEVEL=PHY, AXI_ENABLE=0, NO_OF_CONTROLLERS=1, INTERFACE_TYPE=DDR3, CLK_PERIOD=2500, MEMORY_TYPE=SODIMM, MEMORY_PART=mt4jsf6464hy-1g1, DQ_WIDTH=64, ECC=OFF, DATA_MASK=1, BURST_MODE=8, BURST_TYPE=SEQ, OUTPUT_DRV=HIGH, RTT_NOM=60, REFCLK_FREQ=200, MMCM_ADV_BANDWIDTH=OPTIMIZED, CLKFBOUT_MULT_F=6, CLKOUT_DIVIDE=3, DEBUG_PORT=ON, IODELAY_HP_MODE=ON, INTERNAL_VREF=0, DCI_INOUTS=1, CLASS_ADDR=I, INPUT_CLK_TYPE=DIFFERENTIAL}";
++  attribute CORE_GENERATION_INFO of arch : ARCHITECTURE IS "ddr3_V6_phy,mig_v3_7,{LANGUAGE=VHDL, SYNTHESIS_TOOL=synplicity, LEVEL=PHY, AXI_ENABLE=0, NO_OF_CONTROLLERS=1, INTERFACE_TYPE=DDR3, CLK_PERIOD=2500, MEMORY_TYPE=SODIMM, MEMORY_PART=mt4jsf6464hy-1g1, DQ_WIDTH=64, ECC=OFF, DATA_MASK=1, BURST_MODE=OTF, BURST_TYPE=SEQ, OUTPUT_DRV=HIGH, RTT_NOM=60, REFCLK_FREQ=200, MMCM_ADV_BANDWIDTH=OPTIMIZED, CLKFBOUT_MULT_F=6, CLKOUT_DIVIDE=3, DEBUG_PORT=OFF, IODELAY_HP_MODE=ON, INTERNAL_VREF=0, DCI_INOUTS=1, CLASS_ADDR=II, INPUT_CLK_TYPE=DIFFERENTIAL}";
+    -- For reg dimm addign one extra cycle of latency for CWL. The new value
+    -- will be passed to phy_write and phy_data_io	
+    function CALC_CWL_M return integer is

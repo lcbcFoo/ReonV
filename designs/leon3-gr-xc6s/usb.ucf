@@ -1,0 +1,30 @@
+# Set the ULPI_CLK constraints 
+#NET “usb_clk” TNM_NET = “usb_clk”;
+#TIMESPEC “TS_usb_clk” = PERIOD “usb_clk” 16.667 ns HIGH 50%;
+NET "usb_clk" PERIOD = 16.667 ns HIGH 50 %;
+
+#offset in constraints are calculated as follows.
+#clock frequency is 16.667ns
+#ULPI PHY output delay for output clock mode for ISP1504A is 3.8ns
+#onboard trace delay would be 1ns 
+#input offset = (clock period - PHY outputdelay - trance delay)
+#with 1ns hold requirement for the PHY, considering 200ps clock jitter
+#OFFSET IN valid period would be 800ps.
+# Set the OFFSET IN delay as 12.167 ns with respect to ULPI CLK
+OFFSET = IN 12.167 ns VALID 12.967 ns BEFORE usb_clk RISING;
+
+# ULPI PHY setup time for output clock mode is 3ns in nom case
+# leaving 1ns for onboard trace delay.
+# OFFSET OUT = clock period - (PHY setup time + trace delay)
+# Set the OFFSET OUT delay as 12.667 ns with respect to ULPI_CLK
+OFFSET = OUT 12.667 ns AFTER usb_clk RISING;
+
+# Set MAX DELAY constraint on ULPI DIR pin
+NET "usb_dir" TNM = "usb_pin_grp";
+TIMESPEC TS_usb_dir = FROM "usb_pin_grp" TO  PADS 4 ns;
+
+# Cross clock domain timing Constraints between ULPI Clock and AMBA clock
+NET "uclk" TNM_NET = "uclk";
+TIMESPEC "TS_clkm_usb_clk" = FROM "clkm" TO "uclk" 16 ns DATAPATHONLY;
+TIMESPEC "TS_usb_clk_clkm" = FROM "uclk" TO "clkm" 16 ns DATAPATHONLY;
+

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project NoOfControllers="1" >
+    <ModuleName>mig_39</ModuleName>
+    <TargetFPGA>xc6slx45t-fgg484/-3</TargetFPGA>
+    <Version>3.92</Version>
+    <Controller number="3" >
+        <MemoryDevice>DDR3_SDRAM/Components/MT41J64M16XX-187E</MemoryDevice>
+        <TimePeriod>3000</TimePeriod>
+        <EnableVoltageRange>0</EnableVoltageRange>
+        <DataMask>1</DataMask>
+        <CustomPart>FALSE</CustomPart>
+        <NewPartName></NewPartName>
+        <RowAddress>13</RowAddress>
+        <ColAddress>10</ColAddress>
+        <BankAddress>3</BankAddress>
+        <TimingParameters>
+            <Parameters twtr="7.5" trefi="7.8" twr="15" trtp="7.5" trfc="110" trp="13.13" tras="37.5" trcd="13.13" />
+        </TimingParameters>
+        <mrBurstLength name="Burst Length" >8(00)</mrBurstLength>
+        <mrCasLatency name="CAS Latency" >6</mrCasLatency>
+        <emrDllEnable name="DLL Enable" >Enable</emrDllEnable>
+        <emrOutputDriveStrength name="Output Driver Impedance Control" >RZQ/6</emrOutputDriveStrength>
+        <emrRTT name="RTT (nominal) - ODT" >RZQ/4</emrRTT>
+        <emrPosted name="Additive Latency (AL)" >0</emrPosted>
+        <emrOCD name="Write Leveling Enable" >Disabled</emrOCD>
+        <emrDQS name="TDQS enable" >Disabled</emrDQS>
+        <mr2PartialArraySelfRefresh name="Partial-Array Self Refresh" >Full Array</mr2PartialArraySelfRefresh>
+        <mr2CasWriteLatency name="CAS write latency" >5</mr2CasWriteLatency>
+        <mr2AutoSelfRefresh name="Auto Self Refresh" >Enabled</mr2AutoSelfRefresh>
+        <mr2SelfRefreshTempRange name="High Temparature Self Refresh Rate" >Normal</mr2SelfRefreshTempRange>
+        <PortInterface>NATIVE,NATIVE,NATIVE,NATIVE,NATIVE,NATIVE</PortInterface>
+        <Class>Class II</Class>
+        <DataClass>Class II</DataClass>
+        <InputPinTermination>CALIB_TERM</InputPinTermination>
+        <DataTermination>25 Ohms</DataTermination>
+        <CalibrationRowAddress></CalibrationRowAddress>
+        <CalibrationColumnAddress></CalibrationColumnAddress>
+        <CalibrationBankAddress></CalibrationBankAddress>
+        <SystemClock>Differential</SystemClock>
+        <BypassCalibration>1</BypassCalibration>
+        <DebugSignals>Disable</DebugSignals>
+        <SystemClock>Differential</SystemClock>
+        <Configuration>Two 32-bit bi-directional and four 32-bit unidirectional ports</Configuration>
+        <RzqPin>K7</RzqPin>
+        <ZioPin>M7</ZioPin>
+        <PortsSelected>Port0,Port2</PortsSelected>
+        <PortDirections>Bi-directional,none,Read,none,none,none</PortDirections>
+        <UserMemoryAddressMap>ROW_BANK_COLUMN</UserMemoryAddressMap>
+        <ArbitrationAlgorithm>Round Robin</ArbitrationAlgorithm>
+        <TimeSlot0>02</TimeSlot0>
+        <TimeSlot1>20</TimeSlot1>
+        <TimeSlot2>02</TimeSlot2>
+        <TimeSlot3>20</TimeSlot3>
+        <TimeSlot4>02</TimeSlot4>
+        <TimeSlot5>20</TimeSlot5>
+        <TimeSlot6>02</TimeSlot6>
+        <TimeSlot7>20</TimeSlot7>
+        <TimeSlot8>02</TimeSlot8>
+        <TimeSlot9>20</TimeSlot9>
+        <TimeSlot10>02</TimeSlot10>
+        <TimeSlot11>20</TimeSlot11>
+    </Controller>
+</Project>

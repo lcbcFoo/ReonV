@@ -1,0 +1,4 @@
+#!/bin/sh
+
+socat -d PTY,raw,echo=0,link=slave_grmon PTY,raw,echo=0,link=slave_sim
+

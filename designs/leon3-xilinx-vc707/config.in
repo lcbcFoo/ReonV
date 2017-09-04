@@ -1,0 +1,109 @@
+#
+# LEON3 configuration written in linux configuration language
+#
+# Written by Jiri Gaisler, Gaisler Research
+#
+# Comments and bug reports to support@gaisler.com
+#
+#
+
+#define_bool CONFIG_MCTRL_RMW y
+define_bool CONFIG_LEON3FT_PRESENT y
+define_bool CONFIG_HAS_SHARED_GRFPU y
+
+mainmenu_name "LEON3MP Design Configuration"
+
+mainmenu_option next_comment
+  comment 'Synthesis      '
+  source lib/techmap/gencomp/tech.in
+endmenu
+
+mainmenu_option next_comment
+  comment 'Clock generation'
+  source lib/techmap/clocks/clkgen.in
+endmenu
+
+source lib/gaisler/subsys/leon_dsu_stat_base.in
+source lib/gaisler/l2cache/l2c.in
+source lib/grlib/amba/amba.in
+
+mainmenu_option next_comment
+  comment 'Debug Link           '
+  source lib/gaisler/uart/dcom.in
+  source lib/gaisler/jtag/jtag.in
+  source lib/gaisler/usb/grusb_dcl.in
+  source lib/gaisler/net/edcl.in
+endmenu
+
+mainmenu_option next_comment
+comment 'Peripherals             '
+
+  mainmenu_option next_comment
+  comment 'Memory controller             '
+    source lib/esa/memoryctrl/mctrl.in
+    source lib/gaisler/ddr/mig_7series.in
+    source lib/gaisler/misc/ahbstat.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'On-chip RAM/ROM                 '
+    source lib/gaisler/misc/ahbrom.in
+    source lib/gaisler/misc/ahbram.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'Ethernet             '
+    source lib/gaisler/greth/greth.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'USB 2.0 Host Controller      '
+    source lib/gaisler/usb/grusbhc.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'USB 2.0 Device Controller      '
+    source lib/gaisler/usb/grusbdc.in
+  endmenu
+  
+  mainmenu_option next_comment
+  comment 'CAN                     '
+    source lib/gaisler/can/can_mc.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'Spacewire '
+    source lib/gaisler/spacewire/spacewire.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'UARTs, timers and irq control         '
+    source lib/gaisler/uart/uart1.in
+    source lib/gaisler/irqmp/irqmp.in
+    source lib/gaisler/misc/gptimer.in
+    source lib/gaisler/misc/grgpio.in
+    source lib/gaisler/i2c/i2c.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'Keybord and VGA interface'
+    source lib/gaisler/misc/ps2vga.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'SPI'
+    source lib/gaisler/spi/spimctrl.in
+    source lib/gaisler/spi/spictrl.in
+  endmenu
+
+  mainmenu_option next_comment
+  comment 'Partial Reconfiguration  '
+    source lib/testgrouppolito/pr/pr.in
+  endmenu
+
+endmenu
+
+mainmenu_option next_comment
+comment 'VHDL Debugging        '
+  source lib/grlib/util/debug.in
+endmenu

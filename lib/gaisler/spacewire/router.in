@@ -1,0 +1,64 @@
+  bool 'Enable Spacewire routing switch               ' CONFIG_SPWRTR_ENABLE
+  if [ "$CONFIG_SPWRTR_ENABLE" = "y" ]; then
+        choice 'Select SpaceWire link receiver input type ' \
+	"SDR       CONFIG_SPWRTR_RX_SDR	 \
+	 DDR       CONFIG_SPWRTR_RX_DDR   \
+         Xor       CONFIG_SPWRTR_RX_XOR \
+         Aeroflex  CONFIG_SPWRTR_RX_AFLEX " DDR
+        choice 'Select SpaceWire link transmitter output type ' \
+        "SDR       CONFIG_SPW_TX_SDR	 \
+	 DDR       CONFIG_SPW_TX_DDR   \
+         Aeroflex  CONFIG_SPW_TX_AFLEX " SDR   
+        bool 'SpaceWire link receiver and transmitter uses same clock  ' CONFIG_SPWRTR_RTSAME
+        choice 'Port receiver and transmitter FIFO size (SpW characters) ' \
+	"16	CONFIG_SPWRTR_RXFIFO16	 \
+	 32	CONFIG_SPWRTR_RXFIFO32	 \
+         64	CONFIG_SPWRTR_RXFIFO64	 \
+         128	CONFIG_SPWRTR_RXFIFO128	 \
+         256	CONFIG_SPWRTR_RXFIFO256	 \
+         512	CONFIG_SPWRTR_RXFIFO512	 \
+         1024	CONFIG_SPWRTR_RXFIFO1024 \ 
+	 2048	CONFIG_SPWRTR_RXFIFO2048" 64
+        bool 'Use technology specific RAM blocks for routing table and port FIFOs' CONFIG_SPWRTR_TECHFIFO
+        choice 'Select SpaceWire RAM fault-tolerance ' \
+        "NoFT   CONFIG_SPWRTR_FT_NOFT	 \
+	 Parity CONFIG_SPWRTR_FT_PAR   \
+         TMR    CONFIG_SPWRTR_FT_TMR " NoFT   
+        bool 'Enable Spacewire link ports ' CONFIG_SPWRTR_SPWEN
+        if [ "$CONFIG_SPWRTR_SPWEN" = "y" ]; then
+                int 'Number of SpaceWire link ports (0 - 31)' CONFIG_SPWRTR_SPWPORTS 2  
+        fi
+        bool 'Enable AMBA ports ' CONFIG_SPWRTR_AMBAEN
+        if [ "$CONFIG_SPWRTR_AMBAEN" = "y" ]; then
+                int 'Number of AMBA ports (0 - 16)' CONFIG_SPWRTR_AMBAPORTS 0  
+        fi
+        bool 'Enable FIFO ports ' CONFIG_SPWRTR_FIFOEN
+        if [ "$CONFIG_SPWRTR_FIFOEN" = "y" ]; then
+                int 'Number of FIFO ports (0 - 31)' CONFIG_SPWRTR_FIFOPORTS 0  
+        fi
+        choice 'Select port arbitration ' \
+        "Round-robin CONFIG_SPWRTR_ARB_RR" Round-robin   
+        bool 'Enable hardware RMAP target in AMBA ports   ' CONFIG_SPWRTR_RMAP
+        if [ "$CONFIG_SPWRTR_RMAP" = "y" ]; then
+                choice 'RMAP buffer size (bytes)    ' \
+        	"64	CONFIG_SPWRTR_RMAPBUF2	 \
+	         128	CONFIG_SPWRTR_RMAPBUF4	 \
+        	 192	CONFIG_SPWRTR_RMAPBUF6	 \
+	         256	CONFIG_SPWRTR_RMAPBUF8" 64
+        fi
+        bool 'Enable RMAP CRC support in AMBA ports  ' CONFIG_SPWRTR_RMAPCRC
+        bool 'Enable Rx unaligned transfers in AMBA ports' CONFIG_SPWRTR_RXUNAL
+        choice 'AMBA port AHB RX/TX FIFO size (32-bit words)     ' \
+	"4	CONFIG_SPWRTR_FIFO2_4	 \
+	 8	CONFIG_SPWRTR_FIFO2_8	 \
+	 16	CONFIG_SPWRTR_FIFO2_16	 \
+	 32	CONFIG_SPWRTR_FIFO2_32" 16
+        int 'FIFO port almost indication range' CONFIG_SPWRTR_ALMOST 8
+        int 'Number of DMA channels (1 - 4)' CONFIG_SPWRTR_DMACHAN 
+        bool 'Enable configuration port AHB slave interface   ' CONFIG_SPWRTR_AHBSLVEN
+        int 'Number of bits for Timer prescaler (0 disables timer) ' CONFIG_SPWRTR_TIMERBITS        
+        bool 'SpaceWire Plug and Play      ' CONFIG_SPWRTR_PNP
+        bool 'Routing table Auto-scrubbing ' CONFIG_SPWRTR_AUTOSCRUB
+       
+  fi
+

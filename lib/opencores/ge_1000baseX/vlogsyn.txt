@@ -1,0 +1,7 @@
+clean_rst.v
+decoder_8b10b.v
+encoder_8b10b.v
+ge_1000baseX_constants.v
+ge_1000baseX_regs.v
+ge_1000baseX_test.v
+timescale.v

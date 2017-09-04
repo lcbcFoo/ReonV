@@ -1,0 +1,44 @@
+devices 
+arith 
+memctrl
+grfpu grlfpu grfpc grlfpc 
+grfpc4 grlfpc4
+srmmu
+leon3 leon3v3
+leon4 leon4v0
+irqmp
+l2cache/pkg l2cache/v3
+lram
+can 
+hcan 
+misc 
+ambatest 
+net 
+pci 
+pci/pcif
+uart 
+sim 
+jtag 
+b1553 
+greth
+spacewire 
+usb 
+axi
+ddr 
+crypto 
+satcan 
+slink 
+ascs 
+pwm
+gr1553b
+gr1553b/core
+iommu
+i2c
+spi
+nand
+mma
+clk2x
+grdmac
+grrm
+subsys
+

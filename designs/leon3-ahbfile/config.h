@@ -1,0 +1,193 @@
+/*
+ * Automatically generated C config: don't edit
+ */
+#define AUTOCONF_INCLUDED
+/*
+ * Synthesis      
+ */
+#define CONFIG_SYN_INFERRED 1
+#undef  CONFIG_SYN_AXCEL
+#undef  CONFIG_SYN_AXDSP
+#undef  CONFIG_SYN_PROASIC
+#undef  CONFIG_SYN_PROASICPLUS
+#undef  CONFIG_SYN_PROASIC3
+#undef  CONFIG_SYN_PROASIC3E
+#undef  CONFIG_SYN_PROASIC3L
+#undef  CONFIG_SYN_IGLOO
+#undef  CONFIG_SYN_IGLOO2
+#undef  CONFIG_SYN_SF2
+#undef  CONFIG_SYN_RTG4
+#undef  CONFIG_SYN_FUSION
+#undef  CONFIG_SYN_UT025CRH
+#undef  CONFIG_SYN_UT130HBD
+#undef  CONFIG_SYN_UT90NHBD
+#undef  CONFIG_SYN_CYCLONEIII
+#undef  CONFIG_SYN_STRATIX
+#undef  CONFIG_SYN_STRATIXII
+#undef  CONFIG_SYN_STRATIXIII
+#undef  CONFIG_SYN_STRATIXIV
+#undef  CONFIG_SYN_STRATIXV
+#undef  CONFIG_SYN_ALTERA
+#undef  CONFIG_SYN_ATC18
+#undef  CONFIG_SYN_ATC18RHA
+#undef  CONFIG_SYN_CUSTOM1
+#undef  CONFIG_SYN_DARE
+#undef  CONFIG_SYN_CMOS9SF
+#undef  CONFIG_SYN_LATTICE
+#undef  CONFIG_SYN_ECLIPSE
+#undef  CONFIG_SYN_RH_LIB18T
+#undef  CONFIG_SYN_RHUMC
+#undef  CONFIG_SYN_RHS65
+#undef  CONFIG_SYN_SAED32
+#undef  CONFIG_SYN_SMIC13
+#undef  CONFIG_SYN_TM65GPLUS
+#undef  CONFIG_SYN_TSMC90
+#undef  CONFIG_SYN_UMC
+#undef  CONFIG_SYN_ARTIX7
+#undef  CONFIG_SYN_KINTEX7
+#undef  CONFIG_SYN_SPARTAN3
+#undef  CONFIG_SYN_SPARTAN3E
+#undef  CONFIG_SYN_SPARTAN6
+#undef  CONFIG_SYN_VIRTEX2
+#undef  CONFIG_SYN_VIRTEX4
+#undef  CONFIG_SYN_VIRTEX5
+#undef  CONFIG_SYN_VIRTEX6
+#undef  CONFIG_SYN_VIRTEX7
+#undef  CONFIG_SYN_ZYNQ7000
+#define CONFIG_MEM_INFERRED 1
+#undef  CONFIG_MEM_UMC
+#undef  CONFIG_MEM_RHUMC
+#undef  CONFIG_MEM_SAED32
+#undef  CONFIG_MEM_DARE
+#undef  CONFIG_MEM_RHS65
+#undef  CONFIG_MEM_ARTISAN
+#undef  CONFIG_MEM_CUSTOM1
+#undef  CONFIG_MEM_VIRAGE
+#undef  CONFIG_MEM_VIRAGE90
+#undef  CONFIG_SYN_NO_ASYNC
+#undef  CONFIG_SYN_SCAN
+/*
+ * Processor            
+ */
+#define CONFIG_LEON3 1
+#define CONFIG_PROC_NUM (1)
+#undef  CONFIG_LEON3_MIN
+#undef  CONFIG_LEON3_GP
+#undef  CONFIG_LEON3_HP
+#define CONFIG_LEON3_CUSTOM 1
+/*
+ * Integer unit                                           
+ */
+#define CONFIG_IU_NWINDOWS (8)
+#undef  CONFIG_IU_V8MULDIV
+#undef  CONFIG_IU_BP
+#define CONFIG_IU_SVT 1
+#define CONFIG_IU_LDELAY (1)
+#define CONFIG_IU_WATCHPOINTS (0)
+#undef  CONFIG_PWD
+#define CONFIG_IU_RSTADDR 00000
+#undef  CONFIG_NP_ASI
+#undef  CONFIG_WRPSR
+#undef  CONFIG_ALTWIN
+#undef  CONFIG_REX
+/*
+ * Floating-point unit
+ */
+#undef  CONFIG_FPU_ENABLE
+/*
+ * Cache system
+ */
+#undef  CONFIG_ICACHE_ENABLE
+#undef  CONFIG_ICACHE_LRAM
+#undef  CONFIG_DCACHE_ENABLE
+#undef  CONFIG_DCACHE_LRAM
+/*
+ * MMU
+ */
+#undef  CONFIG_MMU_ENABLE
+/*
+ * Debug Support Unit        
+ */
+#define CONFIG_DSU_ENABLE 1
+#define CONFIG_DSU_ITRACE 1
+#undef  CONFIG_DSU_ITRACESZ1
+#define CONFIG_DSU_ITRACESZ2 1
+#undef  CONFIG_DSU_ITRACESZ4
+#undef  CONFIG_DSU_ITRACESZ8
+#undef  CONFIG_DSU_ITRACESZ16
+#undef  CONFIG_DSU_ITRACE_2P
+#define CONFIG_DSU_ATRACE 1
+#undef  CONFIG_DSU_ATRACESZ1
+#define CONFIG_DSU_ATRACESZ2 1
+#undef  CONFIG_DSU_ATRACESZ4
+#undef  CONFIG_DSU_ATRACESZ8
+#undef  CONFIG_DSU_ATRACESZ16
+#undef  CONFIG_DSU_AFILT
+#undef  CONFIG_DSU_ASTAT
+#undef  CONFIG_STAT_ENABLE
+/*
+ * Fault-tolerance  
+ */
+/*
+ * VHDL debug settings       
+ */
+#define CONFIG_IU_DISAS 1
+#undef  CONFIG_IU_DISAS_NET
+#undef  CONFIG_DEBUG_PC32
+/*
+ * AMBA configuration
+ */
+#define CONFIG_AHB_DEFMST (0)
+#undef  CONFIG_AHB_RROBIN
+#undef  CONFIG_AHB_SPLIT
+#undef  CONFIG_AHB_FPNPEN
+#define CONFIG_AHB_IOADDR FFF
+#define CONFIG_APB_HADDR 800
+#undef  CONFIG_AHB_MON
+#undef  CONFIG_AHB_DTRACE
+/*
+ * Peripherals             
+ */
+/*
+ * On-chip RAM/ROM                 
+ */
+#define CONFIG_AHBRAM_ENABLE 1
+#undef  CONFIG_AHBRAM_SZ1
+#undef  CONFIG_AHBRAM_SZ2
+#undef  CONFIG_AHBRAM_SZ4
+#undef  CONFIG_AHBRAM_SZ8
+#undef  CONFIG_AHBRAM_SZ16
+#undef  CONFIG_AHBRAM_SZ32
+#define CONFIG_AHBRAM_SZ64 1
+#undef  CONFIG_AHBRAM_SZ128
+#undef  CONFIG_AHBRAM_SZ256
+#undef  CONFIG_AHBRAM_SZ512
+#undef  CONFIG_AHBRAM_SZ1024
+#undef  CONFIG_AHBRAM_SZ2048
+#undef  CONFIG_AHBRAM_SZ4096
+#define CONFIG_AHBRAM_START 400
+#undef  CONFIG_AHBRAM_PIPE
+/*
+ * UARTs, timers and irq control         
+ */
+#define CONFIG_UART1_ENABLE 1
+#define CONFIG_UA1_FIFO1 1
+#undef  CONFIG_UA1_FIFO2
+#undef  CONFIG_UA1_FIFO4
+#undef  CONFIG_UA1_FIFO8
+#undef  CONFIG_UA1_FIFO16
+#undef  CONFIG_UA1_FIFO32
+#define CONFIG_IRQ3_ENABLE 1
+#undef  CONFIG_IRQ3_SEC
+#define CONFIG_GPT_ENABLE 1
+#define CONFIG_GPT_NTIM (2)
+#define CONFIG_GPT_SW (8)
+#define CONFIG_GPT_TW (32)
+#define CONFIG_GPT_IRQ (8)
+#undef  CONFIG_GPT_SEPIRQ
+#undef  CONFIG_GPT_WDOGEN
+#undef  CONFIG_GRGPIO_ENABLE
+/*
+ * VHDL Debugging        
+ */
+#undef  CONFIG_DEBUG_UART

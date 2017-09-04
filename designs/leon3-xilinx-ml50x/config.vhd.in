@@ -1,0 +1,33 @@
+#include "config.h"
+#include "tkconfig.h"
+-----------------------------------------------------------------------------
+--  LEON3 Demonstration design test bench configuration
+--  Copyright (C) 2012 Aeroflex Gaisler
+------------------------------------------------------------------------------
+
+
+library techmap;
+use techmap.gencomp.all;
+library grlib;
+use grlib.devices.all;
+
+package config is
+
+-- Board selection
+#ifdef CONFIG_BOARD_ML505
+  constant CFG_BOARD_SELECTION : system_device_type := XILINX_ML505;
+#endif
+#ifdef CONFIG_BOARD_ML506
+  constant CFG_BOARD_SELECTION : system_device_type := XILINX_ML506;
+#endif
+#ifdef CONFIG_BOARD_ML507
+  constant CFG_BOARD_SELECTION : system_device_type := XILINX_ML507;
+#endif
+#ifdef CONFIG_BOARD_ML509
+  constant CFG_BOARD_SELECTION : system_device_type := XILINX_ML509;
+#endif
+
+
+#include "config.vhd.h"
+
+end;

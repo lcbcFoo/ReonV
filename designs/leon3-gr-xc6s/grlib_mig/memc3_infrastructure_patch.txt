@@ -1,0 +1,93 @@
+--- ./mig39/mig_39//user_design/rtl/memc3_infrastructure.vhd	2013-01-15 15:30:14.000000000 +0100
++++ ./p/a/t/c/h/mig39/mig_39//user_design/rtl/memc3_infrastructure.vhd	2013-01-15 15:27:28.724788178 +0100
+@@ -77,6 +77,7 @@
+     C_CLKOUT1_DIVIDE   : integer := 1;
+     C_CLKOUT2_DIVIDE   : integer := 16;
+     C_CLKOUT3_DIVIDE   : integer := 8;
++    C_CLKOUT5_DIVIDE   : integer := 8;
+     C_CLKFBOUT_MULT   : integer := 2;
+     C_DIVCLK_DIVIDE   : integer := 1
+ 
+@@ -95,7 +96,10 @@
+     mcb_drp_clk     : out std_logic;
+     pll_ce_0        : out std_logic;
+     pll_ce_90       : out std_logic;
+-    pll_lock        : out std_logic
++    pll_lock        : out std_logic;
++    pll_lock0       : out std_logic;
++    clk_125         : out std_logic;
++    clk_100         : out std_logic
+   
+ );
+ end entity;
+@@ -130,6 +134,8 @@
+   signal   locked              : std_logic;
+   signal   bufpll_mcb_locked   : std_logic;
+   signal   mcb_drp_clk_sig     : std_logic;
++  signal   clk_125_in          : std_logic;
++  signal   clk_100_in          : std_logic;
+ 
+   attribute max_fanout : string;
+   attribute syn_maxfan : integer;
+@@ -142,6 +148,7 @@
+ 
+   sys_rst  <= not(sys_rst_i) when (C_RST_ACT_LOW /= 0) else sys_rst_i;
+   clk0     <= clk0_bufg;
++  pll_lock0 <= locked;
+   pll_lock <= bufpll_mcb_locked;
+   mcb_drp_clk <= mcb_drp_clk_sig;
+ 
+@@ -165,7 +172,8 @@
+       --***********************************************************************
+       -- SINGLE_ENDED input clock input buffers
+       --***********************************************************************
+-      u_ibufg_sys_clk : IBUFG
++--      u_ibufg_sys_clk : IBUFG
++      u_ibufg_sys_clk : BUFG
+         port map (
+           I  => sys_clk,
+           O  => sys_clk_ibufg
+@@ -184,10 +192,10 @@
+          CLKIN2_PERIOD      => CLK_PERIOD_NS,
+          CLKOUT0_DIVIDE     => C_CLKOUT0_DIVIDE,
+          CLKOUT1_DIVIDE     => C_CLKOUT1_DIVIDE,
+-         CLKOUT2_DIVIDE     => C_CLKOUT2_DIVIDE,
++         CLKOUT2_DIVIDE     => 10,
+          CLKOUT3_DIVIDE     => C_CLKOUT3_DIVIDE,
+-         CLKOUT4_DIVIDE     => 1,
+-         CLKOUT5_DIVIDE     => 1,
++         CLKOUT4_DIVIDE     => 4,
++         CLKOUT5_DIVIDE     => 5,
+          CLKOUT0_PHASE      => 0.000,
+          CLKOUT1_PHASE      => 180.000,
+          CLKOUT2_PHASE      => 0.000,
+@@ -232,8 +240,8 @@
+            CLKOUT1          => clk_2x_180,
+            CLKOUT2          => clk0_bufg_in,
+            CLKOUT3          => mcb_drp_clk_bufg_in,
+-           CLKOUT4          => open,
+-           CLKOUT5          => open,
++           CLKOUT4          => clk_125_in,
++           CLKOUT5          => clk_100_in,
+            DO               => open,
+            DRDY             => open,
+            LOCKED           => locked
+@@ -258,6 +266,18 @@
+      I => mcb_drp_clk_bufg_in,
+      CE => locked
+      );
++ 
++  
++  
++  
++  clk_125 <= clk_125_in;
++  
++
++   U_BUFG_CLK3 : BUFG 
++    port map (  
++     O => clk_100,
++     I => clk_100_in
++     );
+ 
+    process (mcb_drp_clk_sig, sys_rst)
+    begin

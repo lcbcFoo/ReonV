@@ -1,0 +1,21 @@
+NET "sys_reset_n"      LOC = "K18"  | IOSTANDARD = LVCMOS25 | PULLUP | NODELAY ;
+
+NET  "sys_clk_p"       LOC = "AF4"  ;
+NET  "sys_clk_n"       LOC = "AF3"  ;
+INST "pcie_mf_no_dma.EP/pcie_clk_v5.refclk_ibuf"     DIFF_TERM = "TRUE" ;
+
+# PCIe Lane 0
+INST "pcie_mf_no_dma.EP/pcie_v5.endpoint_blk_plus_v1_14_i/pcie_ep0/pcie_blk/SIO/.pcie_gt_wrapper_i/GTD[0].GT_i" LOC = GTP_DUAL_X0Y1;
+
+INST "pcie_mf_no_dma.EP/pcie_v5.endpoint_blk_plus_v1_14_i/pcie_ep0/pcie_blk/pcie_mim_wrapper_i/bram_tl_rx/generate_tdp2[1].ram_tdp2_inst" LOC = RAMB36_X1Y8 ;
+INST "pcie_mf_no_dma.EP/pcie_v5.endpoint_blk_plus_v1_14_i/pcie_ep0/pcie_blk/pcie_mim_wrapper_i/bram_tl_rx/generate_tdp2[0].ram_tdp2_inst" LOC = RAMB36_X1Y6 ;
+INST "pcie_mf_no_dma.EP/pcie_v5.endpoint_blk_plus_v1_14_i/pcie_ep0/pcie_blk/pcie_mim_wrapper_i/bram_retry/generate_sdp.ram_sdp_inst"      LOC = RAMB36_X1Y5 ;
+
+# Timing Constraints
+
+NET "pcie_mf_no_dma.EP/sys_clk_c"                                      PERIOD = 10ns;
+
+NET "pcie_mf_no_dma.EP/pcie_v5.endpoint_blk_plus_v1_14_i/pcie_ep0/pcie_blk/SIO/.pcie_gt_wrapper_i/gt_refclk_out" TNM_NET = "MGTCLK" ;
+
+
+TIMESPEC "TS_MGTCLK"  = PERIOD "MGTCLK" 100.00 MHz HIGH 50 % ;

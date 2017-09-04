@@ -1,0 +1,7 @@
+spi.vhd
+spimctrl.vhd
+spictrlx.vhd
+spictrl.vhd
+spi2ahbx.vhd
+spi2ahb.vhd
+spi2ahb_apb.vhd

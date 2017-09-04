@@ -1,0 +1,159 @@
+--- ./mig/user_design/rtl/ip_top/mig.v	2012-12-18 14:40:26.000000000 +0100
++++ ./mig_patch/p/a/t/c/h/mig_design/mig.v	2012-12-18 14:24:36.329423978 +0100
+@@ -74,7 +74,7 @@
+ 
+ `timescale 1ps/1ps
+ 
+-module mig #
++module mig_37 #
+   (
+    parameter REFCLK_FREQ             = 200,
+                                        // # = 200 for all design frequencies of
+@@ -91,9 +91,10 @@
+                                        // MMCM programming algorithm
+    parameter CLKFBOUT_MULT_F         = 6,
+                                        // write PLL VCO multiplier.
+-   parameter DIVCLK_DIVIDE           = 2,
++   parameter DIVCLK_DIVIDE           = 1,  // ML605 200MHz input clock (VCO = 1200MHz)use "2" for 400MHz SMA,
+                                        // write PLL VCO divisor.
+-   parameter CLKOUT_DIVIDE           = 3,
++   parameter CLKOUT_DIVIDE4          = 12, // Leon3 Amba clock control
++   parameter CLKOUT_DIVIDE           = 3,  //400MHz clock
+                                        // VCO output divisor for fast (memory) clocks.
+    parameter nCK_PER_CLK             = 2,
+                                        // # of memory CKs per fabric clock.
+@@ -136,14 +137,14 @@
+                                        // # of DQS/DQS# bits.
+    parameter ROW_WIDTH               = 13,
+                                        // # of memory Row Address bits.
+-   parameter BURST_MODE              = "8",
++   parameter BURST_MODE              = "OTF",
+                                        // Burst Length (Mode Register 0).
+                                        // # = "8", "4", "OTF".
+    parameter BM_CNT_WIDTH            = 2,
+                                        // # = ceil(log2(nBANK_MACHS)).
+    parameter ADDR_CMD_MODE           = "1T" ,
+                                        // # = "2T", "1T".
+-   parameter ORDERING                = "NORM",
++   parameter ORDERING                = "STRICT",
+                                        // # = "NORM", "STRICT".
+    parameter WRLVL                   = "ON",
+                                        // # = "ON" - DDR3 SDRAM
+@@ -210,8 +211,8 @@
+    )
+   (
+ 
+-  input                             sys_clk_p,    //differential system clocks
+-  input                             sys_clk_n,
++//  input                             sys_clk_p,    //differential system clocks
++//  input                             sys_clk_n,
+   input                             clk_ref_p,     //differential iodelayctrl clk
+   input                             clk_ref_n,
+    inout  [DQ_WIDTH-1:0]                ddr3_dq,
+@@ -229,8 +230,8 @@
+    inout  [DQS_WIDTH-1:0]               ddr3_dqs_n,
+    output [CK_WIDTH-1:0]                ddr3_ck_p,
+    output [CK_WIDTH-1:0]                ddr3_ck_n,
+-   inout                                sda,
+-   output                               scl,
++   //inout                                sda,
++   //output                               scl,
+    input                                app_wdf_wren,
+    input [(4*PAYLOAD_WIDTH)-1:0]        app_wdf_data,
+    input [(4*PAYLOAD_WIDTH)/8-1:0]      app_wdf_mask,
+@@ -241,10 +242,12 @@
+    output                               app_rdy,
+    output                               app_wdf_rdy,
+    output [(4*PAYLOAD_WIDTH)-1:0]       app_rd_data,
+-   output                               app_rd_data_end,
++   //output                               app_rd_data_end,
+    output                               app_rd_data_valid,
+-   output                               ui_clk_sync_rst,
+-   output                               ui_clk,
++   output                               tb_rst,
++   output                               tb_clk,
++   output                               clk_ahb,
++   output                               clk100,
+    output                               phy_init_done,
+ 
+    input                                sys_rst   // System reset
+@@ -266,9 +269,9 @@
+   wire                                sys_clk;
+   wire                                mmcm_clk;
+   wire                                iodelay_ctrl_rdy;
+-      
+-  (* KEEP = "TRUE" *) wire            sda_i;
+-  (* KEEP = "TRUE" *) wire            scl_i;
++  wire                                app_rd_data_end;
++//  (* KEEP = "TRUE" *) wire            sda_i;
++//  (* KEEP = "TRUE" *) wire            scl_i;
+   wire                                rst;
+   wire                                clk;
+   wire                                clk_mem;
+@@ -365,9 +368,9 @@
+ 
+   assign app_hi_pri = 1'b0;
+ 
+-  assign ui_clk = clk;
+-  assign ui_clk_sync_rst = rst;
+-  MUXCY scl_inst
++  assign tb_clk = clk;
++  assign tb_rst = rst;
++ /* MUXCY scl_inst
+     (
+      .O  (scl),
+      .CI (scl_i),
+@@ -382,8 +385,11 @@
+      .DI (1'b0),
+      .S  (1'b1)
+      );
++*/
+   assign clk_ref = 1'b0;
+-  assign sys_clk = 1'b0;
++//  assign sys_clk = 1'b0; 
++// ML605 200MHz clock sourced from BUFG within "idelay_ctrl" module.
++  wire clk_200;    
+ 
+ 
+   iodelay_ctrl #
+@@ -399,8 +405,11 @@
+        .clk_ref_n        (clk_ref_n),
+        .clk_ref          (clk_ref),
+        .sys_rst          (sys_rst),
++       .clk_200          (clk_200),    // ML605 200MHz clock from BUFG to MMCM CLKIN1
+        .iodelay_ctrl_rdy (iodelay_ctrl_rdy)
+        );
++/* ML605 comment out "clk_ibuf" module. MIG default requires 2 inputs clocks.
++
+   clk_ibuf #
+     (
+      .INPUT_CLK_TYPE (INPUT_CLK_TYPE)
+@@ -412,6 +421,8 @@
+        .sys_clk           (sys_clk),
+        .mmcm_clk          (mmcm_clk)
+        );
++*/
++  
+   infrastructure #
+     (
+      .TCQ                (TCQ),
+@@ -420,6 +431,7 @@
+      .MMCM_ADV_BANDWIDTH (MMCM_ADV_BANDWIDTH),
+      .CLKFBOUT_MULT_F    (CLKFBOUT_MULT_F),
+      .DIVCLK_DIVIDE      (DIVCLK_DIVIDE),
++     .CLKOUT_DIVIDE4     (CLKOUT_DIVIDE4),
+      .CLKOUT_DIVIDE      (CLKOUT_DIVIDE),
+      .RST_ACT_LOW        (RST_ACT_LOW)
+      )
+@@ -428,8 +440,10 @@
+        .clk_mem          (clk_mem),
+        .clk              (clk),
+        .clk_rd_base      (clk_rd_base),
++       .clk_amba         (clk_ahb),
++       .clk_100          (clk100),
+        .rstdiv0          (rst),
+-       .mmcm_clk         (mmcm_clk),
++       .mmcm_clk         (clk_200),    // ML605 single input clock 200MHz from "iodelay_ctrl"
+        .sys_rst          (sys_rst),
+        .iodelay_ctrl_rdy (iodelay_ctrl_rdy),
+        .PSDONE           (pd_PSDONE),

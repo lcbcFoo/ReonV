@@ -1,0 +1,10 @@
+# Ethernet PHY regs for 1G
+#INST "rgmii0/rgmii_rxd[3].ddr_ireg0/xil.xil0/Q2" LOC = SLICE_X66Y29;
+#INST "rgmii0/rgmii_rxd[2].ddr_ireg0/xil.xil0/Q2" LOC = SLICE_X67Y25;
+#INST "eth0.e1/m1000.u0/gtxc0/rx0/Mshreg_r_rxd_2" LOC = SLICE_X48Y61;
+#INST "eth0.e1/m1000.u0/gtxc0/rx0/Mshreg_r_rxd_3" LOC = SLICE_X48Y61;
+#INST "rgmii0/rxd2_6" LOC = SLICE_X65Y55;
+#INST "rgmii0/rxd2_7" LOC = SLICE_X65Y55; 
+#INST "rgmii0/rgmii_rxd[1].ddr_ireg0/xil.xil0/Q2" LOC = SLICE_X67Y101;
+#INST "rgmii0/rgmii_rxd[0].ddr_ireg0/xil.xil0/Q2" LOC = SLICE_X67Y115;
+

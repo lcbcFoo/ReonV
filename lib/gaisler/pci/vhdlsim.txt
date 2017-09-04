@@ -1,0 +1,5 @@
+ptf/pt_pkg.vhd
+ptf/pt_pci_master.vhd
+ptf/pt_pci_target.vhd
+ptf/pt_pci_arb.vhd
+#ptf/pt_pci_monitor.vhd

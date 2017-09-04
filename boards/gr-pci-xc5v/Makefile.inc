@@ -1,0 +1,23 @@
+TECHNOLOGY=Virtex5
+PACKAGE=ff1153
+ifeq ("$(CONFIG_FPGA_LX110)","y")
+PART=xc5vlx110
+MGCPART=5vlx110$(PACKAGE)
+else
+ifeq ("$(CONFIG_FPGA_LX85)","y")
+PART=xc5vlx85
+MGCPART=5vlx85$(PACKAGE)
+else
+PART=xc5vlx50
+MGCPART=5vlx50$(PACKAGE)
+endif
+endif
+SPEED=-1
+SYNFREQ=50
+PROMGENPAR=-x xcf32p xcf32p -u 0 $(TOP).bit -p mcs -w -o gr-pci-xc5v
+
+
+MANUFACTURER=Xilinx
+MGCTECHNOLOGY=VIRTEX-5
+MGCPACKAGE=$(PACKAGE)
+

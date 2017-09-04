@@ -1,0 +1,5 @@
+# ICAP Constraints for Virtex4 and Virtex 5
+NET "prc.p1/ricap_in.idata*" MAXDELAY = 7 ns;
+NET "prc.p1/icap_out_odata*" MAXDELAY = 7 ns;
+NET "prc.p1/wen_del" MAXDELAY = 7 ns;
+NET "prc.p1/ricap_in.cen" MAXDELAY = 7 ns;

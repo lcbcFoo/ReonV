@@ -1,0 +1,93 @@
+Spacewire link
+CONFIG_SPW_ENABLE
+  Say Y here to enable one or more Spacewire serial links. The links
+  are based on the GRSPW core from Gaisler Research.
+
+Number of spacewire links
+CONFIG_SPW_NUM
+  Select the number of links to implement. Each link will be a
+  separate AHB master and APB slave for configuration.
+
+AHB FIFO depth
+CONFIG_SPW_AHBFIFO4
+  Select the AHB FIFO depth (in 32-bit words).
+
+RX FIFO depth
+CONFIG_SPW_RXFIFO16
+  Select the receiver FIFO depth (in bytes).
+
+RMAP protocol
+CONFIG_SPW_RMAP
+  Enable hardware target support for the RMAP protocol (
+  draft C for GRSPW1 and ECSS-E-ST-50-11C Draft V1.3 
+  for GRSPW2).
+
+RMAP Buffer depth
+CONFIG_SPW_RMAPBUF2
+  Select the size of the RMAP buffer (in bytes).
+
+RMAP CRC
+CONFIG_SPW_RMAPCRC
+  Enable hardware calculation of the RMAP CRC checksum. RMAP CRC
+  is always enabled when the RMAP hardware target is enabled so this
+  parameter will have no effect in that case.
+
+Rx unaligned
+CONFIG_SPW_RXUNAL
+  Enable support for byte writes used for non word-aligned 
+  receiver buffer addresses. Without this enabled data will
+  still be written at the correct location but complete words
+  will always be written so data outside the intended boundaries
+  might be overwritten.
+
+Netlists
+CONFIG_SPW_NETLIST
+  Use the netlist version of GRSPW. This option is required if
+  you have not licensed the source code of the Spacewire core.
+  Currently only supported for Xilinx and Actel FPGAs.
+  The AHB/RX FIFO sizes should be set to 16 word/byte. If the
+  RMAP is enabled, set the buffer size to 128 bytes. Other netlist
+  configurations can be requested from Gaisler Research.
+
+Spacewire FT
+CONFIG_SPW_FT
+  Say Y here to implement the Spacewire block rams with fault-tolerance
+  against SEU errors.
+
+Spacewire core
+CONFIG_SPW_GRSPW1
+  Select to use GRSPW1 core or GRSPW2 core.
+
+DMA channels
+CONFIG_SPW_DMACHAN
+  Set the number of DMA channels for the GRSPW2 core.
+  Set to 1 for now ...
+
+Ports
+CONFIG_SPW_PORTS
+  Set the number of SpaceWire ports for the GRSPW2 core
+
+Same clock for SpaceWire receiver and transmitter
+CONFIG_SPW_RTSAME            
+  Say Y here if the same clock is connected to both the receiver
+  and transmitter in the GRSPW2 core. This will remove two
+  asynchronous resets and some synchronization logic. This is only
+  applicable for the SDR and DDR inputs modes.
+
+
+Receiver clock type
+CONFIG_SPW_RX_SDR
+  Selects the input clocking scheme for the GRSPW2. SDR means that the
+  core samples data and strobe using single data rate registers at the
+  receiver clock frequency. DDR is the same except DDR registers are used.
+  Xor selects the traditional self clocking scheme using a xor gate. 
+  Aeroflex sets the receiver in a mode compatible with the Aeroflex
+  SpaceWire transceiver.
+
+Receiver clock type
+CONFIG_SPW_TX_SDR
+  Selects the output clocking scheme for the GRSPW2. SDR means that the
+  core transmits data and strobe using single data rate registers at the
+  transmitter clock frequency. DDR is the same except DDR registers are used.
+  Aeroflex sets the transmitter in a mode compatible with the Aeroflex
+  SpaceWire transceiver.

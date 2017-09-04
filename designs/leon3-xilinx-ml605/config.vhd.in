@@ -1,0 +1,20 @@
+#include "config.h"
+#include "tkconfig.h"
+#include "tkconfig2.h"
+
+-----------------------------------------------------------------------------
+--  LEON3 Demonstration design test bench configuration
+------------------------------------------------------------------------------
+
+
+library techmap;
+use techmap.gencomp.all;
+
+package config is
+
+#include "config.vhd.h"
+
+-- Xilinx MIG controller ML605 specific option
+  constant CFG_MIG_CLK4 : integer := CFG_SYS_FREQ_DIV;
+
+end;

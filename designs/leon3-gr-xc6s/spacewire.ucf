@@ -1,0 +1,13 @@
+##################################################################
+# Only enable these is you have enabled any Spacewire ports and
+# Space Wire Clock is not in phase with the system clock.
+# Please note that this isn't the case when using the leon3-gr-xc6s
+# ref design
+
+#NET spw100 period = 10.000 ;
+#NET "spw100" 	TNM_NET = "spw100";
+#TIMESPEC "TS_clkm_spw100" = FROM "clkm" TO "spw100" 8 ns DATAPATHONLY;
+#TIMESPEC "TS_spw100_clkm" = FROM "spw100" TO "clkm" 8 ns DATAPATHONLY;
+
+##################################################################
+
