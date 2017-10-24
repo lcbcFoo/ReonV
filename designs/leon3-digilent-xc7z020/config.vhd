@@ -1,15 +1,9 @@
-
-
-
 -----------------------------------------------------------------------------
 -- LEON3 Demonstration design test bench configuration
 -- Copyright (C) 2009 Aeroflex Gaisler
 ------------------------------------------------------------------------------
-
-
 library techmap;
 use techmap.gencomp.all;
-
 package config is
 -- Technology and synthesis options
   constant CFG_FABTECH : integer := zynq7000;
@@ -32,10 +26,10 @@ package config is
   constant CFG_LEON3 : integer := 1;
   constant CFG_NCPU : integer := (1);
   constant CFG_NWIN : integer := (8);
-  constant CFG_V8 : integer := 16#32# + 4*0;
+  constant CFG_V8 : integer := 0 + 4*0;
   constant CFG_MAC : integer := 0;
-  constant CFG_BP : integer := 1;
-  constant CFG_SVT : integer := 1;
+  constant CFG_BP : integer := 0;
+  constant CFG_SVT : integer := 0;
   constant CFG_RSTADDR : integer := 16#00000#;
   constant CFG_LDDEL : integer := (1);
   constant CFG_NOTAG : integer := 0;
@@ -58,7 +52,7 @@ package config is
   constant CFG_DLINE : integer := 8;
   constant CFG_DREPL : integer := 0;
   constant CFG_DLOCK : integer := 0;
-  constant CFG_DSNOOP : integer := 0 + 1*2 + 4*1;
+  constant CFG_DSNOOP : integer := 0 + 0*2 + 4*0;
   constant CFG_DFIXED : integer := 16#0#;
   constant CFG_DLRAMEN : integer := 0;
   constant CFG_DLRAMADDR: integer := 16#8F#;

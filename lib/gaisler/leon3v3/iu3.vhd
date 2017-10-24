@@ -2765,11 +2765,20 @@ end;
     if REX/=0 and r.e.ctrl.pc(PCLOW)='1' then
       miscout(31 downto 2) := miscout(31 downto 2)-1;
     end if;
-    edata := aluin1; bpdata := aluin1;
+    edata := aluin1;
+
+    bpdata(7 downto 0) := aluin1(31 downto 24);
+    bpdata(15 downto 8) := aluin1(23 downto 16);
+    bpdata(23 downto 16) := aluin1(15 downto 8);
+    bpdata(31 downto 24) := aluin1(7 downto 0);
+
+
     if ((r.x.ctrl.wreg and r.x.ctrl.ld and not r.x.ctrl.annul) = '1') and
        (r.x.ctrl.rd = r.e.ctrl.rd) and (r.e.ctrl.inst(6 downto 0) = R_LD) and
         (r.e.ctrl.cnt /= "10")
     then bpdata := ldata; end if;
+
+
 
     case r.e.aluop is
     when EXE_STB   => miscout := bpdata(7 downto 0) & bpdata(7 downto 0) &
@@ -3070,7 +3079,7 @@ end;
 
   function ld_align(data : dcdtype; set : std_logic_vector(DSETMSB downto 0);
         size, laddr : std_logic_vector(1 downto 0); signed : std_ulogic) return word is
-  variable align_data, rdata : word;
+  variable align_data, rdata, outdata : word;
   begin
     align_data := data(conv_integer(set)); rdata := (others => '0');
     case size is
@@ -3100,7 +3109,12 @@ end;
     when others =>                      -- single and double word read
       rdata := align_data;
     end case;
-    return(rdata);
+
+    outdata(7 downto 0) := rdata(31 downto 24);
+    outdata(15 downto 8) := rdata(23 downto 16);
+    outdata(23 downto 16) := rdata(15 downto 8);
+    outdata(31 downto 24) := rdata(7 downto 0);
+    return(outdata);
   end;
 
 
@@ -4807,15 +4821,12 @@ begin
     de_nrexen := '0'; de_nbufpos16:="10"; de_ncnt16:="0"; de_rexhold:='0';
     de_rexbubble := '0'; de_rexbaddr1:='0'; de_reximmexp:='0'; de_reximmval:=(others => '0');
     de_rexmaskpv := '0'; de_rexillinst:='0'; de_rexnostep:='0';
---  NO need for REX instructions in RISCV
---    if REX=1 then
---      rex_decode(r, de_inst1, de_inst, de_nrexen, de_nbufpos16, de_ncnt16,
---                 de_rexhold, de_rexbubble, de_rexbaddr1, de_reximmexp,
---                 de_reximmval, v.a.getpc, de_rexmaskpv, de_rexillinst,
---                 de_rexnostep, v.a.ctrl.itovr);
---    else
-      de_inst := de_inst1;
---    end if;
+
+    --de_inst := de_inst1;
+    de_inst(7 downto 0) := de_inst1(31 downto 24);
+    de_inst(15 downto 8) := de_inst1(23 downto 16);
+    de_inst(23 downto 16) := de_inst1(15 downto 8);
+    de_inst(31 downto 24) := de_inst1(7 downto 0);
 
     de_icc := r.m.icc; v.a.cwp := r.d.cwp;
     if AWPEN then
