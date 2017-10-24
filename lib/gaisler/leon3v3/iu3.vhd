@@ -4843,14 +4843,8 @@ begin
     if AWPEN and r.d.aw='1' then de_rcwp := r.d.awp; end if;
     cwp_ctrl(r, de_rcwp, v.w.s.wim, de_inst, de_cwp, v.a.wovf, v.a.wunf, de_wcwp);
     if AWPEN and (r.d.aw='1' or (r.d.paw='1' and de_inst(24 downto 19)=RETT)) then v.a.wovf:='0'; v.a.wunf:='0'; end if;
-    --if CASAEN and (de_inst(31 downto 30) = LDST) and (de_inst(24 downto 19) = CASA) then
-    -- case r.d.cnt is
-    --  when "00" | "01" => de_inst(4 downto 0) := "00000"; -- rs2=0
-    --  when others =>
-    --  end case;
-    --end if;
 
-    -- RISCV32I rs1 and rs2 are always at same position
+    -- Get rs1 and rs2
     rs1_gen(r, de_inst, v.a.rs1, de_rs1mod);
     de_rs2 := de_inst(24 downto 20);
 
@@ -4861,22 +4855,8 @@ begin
     v.a.rfa1 := de_raddr1(RFBITS-1 downto 0);
     v.a.rfa2 := de_raddr2(RFBITS-1 downto 0);
 
---    if RS1OPT then
---      if de_rs1mod = '1' then
---        regaddr(de_rcwp, de_inst(29 downto 26) & v.a.rs1(0), r.d.stwin, r.d.cwpmax, de_raddr1(RFBITS-1 downto 0));
---      else
---        regaddr(de_rcwp, de_inst(18 downto 15) & v.a.rs1(0), r.d.stwin, r.d.cwpmax, de_raddr1(RFBITS-1 downto 0));
---      end if;
---    else
---    regaddr(de_rcwp, v.a.rs1, r.d.stwin, r.d.cwpmax, de_raddr1(RFBITS-1 downto 0));
---    end if;
---    regaddr(de_rcwp, de_rs2, r.d.stwin, r.d.cwpmax, de_raddr2(RFBITS-1 downto 0));
---    v.a.rfa1 := de_raddr1(RFBITS-1 downto 0);
---    v.a.rfa2 := de_raddr2(RFBITS-1 downto 0);
-
     -- Get rd and set write enable and other LEON3 signals
     rd_gen(r, de_inst, v.a.ctrl.wreg, v.a.ctrl.ld, de_rd, de_rexen);
-    --if r.d.annul='1' then de_rexen:='0'; end if;
     regaddr(de_cwp, de_rd, r.d.stwin, r.d.cwpmax, v.a.ctrl.rd);
 
     -- No FP unit
@@ -4885,13 +4865,14 @@ begin
 
     -- Get immediate
     v.a.imm := imm_data(r, de_inst, de_reximmexp, de_reximmval);
-      de_iperr := '0';
+    de_iperr := '0';
 
-    -- May change this
------
+    -- Generates control signals
     lock_gen(r, de_rs2, de_rd, v.a.rfa1, v.a.rfa2, v.a.ctrl.rd, de_inst,
         fpo.ldlock, v.e.mul, ra_div, de_wcwp, v.a.ldcheck1, v.a.ldcheck2, de_ldlock,
         v.a.ldchkra, v.a.ldchkex, v.a.bp, v.a.nobp, de_fins_hold, de_iperr, ico.bpmiss);
+
+    -- Generates behavior of next cycle based on current instruction
     ic_ctrl(r, de_inst, v.x.annul_all, de_ldlock, de_rexhold, de_rexbubble, de_rexmaskpv, de_rexillinst, branch_true(de_icc, de_inst),
         de_fbranch, de_cbranch, fpo.ccv, cpo.ccv, v.d.cnt, v.d.pc, de_branch,
         v.a.ctrl.annul, v.d.annul, v.a.jmpl, de_inull, v.d.pv, v.a.ctrl.pv,
@@ -4908,21 +4889,14 @@ begin
     cwp_gen(r, v, v.a.ctrl.annul, de_wcwp, de_cwp, v.d.cwp, v.d.awp, v.d.aw, v.d.paw, v.d.stwin, v.d.cwpmax);
 
     v.d.inull := ra_inull_gen(r, v);
------
 
-    -- Select operand control signals of ALU (only changed imm_select)
+    -- Select operand control signals of ALU
     op_find(r, v.a.ldchkra, v.a.ldchkex, v.a.rs1, v.a.rfa1,
             false, v.a.rfe1, v.a.rsel1, v.a.ldcheck1);
     op_find(r, v.a.ldchkra, v.a.ldchkex, de_rs2, v.a.rfa2,
             imm_select(de_inst,(de_rexen and not r.w.s.rexdis)), v.a.rfe2, v.a.rsel2, v.a.ldcheck2);
 
-    if CASAEN and lddel=2 and r.a.ctrl.cnt="10" and v.m.casa='1' then
-      v.a.rsel1 := "000";
-      v.a.rsel2 := "011";
-      v.a.rfe1 := '1';
-    end if;
-
-
+    -- May change this part for Branch prediction
     v.a.ctrl.wicc := v.a.ctrl.wicc and (not v.a.ctrl.annul);
     v.a.ctrl.wreg := v.a.ctrl.wreg and (not v.a.ctrl.annul);
     v.a.ctrl.rett := v.a.ctrl.rett and (not v.a.ctrl.annul);
