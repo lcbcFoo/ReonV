@@ -1633,9 +1633,9 @@ begin
   inst := r.a.ctrl.inst; trap := trapin; tt := ttin;
 
   if r.a.ctrl.annul = '0' then
-      if(inst(31 downto 0) = x"00000013" or inst(31 downto 0) = x"01000000" or
-            inst(31 downto 0) = x"00000000")then
-
+      if(inst(31 downto 0) = "00000000000100000000000001110011")then
+          illegal_inst := '1';
+      elsif(inst(31 downto 0) = "00000000000100000000000001110011")then
           illegal_inst := '1';
       else
           illegal_inst := '0';
