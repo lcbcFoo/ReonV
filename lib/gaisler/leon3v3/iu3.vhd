@@ -1633,13 +1633,24 @@ begin
   inst := r.a.ctrl.inst; trap := trapin; tt := ttin;
 
   if r.a.ctrl.annul = '0' then
-      if(inst(31 downto 0) = "00000000000100000000000001110011")then
-          illegal_inst := '1';
-      elsif(inst(31 downto 0) = "00000000000100000000000001110011")then
-          illegal_inst := '1';
-      else
-          illegal_inst := '0';
-      end if;
+      case inst(6 downto 0) is
+          when  R_LUI | R_AUIPC | R_JAL | R_JALR | R_BRANCH | R_LD | R_ST | R_IMM
+            | R_NOIMM =>
+                illegal_inst := '0';
+          when others =>
+                illegal_inst := '1';
+        end case;
+
+    --   if(inst(31 downto 0) = "00000000000100000000000001110011")then
+    --       illegal_inst := '1';
+    --   elsif(inst(31 downto 0) = "00000000000000000000000001110011")then
+    --       illegal_inst := '1';
+    --   else
+    --       illegal_inst := '0';
+    --   end if;
+
+
+
   --   op  := inst(31 downto 30); op2 := inst(24 downto 22);
   --   op3 := inst(24 downto 19); rd  := inst(29 downto 25);
   --   illegal_inst := '0'; privileged_inst := '0'; cp_disabled := '0';
