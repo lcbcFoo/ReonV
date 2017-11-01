@@ -1503,17 +1503,6 @@ architecture rtl of iu3 is
               when others => null;
           end case;
        end if;
-    -- n := icc(3); z := icc(2); v := icc(1); c := icc(0);
-    -- case inst(27 downto 25) is
-    -- when "000" =>  branch := inst(28) xor '0';                  -- bn, ba
-    -- when "001" =>  branch := inst(28) xor z;                    -- be, bne
-    -- when "010" =>  branch := inst(28) xor (z or (n xor v));     -- ble, bg
-    -- when "011" =>  branch := inst(28) xor (n xor v);            -- bl, bge
-    -- when "100" =>  branch := inst(28) xor (c or z);             -- bleu, bgu
-    -- when "101" =>  branch := inst(28) xor c;                    -- bcs, bcc
-    -- when "110" =>  branch := inst(28) xor n;                    -- bneg, bpos
-    -- when others => branch := inst(28) xor v;                    -- bvs, bvc
-    -- end case;
     return(branch);
   end;
 
@@ -1632,6 +1621,8 @@ variable wph : std_ulogic;
 begin
   inst := r.a.ctrl.inst; trap := trapin; tt := ttin;
 
+  -- Exceptions and traps detection and handling are not completely implemented
+
   if r.a.ctrl.annul = '0' then
       case inst(6 downto 0) is
           when  R_LUI | R_AUIPC | R_JAL | R_JALR | R_BRANCH | R_LD | R_ST | R_IMM
@@ -1640,97 +1631,6 @@ begin
           when others =>
                 illegal_inst := '1';
         end case;
-
-    --   if(inst(31 downto 0) = "00000000000100000000000001110011")then
-    --       illegal_inst := '1';
-    --   elsif(inst(31 downto 0) = "00000000000000000000000001110011")then
-    --       illegal_inst := '1';
-    --   else
-    --       illegal_inst := '0';
-    --   end if;
-
-
-
-  --   op  := inst(31 downto 30); op2 := inst(24 downto 22);
-  --   op3 := inst(24 downto 19); rd  := inst(29 downto 25);
-  --   illegal_inst := '0'; privileged_inst := '0'; cp_disabled := '0';
-  --   fp_disabled := '0'; fpop := '0';
-  --   case op is
-  --   when CALL => null;
-  --   when FMT2 =>
-  --     case op2 is
-  --     when SETHI | BICC => null;
-  --     when FBFCC =>
-  --       if FPEN then fp_disabled := not r.w.s.ef; else fp_disabled := '1'; end if;
-  --     when CBCCC =>
-  --       if (not CPEN) or (r.w.s.ec = '0') then cp_disabled := '1'; end if;
-  --     when others => illegal_inst := '1';
-  --     end case;
-  --   when FMT3 =>
-  --     case op3 is
-  --     when IAND | ANDCC | ANDN | ANDNCC | IOR | ORCC | ORN | ORNCC | IXOR |
-  --       XORCC | IXNOR | XNORCC | ISLL | ISRL | ISRA | MULSCC | IADD | ADDX |
-  --       ADDCC | ADDXCC | ISUB | SUBX | SUBCC | SUBXCC | FLUSH | JMPL | TICC |
-  --       SAVE | RESTORE | RDY => null;
-  --     when TADDCC | TADDCCTV | TSUBCC | TSUBCCTV =>
-  --       if notag = 1 then illegal_inst := '1'; end if;
-  --     when UMAC | SMAC =>
-  --       if not MACEN then illegal_inst := '1'; end if;
-  --     when UMUL | SMUL | UMULCC | SMULCC =>
-  --       if not MULEN then illegal_inst := '1'; end if;
-  --     when UDIV | SDIV | UDIVCC | SDIVCC =>
-  --       if not DIVEN then illegal_inst := '1'; end if;
-  --     when RETT => illegal_inst := r.a.et; privileged_inst := not r.a.su;
-  --     when RDPSR | RDTBR | RDWIM => privileged_inst := not r.a.su;
-  --     when WRY =>
-  --       if rd(4) = '1' and rd(3 downto 0) /= "0010" then -- %ASR16-17, %ASR19-31
-  --         privileged_inst := not r.a.su;
-  --       end if;
-  --     when WRPSR =>
-  --       privileged_inst := not r.a.su;
-  --     when WRWIM | WRTBR  => privileged_inst := not r.a.su;
-  --     when FPOP1 | FPOP2 =>
-  --       if FPEN then fp_disabled := not r.w.s.ef; fpop := '1';
-  --       else fp_disabled := '1'; fpop := '0'; end if;
-  --     when CPOP1 | CPOP2 =>
-  --       if (not CPEN) or (r.w.s.ec = '0') then cp_disabled := '1'; end if;
-  --     when others => illegal_inst := '1';
-  --     end case;
-  --   when others =>      -- LDST
-  --     case op3 is
-  --     when LDD | ISTD => illegal_inst := rd(0); -- trap if odd destination register
-  --     when LD | LDUB | LDSTUB | LDUH | LDSB | LDSH | ST | STB | STH | SWAP =>
-  --       null;
-  --     when LDDA | STDA =>
-  --       illegal_inst := inst(13) or rd(0);
-  --       if (npasi = 0) or (inst(12) = '0') then
-  --         privileged_inst := not r.a.su;
-  --       end if;
-  --     when LDA | LDUBA| LDSTUBA | LDUHA | LDSBA | LDSHA | STA | STBA | STHA |
-  --          SWAPA =>
-  --       illegal_inst := inst(13);
-  --       if (npasi = 0) or (inst(12) = '0') then
-  --         privileged_inst := not r.a.su;
-  --       end if;
-  --     when CASA =>
-  --       if CASAEN then
-  --         illegal_inst := inst(13);
-  --         if (inst(12 downto 5) /= X"0A") then privileged_inst := not r.a.su; end if;
-  --       else illegal_inst := '1'; end if;
-  --     when LDDF | STDF | LDF | LDFSR | STF | STFSR =>
-  --       if FPEN then fp_disabled := not r.w.s.ef;
-  --       else fp_disabled := '1'; end if;
-  --     when STDFQ =>
-  --       privileged_inst := not r.a.su;
-  --       if (not FPEN) or (r.w.s.ef = '0') then fp_disabled := '1'; end if;
-  --     when STDCQ =>
-  --       privileged_inst := not r.a.su;
-  --       if (not CPEN) or (r.w.s.ec = '0') then cp_disabled := '1'; end if;
-  --     when LDC | LDCSR | LDDC | STC | STCSR | STDC =>
-  --       if (not CPEN) or (r.w.s.ec = '0') then cp_disabled := '1'; end if;
-  --     when others => illegal_inst := '1';
-  --     end case;
-  --   end case;
 
     wph := wphit(r, wpr, dbgi, dsur, pccomp);
 
@@ -1756,39 +1656,6 @@ begin
   if(inst(6 downto 0) = R_BRANCH) then
       wicc := '1';
   end if;
-  -- if inst(31 downto 30) = FMT3 then
-  --   case inst(24 downto 19) is
-  --   when SUBCC | TSUBCC | TSUBCCTV | ADDCC | ANDCC | ORCC | XORCC | ANDNCC |
-  --        ORNCC | XNORCC | TADDCC | TADDCCTV | ADDXCC | SUBXCC | WRPSR =>
-  --     wicc := '1';
-  --     if (pwrpsr /= 0) and inst(24 downto 19)=WRPSR and inst(29 downto 25)/="00000" then
-  --       wicc := '0';
-  --     end if;
-  --   when WRY =>
-  --     if REX=0 then
-  --       if r.d.inst(conv_integer(r.d.set))(29 downto 25) = "00000" then wy := '1'; end if;
-  --     else
-  --       if inst(29 downto 25) = "00000" then wy := '1'; end if;
-  --     end if;
-  --   when MULSCC =>
-  --     wicc := '1'; wy := '1';
-  --   when  UMAC | SMAC  =>
-  --     if MACEN then wy := '1'; end if;
-  --   when UMULCC | SMULCC =>
-  --     if MULEN and (((mulo.nready = '1') and (r.d.cnt /= "00")) or (MULTYPE /= 0)) then
-  --       wicc := '1'; wy := '1';
-  --     end if;
-  --   when UMUL | SMUL =>
-  --     if MULEN and (((mulo.nready = '1') and (r.d.cnt /= "00")) or (MULTYPE /= 0)) then
-  --       wy := '1';
-  --     end if;
-  --   when UDIVCC | SDIVCC =>
-  --     if DIVEN and (divo.nready = '1') and (r.d.cnt /= "00") then
-  --       wicc := '1';
-  --     end if;
-  --   when others =>
-  --   end case;
-  -- end if;
 end;
 
 -- select cwp
@@ -1901,20 +1768,6 @@ procedure rs1_gen(r : registers; inst : word;  rs1 : out std_logic_vector(4 down
       if(inst(6 downto 0) = R_ST and r.d.cnt = "01")then
           rs1 := inst(24 downto 20);
       end if;
--- variable op : std_logic_vector(1 downto 0);
--- variable op3 : std_logic_vector(5 downto 0);
--- begin
---   op := inst(31 downto 30); op3 := inst(24 downto 19);
---   rs1 := inst(18 downto 14); rs1mod := '0';
---   if (op = LDST) then
---     if ((r.d.cnt = "01") and ((op3(2) and not op3(3)) = '1')) or
---       ((r.d.cnt = "10") and (not (CASAEN and LDDEL=2 and op3(5 downto 3)="111"))) or
---       ((r.d.cnt = "11") and (    (CASAEN and LDDEL=2)))
---     then rs1mod := '1'; rs1 := inst(29 downto 25); end if;
---     if ((r.d.cnt = "10") and (op3(3 downto 0) = "0111")) then
---       rs1(0) := '1';
---     end if;
---   end if;
 end;
 -- load/icc interlock detection
 
@@ -1930,7 +1783,6 @@ end;
   variable miss : std_logic;
   begin
     miss := (not r.e.ctrl.annul) and r.e.bp and not branch_true(icc, r.e.ctrl.inst);
-    --ra_bpannul := miss and r.e.ctrl.inst(29);
     ra_bpannul := miss;
     ex_bpmiss := miss;
   end;
@@ -1940,7 +1792,6 @@ end;
   variable miss : std_logic;
   begin
     miss := ((not r.a.ctrl.annul) and r.a.bp and icc_valid(r) and not branch_true(r.m.icc, r.a.ctrl.inst));
-    --de_bpannul := miss and r.a.ctrl.inst(29;
     de_bpannul := miss;
     ra_bpmiss := miss;
   end;
@@ -1991,74 +1842,16 @@ end;
         ldcheck1 := '1'; ldchkra := '0';
         case r.d.cnt is
             when "00" =>
-                --if (lddel = 2) and (op3(2) = '1') and (op3(5) = '0') then ldcheck3 := '1'; end if;
                 if (op(5) = '1') then ldcheck3 := '1'; end if; -- store
                 ldchkra := '1';
             when "01" =>
                 ldchkra := '1';
-          --if (op  3(5) and op3(2) and not op3(3)) = '1' then ldcheck1 := '0'; ldcheck2 := '0'; end if;  -- STF/STC
             when others => NULL;
         end case;
       when others => null;
       end case;
     end if;
 
-
-
---------------------------------------------------------------------------------
-
-    -- if (r.d.annul = '0') and (icbpmiss='0')
-    -- then
-    --   case op is
-    --   when CALL =>
-    --     call_hold := '1'; nobp := BPRED;
-    --   when FMT2 =>
-    --     if (op2 = BICC) and (cond(2 downto 0) /= "000") then
-    --       icc_check_bp := '1';
-    --     end if;
-    --     if (op2 = BICC) then nobp := BPRED; end if;
-    --   when FMT3 =>
-    --     ldcheck1 := '1'; ldcheck2 := not i;
-    --     case op3 is
-    --     when TICC =>
-    --       if (cond(2 downto 0) /= "000") then icc_check := '1'; end if;
-    --       nobp := BPRED;
-    --     when RDY =>
-    --       ldcheck1 := '0'; ldcheck2 := '0';
-    --       if MACPIPE then y_check := '1'; end if;
-    --     when RDWIM | RDTBR =>
-    --       ldcheck1 := '0'; ldcheck2 := '0';
-    --     when RDPSR =>
-    --       ldcheck1 := '0'; ldcheck2 := '0'; icc_check := '1';
-    --     when SDIV | SDIVCC | UDIV | UDIVCC =>
-    --       if DIVEN then y_check := '1'; nobp := op3(4); end if; -- no BP on divcc
-    --     when FPOP1 | FPOP2 => ldcheck1:= '0'; ldcheck2 := '0'; fins := BPRED;
-    --     when JMPL => call_hold := '1'; nobp := BPRED;
-    --     when others =>
-    --     end case;
-    --   when LDST =>
-    --     ldcheck1 := '1'; ldchkra := '0';
-    --     case r.d.cnt is
-    --     when "00" =>
-    --       if (lddel = 2) and (op3(2) = '1') and (op3(5) = '0') then ldcheck3 := '1'; end if;
-    --       ldcheck2 := not i; ldchkra := '1';
-    --     when "01" =>
-    --       ldcheck2 := not i;
-    --       if (op3(5) and op3(2) and not op3(3)) = '1' then ldcheck1 := '0'; ldcheck2 := '0'; end if;  -- STF/STC
-    --     when others => ldchkex := '0';
-    --       if CASAEN and (op3(5 downto 3) = "111") then
-    --         if lddel=2 then
-    --           ldcheck2 := r.d.cnt(0);
-    --         else
-    --           ldcheck2 := '1';
-    --         end if;
-    --       elsif (op3(5) = '1') or ((op3(5) & op3(3 downto 1)) = "0110") -- LDST
-    --       then ldcheck1 := '0'; ldcheck2 := '0'; end if;
-    --     end case;
-    --     if op3(5) = '1' then fins := BPRED; end if; -- no BP on FPU/CP LD/ST
-    --   when others => null;
-    --   end case;
-    -- end if;
 
     if MULEN or DIVEN then
       chkmul := mulinsn;
@@ -2206,22 +1999,6 @@ end;
     if ((exbpmiss and not r.a.ctrl.annul and not r.d.pv and not hold_pc) = '1') then
         annul_next := '1'; pv := '0';
     end if;
-    -- if ((exbpmiss and r.e.ctrl.inst(29) and not r.a.ctrl.annul and not r.d.pv ) = '1')
-    --     and (r.d.cnt = "01") then
-    --     annul_next := '1'; annul_current := '1'; pv := '0';
-    -- end if;
-    -- if (exbpmiss and r.e.ctrl.inst(29) and r.a.ctrl.annul and r.d.pv) = '1' then
-    --   annul_next := '1'; pv := '0'; inhibit_current := '1';
-    -- end if;
-    -- if (exbpmiss and r.e.ctrl.inst(29) and BLOCKBPMISS and r.a.bpimiss) = '1' then
-    --   annul_next := '1'; pv := '0';
-    -- end if;
-    -- if (rabpmiss and not r.a.ctrl.inst(29) and not r.d.annul and r.d.pv and not hold_pc) = '1' then
-    --     annul_next := '1'; pv := '0';
-    -- end if;
-    -- if (rabpmiss and r.a.ctrl.inst(29 and not r.d.annul and r.d.pv ) = '1' then
-    --     annul_next := '1'; pv := '0'; inhibit_current := '1';
-    -- end if;
 
     if irqlat/=0 and r.d.irqstart='1' and r.d.irqlatmet='0' then
       annul_current := '1';
@@ -2290,56 +2067,6 @@ end;
         write_reg := '0';
     end if;
     wreg := write_reg; rdo := rd; rexen := vrexen;
-----------------------------------------------------------------------------
-
---    case op is
---    when CALL =>
---        write_reg := '1'; rd := "01111";    -- CALL saves PC in r[15] (%o7)
---    when FMT2 =>
---        if (op2 = SETHI) then write_reg := '1'; end if;
---    when FMT3 =>
---        case op3 is
---        when UMUL | SMUL | UMULCC | SMULCC =>
---          if MULEN then
---            if (((mulo.nready = '1') and (r.d.cnt /= "00")) or (MULTYPE /= 0)) then
---              write_reg := '1';
---            end if;
---          else write_reg := '1'; end if;
---        when UDIV | SDIV | UDIVCC | SDIVCC =>
---          if DIVEN then
---            if (divo.nready = '1') and (r.d.cnt /= "00") then
---              write_reg := '1';
---            end if;
---          else write_reg := '1'; end if;
---        when RETT | WRPSR | WRY | WRWIM | WRTBR | TICC | FLUSH => null;
---        when FPOP1 | FPOP2 => null;
---        when CPOP1 | CPOP2 => null;
---        when SAVE | IADD =>
---          write_reg := '1';
---          if REX /= 0 and inst(13)='0' and inst(12)='1' then
---            vrexen := '1';
---          end if;
---        when others => write_reg := '1';
---        end case;
---      when others =>   -- LDST
---        ld := not op3(2);
---        if (op3(2) = '0') and not ((CPEN or FPEN) and (op3(5) = '1'))
---        then write_reg := '1'; end if;
---        case op3 is
---        when SWAP | SWAPA | LDSTUB | LDSTUBA | CASA =>
---          if r.d.cnt = "00" then write_reg := '1'; ld := '1'; end if;
---        when others => null;
---        end case;
---        if r.d.cnt = "01" then
---          case op3 is
---          when LDD | LDDA | LDDC | LDDF => rd(0) := '1';
---          when others =>
---          end case;
---        end if;
---    end case;
---
---    if (rd = "00000") then write_reg := '0'; end if;
---    wreg := write_reg; rdo := rd; rexen := vrexen;
   end;
 
 -- immediate data generation
@@ -2404,24 +2131,6 @@ end;
         imm := false;
     end if;
     return(imm);
-
---    if REX=1 and de_rexen='1' then imm:=true; end if;
---    case inst(31 downto 30) is
---    when FMT2 =>
---      case inst(24 downto 22) is
---      when SETHI => imm := true;
---      when others =>
---      end case;
---    when FMT3 =>
---      case inst(24 downto 19) is
---      when RDWIM | RDPSR | RDTBR => imm := true;
---      when others => if (inst(13) = '1') then imm := true; end if;
---      end case;
---    when LDST =>
---      if (inst(13) = '1') then imm := true; end if;
---    when others =>
---    end case;
---    return(imm);
 end;
 
 -- EXE operation
@@ -2433,8 +2142,6 @@ end;
         mulins, divins, mulstep, macins, ldbp2, invop2 : out std_logic
         ) is
   variable op : std_logic_vector(6 downto 0);
-  --variable op2 : std_logic_vector(2 downto 0);
-  --variable op3 : std_logic_vector(5 downto 0);
   variable f3 : std_logic_vector(2 downto 0);
   variable rs1, rs2, rd  : std_logic_vector(4 downto 0);
   variable icc : std_logic_vector(3 downto 0);
@@ -2462,9 +2169,8 @@ end;
     elsif r.x.ctrl.wicc = '1' then icc := r.x.icc;
     else icc := r.w.s.icc; end if;
 
---------------------------------------------------------------------
-    --TODO: finish
-    -- RISCV32I operations
+
+    -- Generate ALU operation
     case op is
         when R_AUIPC =>
             aluop := EXE_AUIPC;
@@ -2547,82 +2253,8 @@ end;
             end case;
         when others => null;
     end case;
-
----------------------------------------------------------------------
-
---    case op is
---    when CALL =>
---      aluop := EXE_LINK;
---    when FMT2 =>
---      case op2 is
---      when SETHI => aluop := EXE_PASS2;
---      when others =>
---      end case;
---    when FMT3 =>
---      case op3 is
---      when IADD | ADDX | ADDCC | ADDXCC | TADDCC | TADDCCTV | SAVE | RESTORE |
---           TICC | JMPL | RETT  =>
---        alusel := EXE_RES_ADD;
---        if REX=1 then aluop := EXE_LINK; end if;
---      when ISUB | SUBX | SUBCC | SUBXCC | TSUBCC | TSUBCCTV  =>
---        alusel := EXE_RES_ADD; aluadd := '0'; aop2 := not iop2; invop2 := '1';
---      when MULSCC => alusel := EXE_RES_ADD;
---        aop1 := (icc(3) xor icc(1)) & iop1(31 downto 1);
---        if y0 = '0' then aop2 := (others => '0'); ldbp2 := '0'; end if;
---        mulstep := '1';
---      when UMUL | UMULCC | SMUL | SMULCC =>
---        if MULEN then mulins := '1'; end if;
---      when UMAC | SMAC =>
---        if MACEN then mulins := '1'; macins := '1'; end if;
---      when UDIV | UDIVCC | SDIV | SDIVCC =>
---        if DIVEN then
---          aluop := EXE_DIV; alusel := EXE_RES_LOGIC; divins := '1';
---        end if;
---      when IAND | ANDCC => aluop := EXE_AND; alusel := EXE_RES_LOGIC;
---      when ANDN | ANDNCC => aluop := EXE_ANDN; alusel := EXE_RES_LOGIC;
---      when IOR | ORCC  => aluop := EXE_OR; alusel := EXE_RES_LOGIC;
---      when ORN | ORNCC  => aluop := EXE_ORN; alusel := EXE_RES_LOGIC;
---      when IXNOR | XNORCC  => aluop := EXE_XNOR; alusel := EXE_RES_LOGIC;
---      when XORCC | IXOR | WRPSR | WRWIM | WRTBR | WRY  =>
---        aluop := EXE_XOR; alusel := EXE_RES_LOGIC;
---      when RDPSR | RDTBR | RDWIM => aluop := EXE_SPR;
---      when RDY => aluop := EXE_RDY;
---      when ISLL => aluop := EXE_SLL; alusel := EXE_RES_SHIFT; shleft := '1';
---                   shcnt := not iop2(4 downto 0); invop2 := '1';
---      when ISRL => aluop := EXE_SRL; alusel := EXE_RES_SHIFT;
---      when ISRA => aluop := EXE_SRA; alusel := EXE_RES_SHIFT; sari := iop1(31);
---      when FPOP1 | FPOP2 =>
---      when others =>
---      end case;
---    when others =>      -- LDST
---      case r.a.ctrl.cnt is
---      when "00" =>
---        alusel := EXE_RES_ADD;
---      when "01" =>
---        case op3 is
---        when LDD | LDDA | LDDC => alusel := EXE_RES_ADD;
---        when LDDF => alusel := EXE_RES_ADD;
---        when SWAP | SWAPA | LDSTUB | LDSTUBA | CASA => alusel := EXE_RES_ADD;
---        when STF | STDF =>
---        when others =>
---          aluop := EXE_PASS1;
---          if op3(2) = '1' then
---            if op3(1 downto 0) = "01" then aluop := EXE_STB;
---            elsif op3(1 downto 0) = "10" then aluop := EXE_STH; end if;
---          end if;
---        end case;
---      when "10" =>
---        aluop := EXE_PASS1;
---        if op3(2) = '1' then  -- ST
---          if (op3(3) and not op3(5) and not op3(1))= '1' then aluop := EXE_ONES; end if; -- LDSTUB
---        end if;
---        if CASAEN and (r.m.casa = '1') and LDDEL=1 then
---          alusel := EXE_RES_ADD; aluadd := '0'; aop2 := not iop2; invop2 := '1';
---        end if;
---      when others =>
---      end case;
---    end case;
   end;
+
 
   function ra_inull_gen(r, v : registers) return std_ulogic is
   variable de_inull : std_ulogic;
@@ -2691,25 +2323,8 @@ end;
             cin := '1';
         when others => null;
     end case;
-
-------------------------------------------------------------------------------
-
---    case op is
---    when FMT3 =>
---      case op3 is
---      when ISUB | SUBCC | TSUBCC | TSUBCCTV => cin := '1';
---      when ADDX | ADDXCC => cin := ncin;
---      when SUBX | SUBXCC => cin := not ncin;
---      when others => null;
---      end case;
---    when LDST =>
---      if CASAEN and (r.m.casa = '1') and
---        ((r.a.ctrl.cnt = "10" and LDDEL=1) or (r.a.ctrl.cnt = "11" and LDDEL=2)) then
---        cin := '1';
---      end if;
---    when others => null;
---    end case;
   end;
+
 
   procedure logic_op(r : registers; aluin1, aluin2, mey : word;
         ymsb : std_ulogic; logicres, y : out word) is
@@ -2717,11 +2332,9 @@ end;
   begin
     case r.e.aluop is
     when EXE_AND   => logicout := aluin1 and aluin2;
-    --when EXE_ANDN  => logicout := aluin1 and not aluin2;
     when EXE_OR    => logicout := aluin1 or aluin2;
     when EXE_ORN   => logicout := aluin1 or not aluin2;
     when EXE_XOR   => logicout := aluin1 xor aluin2;
-    --when EXE_XNOR  => logicout := aluin1 xor not aluin2;
     when EXE_SLT   =>
         if(signed(aluin1) < signed(aluin2)) then
             logicout(0) := '1';
@@ -2736,10 +2349,7 @@ end;
             logicout(0) := '0';
         end if;
         logicout(31 downto 1) := (others => '0');
-
-    --when EXE_DIV   =>
-    --  if DIVEN then logicout := aluin2;
-    --  else logicout := (others => '-'); end if;
+;
     when others => logicout := (others => '-');
     end case;
     if (r.e.ctrl.wy and r.e.mulstep) = '1' then
@@ -2773,11 +2383,9 @@ end;
     wpi := 0;
     miscout := (others => '0');
     miscout(31 downto PCLOW) := r.e.ctrl.pc(31 downto PCLOW);
-    if REX/=0 and r.e.ctrl.pc(PCLOW)='1' then
-      miscout(31 downto 2) := miscout(31 downto 2)-1;
-    end if;
     edata := aluin1;
 
+    -- Dummy endian convertion to store data
     bpdata(7 downto 0) := aluin1(31 downto 24);
     bpdata(15 downto 8) := aluin1(23 downto 16);
     bpdata(23 downto 16) := aluin1(15 downto 8);
@@ -2799,56 +2407,10 @@ end;
                       edata := miscout;
     when EXE_PASS1 => miscout := bpdata; edata := miscout;
     when EXE_PASS2 => miscout := aluin2;
---    when EXE_ONES  => miscout := (others => '1');
---                      edata := miscout;
 
     when EXE_AUIPC =>
         miscout := aluin2 + (r.e.ctrl.pc & "00");
 
-    when EXE_RDY  =>
-      if MULEN and (r.m.ctrl.wy = '1') then miscout := mey;
-      else miscout := r.m.y; end if;
-      if (NWP > 0) and (r.e.ctrl.inst(18 downto 17) = "11") then
-        wpi := conv_integer(r.e.ctrl.inst(16 downto 15));
-        if r.e.ctrl.inst(14) = '0' then miscout := wpr(wpi).addr & '0' & wpr(wpi).exec;
-        else miscout := wpr(wpi).mask & wpr(wpi).load & wpr(wpi).store; end if;
-      end if;
-
-    --   if MACEN then
-    --     if (r.e.ctrl.inst(18 downto 14) = "10010") then --%ASR18
-    --       if ((r.m.mac = '1') and not MACPIPE) or ((r.x.mac = '1') and MACPIPE) then
-    --         miscout := mulo.result(31 downto 0);        -- data forward of asr18
-    --       else miscout := r.w.s.asr18; end if;
-    --     else
-    --       if ((r.m.mac = '1') and not MACPIPE) or ((r.x.mac = '1') and MACPIPE) then
-    --         miscout := mulo.result(63 downto 32);   -- data forward Y
-    --       end if;
-    --     end if;
-    --   end if;
-    --   if (r.e.ctrl.inst(18 downto 17) = "10") and (r.e.ctrl.inst(14) = '1') then --%ASR17
-    --     miscout := asr17_gen(r);
-    --   end if;
-    --   if (r.e.ctrl.inst(18 downto 14) = "10110") then --%ASR22
-    --     miscout(31) := r.w.s.ducnt;
-    --     miscout(30 downto 0) := dbgi.timer(62 downto 32);
-    --   elsif (r.e.ctrl.inst(18 downto 14) = "10111") then --%ASR23
-    --     miscout := dbgi.timer(31 downto 0);
-    --   end if;
-
-      if AWPEN or RFPART then
-        if (r.e.ctrl.inst(18 downto 14) = "10100") then  -- %asr20
-          miscout := (others => '0');
-          if AWPEN then
-            miscout(NWINLOG2-1 downto 0) := r.e.awp;
-          end if;
-          if RFPART then
-            miscout(20+NWINLOG2 downto 21) := r.w.s.stwin;
-            miscout(15+NWINLOG2 downto 16) := r.w.s.cwpmax;
-          end if;
-        end if;
-      end if;
-    when EXE_SPR  =>
-      miscout := get_spr(r, xc_wimmask);
     when others => null;
     end case;
     mout := miscout;
@@ -2882,19 +2444,6 @@ end;
             icc(1) := (op1(31) and op2(31) and not addout(32)) or   -- Overflow
                   (addout(32) and (not op1(31)) and (not op2(31)));
         end if;
-    --if notag = 0 then
-    --    case op is
-    --    when FMT3 =>
-        --  case op3 is
-        --  when TADDCC | TADDCCTV =>
-        --    icc(1) := op1(0) or op1(1) or op2(0) or op2(1) or icc(1);
-        --  when TSUBCC | TSUBCCTV =>
-        --    icc(1) := op1(0) or op1(1) or (not op2(0)) or (not op2(1)) or icc(1);
-        -- when others => null;
-        --  end case;
-        --when others => null;
-        --end case;
-      --end if;
 
         if aluresult = zero32 then icc(2) := '1'; end if;
 
@@ -2904,18 +2453,13 @@ end;
     when others => aluresult := miscout;
     end case;
 
+    -- If jump, alu outputs PC to be linked to rd
     if r.e.jmpl = '1' then aluresult := (r.e.ctrl.pc(31 downto 2) + 1) & "00"; end if;
 
-
     icc(3) := aluresult(31);
-    --divz := icc(2);
     if r.e.ctrl.wicc = '1' then
-    --  if (op = FMT3) and (op3 = WRPSR) then icco := logicout(23 downto 20);
         icco := icc;
     end if;
-    --elsif r.m.ctrl.wicc = '1' then icco := me_icc;
-    --elsif r.x.ctrl.wicc = '1' then icco := r.x.icc;
-    --else icco := r.w.s.icc; end if;
     res := aluresult;
   end;
 
@@ -2979,114 +2523,9 @@ end;
     if ((r.x.ctrl.rett and not r.x.ctrl.annul) = '1') then su := r.w.s.ps;
     else su := r.w.s.s; end if;
     if su = '1' then dci.asi := "00001011"; else dci.asi := "00001010"; end if;
-----------------------------------------------------------------------------
-
---    if op = LDST then
---    case op3 is
---      when LDUB | LDUBA => dci.size := SZBYTE;
---      when LDSTUB | LDSTUBA => dci.size := SZBYTE; dci.lock := '1';
---      when LDUH | LDUHA => dci.size := SZHALF;
---      when LDSB | LDSBA => dci.size := SZBYTE; dci.signed := '1';
---      when LDSH | LDSHA => dci.size := SZHALF; dci.signed := '1';
---      when LD | LDA | LDF | LDC => dci.size := SZWORD;
---      when SWAP | SWAPA => dci.size := SZWORD; dci.lock := '1';
---      when CASA => if CASAEN then dci.size := SZWORD; dci.lock := '1'; end if;
---      when LDD | LDDA | LDDF | LDDC => dci.size := SZDBL;
---      when STB | STBA => dci.size := SZBYTE;
---      when STH | STHA => dci.size := SZHALF;
---      when ST | STA | STF => dci.size := SZWORD;
---      when ISTD | STDA => dci.size := SZDBL;
---      when STDF | STDFQ => if FPEN then dci.size := SZDBL; end if;
---      when STDC | STDCQ => if CPEN then dci.size := SZDBL; end if;
---      when others => dci.size := SZWORD; dci.lock := '0'; dci.signed := '0';
---    end case;
---    end if;
---    link_pc := '0'; jump:= '0'; force_a2 := '0'; load := '0';
---    dci.write := '0'; dci.enaddr := '0'; dci.read := not op3(2);
-
--- load/store control decoding
-
-    --if (r.e.ctrl.annul or r.e.ctrl.trap) = '0' then
-    --  case op is
-    --  when CALL => link_pc := '1';
-    --  when FMT3 =>
-    --    if r.e.ctrl.trap = '0' then
-    --      case op3 is
-    --      when JMPL => jump := '1'; link_pc := '1';
-    --      when RETT => if REX=0 or r.f.pc(0+2*(1-REX))='0' then jump := '1'; end if;
-    --      when others => null;
-    --      end case;
-    --    end if;
-    --  when LDST =>
-    --      case r.e.ctrl.cnt is
-    --      when "00" =>
-    --        dci.read := op3(3) or not op3(2);   -- LD/LDST/SWAP/CASA
-    --        load := op3(3) or not op3(2);
-    --        --dci.enaddr := '1';
-    --        dci.enaddr := (not op3(2)) or op3(2)
-    --                      or (op3(3) and op3(2));
-    --      when "01" =>
-    --        force_a2 := not op3(2);     -- LDD
-    --        load := not op3(2); dci.enaddr := not op3(2);
-    --        if op3(3 downto 2) = "01" then              -- ST/STD
-    --          dci.write := '1';
-    --        end if;
-    --        if (op3(3 downto 2) = "11") and -- LDST/SWAP/CASA
-    --          not (CASAEN and LDDEL=2 and op3(5 downto 4)="11")
-    --        then
-    --          dci.enaddr := '1';
-    --        end if;
-    --        if (CASAEN and LDDEL=2 and op3(5 downto 4)="11") then
-    --          dci.read := '1';
-    --        end if;
-    --      when "10" =>                                  -- STD/LDST/SWAP/CASA
-    --        dci.write := '1';
-    --        if (CASAEN and LDDEL=2 and (op3(5 downto 4) = "11")) then -- CASA
-    --          dci.enaddr := '1';
-    --          dci.write := '0';
-    --        end if;
-    --      when others =>
-    --        if (CASAEN and LDDEL=2 and (op3(5 downto 4) = "11")) then -- CASA
-    --          dci.write := '1';
-    --        end if;
-    --      end case;
-    --      if (r.e.ctrl.trap or (v.x.ctrl.trap and not v.x.ctrl.annul)) = '1' then
-    --        dci.enaddr := '0';
-    --      end if;
-    --      if (CASAEN and (op3(5 downto 4) = "11")) then mcasa := '1'; end if;
-    --  when others => null;
-    --  end case;
-    --end if;
-
---    if ((r.x.ctrl.rett and not r.x.ctrl.annul) = '1') then su := r.w.s.ps;
---    else su := r.w.s.s; end if;
---    if su = '1' then dci.asi := "00001011"; else dci.asi := "00001010"; end if;
-    --if (op3(4) = '1') and ((op3(5) = '0') or not CPEN) then
-    --  dci.asi := r.e.ctrl.inst(12 downto 5);
-    --  if r.e.ctrl.inst(12 downto 10) /= "000" then dci.enaddr := '0'; end if;
-    --end if;
-
   end;
 
-  procedure fpstdata(r : in registers; edata, eres : in word; fpstdata : in std_logic_vector(31 downto 0);
-                       edata2, eres2 : out word) is
-    variable op : std_logic_vector(1 downto 0);
-    variable op3 : std_logic_vector(5 downto 0);
-  begin
-    edata2 := edata; eres2 := eres;
 
-    -- RV32I changes
-
---    op := r.e.ctrl.inst(31 downto 30); op3 := r.e.ctrl.inst(24 downto 19);
---    if FPEN then
---      if FPEN and (op = LDST) and  ((op3(5 downto 4) & op3(2)) = "101") and (r.e.ctrl.cnt /= "00") then
---        edata2 := fpstdata; eres2 := fpstdata;
---      end if;
---    end if;
---    if CASAEN and (r.m.casa = '1') and r.e.ctrl.cnt(1)='1' then
---      edata2 := r.e.op1; eres2 := r.e.op1;
---    end if;
-  end;
 
   function ld_align(data : dcdtype; set : std_logic_vector(DSETMSB downto 0);
         size, laddr : std_logic_vector(1 downto 0); signed : std_ulogic) return word is
@@ -3121,6 +2560,7 @@ end;
       rdata := align_data;
     end case;
 
+    -- Dummy endian convertion for loaded data
     outdata(7 downto 0) := rdata(31 downto 24);
     outdata(15 downto 8) := rdata(23 downto 16);
     outdata(23 downto 16) := rdata(15 downto 8);
@@ -4698,32 +4138,14 @@ begin
     ex_ymsb := r.e.ymsb; mul_op2 := ex_op2; ex_shcnt := r.e.shcnt;
     v.e.cwp := r.a.cwp; ex_sari := r.e.sari;
     v.m.su := r.e.su;
--- May remove this
-    if MULTYPE = 3 then v.m.mul := r.e.mul; else v.m.mul := '0'; end if;
-    if lddel = 1 then
-      if r.e.ldbp1 = '1' then
-        ex_op1 := r.x.data(0);
-        ex_sari := r.x.data(0)(31) and r.e.ctrl.inst(19) and r.e.ctrl.inst(20);
-      end if;
-      if r.e.ldbp2 = '1' then
-        ex_op2 := r.x.data(0); ex_ymsb := r.x.data(0)(0);
-        mul_op2 := ex_op2; ex_shcnt := r.x.data(0)(4 downto 0);
-        if r.e.invop2 = '1' then
-          ex_op2 := not ex_op2; ex_shcnt := not ex_shcnt;
-        end if;
-      end if;
-    end if;
----
 
+    -- Adder
     ex_add_res := (ex_op1 & '1') + (ex_op2 & r.e.alucin);
 
     if ex_add_res(2 downto 1) = "00" then v.m.nalign := '0';
     else v.m.nalign := '1'; end if;
---    if REX=1 then
---      if ex_add_res(2 downto 1) /= "10" then v.m.rexnalign := '0';
---      else v.m.rexnalign := '1'; end if;
---    end if;
 
+    -- Generates data cache control signals
     dcache_gen(r, v, ex_dci, ex_link_pc, ex_jump, ex_force_a2, ex_load, v.m.casa);
 
     -- RV32I change
@@ -4733,37 +4155,29 @@ begin
         ex_jump_address := ex_add_res(32 downto PCLOW+1) + r.e.ctrl.pc(31 downto PCLOW);
     end if;
 
+    -- Logical insts
     logic_op(r, ex_op1, ex_op2, v.x.y, ex_ymsb, ex_logic_res, v.m.y);
+
+    -- Shifts
     ex_shift_res := shift(r, ex_op1, ex_op2, ex_shcnt, ex_sari);
+
+    -- Load/Store, jump, branch uses this
     misc_op(r, wpr, ex_op1, ex_op2, xc_df_result, v.x.y, xc_wimmask, ex_misc_res, ex_edata);
-    ex_add_res(3):= ex_add_res(3) or ex_force_a2;
-    if CASAEN and LDDEL=2 and (r.m.casa='1' and r.e.ctrl.cnt="11") then
-      ex_add_res(32 downto 1) := r.e.op2;
-    end if;
+
+    -- Select which operation ALU is supposed to execute
     alu_select(r, ex_add_res, ex_op1, ex_op2, ex_shift_res, ex_logic_res,
         ex_misc_res, ex_result, me_icc, v.m.icc, v.m.divz, v.m.casaz);
+
+    -- Generates debug unit output
     dbg_cache(holdn, dbgi, r, dsur, ex_result, ex_dci, ex_result2, v.m.dci);
-    fpstdata(r, ex_edata, ex_result2, fpo.data, ex_edata2, ex_result3);
+
     v.m.result := ex_result3;
     cwp_ex(r, v.m.wcwp, v.m.wawp);
 
-    -- if CASAEN and ( (LDDEL=1 and (r.m.casa='1' and r.e.ctrl.cnt="10")) or
-    --                 (LDDEL=2 and (r.m.casa='1' and r.e.ctrl.cnt="11")))
-    --   and v.m.casaz='0' then
-    --   me_nullify2 := '1';
-    -- end if;
-    -- dci.nullify  <= me_nullify2;
     dci.nullify <= '0';
 
-    ex_mulop1 := (ex_op1(31) and r.e.ctrl.inst(19)) & ex_op1;
-    ex_mulop2 := (mul_op2(31) and r.e.ctrl.inst(19)) & mul_op2;
 
-    if is_fpga(fabtech) = 0 and (r.e.mul = '0') then     -- power-save for mul
---    if (r.e.mul = '0') then
-        ex_mulop1 := (others => '0'); ex_mulop2 := (others => '0');
-    end if;
-
-
+    -- Updates control registers for next pipeline stage
     v.m.ctrl.annul := v.m.ctrl.annul or v.x.annul_all;
     v.m.ctrl.wicc := r.e.ctrl.wicc and not v.x.annul_all;
     v.m.mac := r.e.mac;
@@ -4780,6 +4194,7 @@ begin
 -- REGFILE STAGE
 -----------------------------------------------------------------------
 
+-- May change this for trap/exceptions support
 --Resource Sharing between hardware breakpoint detection
 --and instruction trace buffer filter
     pccompare(r,wpr,pccomp);
@@ -4833,6 +4248,7 @@ begin
     de_rexbubble := '0'; de_rexbaddr1:='0'; de_reximmexp:='0'; de_reximmval:=(others => '0');
     de_rexmaskpv := '0'; de_rexillinst:='0'; de_rexnostep:='0';
 
+    -- Dummy endian change for fetched instruction
     --de_inst := de_inst1;
     de_inst(7 downto 0) := de_inst1(31 downto 24);
     de_inst(15 downto 8) := de_inst1(23 downto 16);
@@ -4869,10 +4285,6 @@ begin
     -- Get rd and set write enable and other LEON3 signals
     rd_gen(r, de_inst, v.a.ctrl.wreg, v.a.ctrl.ld, de_rd, de_rexen);
     regaddr(de_cwp, de_rd, r.d.stwin, r.d.cwpmax, v.a.ctrl.rd);
-
-    -- No FP unit
---    fpbranch(de_inst, fpo.cc, de_fbranch);
---    fpbranch(de_inst, cpo.cc, de_cbranch);
 
     -- Get immediate
     v.a.imm := imm_data(r, de_inst, de_reximmexp, de_reximmval);
@@ -5043,11 +4455,6 @@ begin
 
     end if;
 
-    -- For pipelined REX implementation
-    --if REX/=0 and REXPIPE then
-    --  rex_pl_fetch(v.d,r.d,holdn,
-    --               v.d.rexpl);
-    --end if;
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
@@ -5108,39 +4515,6 @@ begin
     dbgo.ducnt <= r.w.s.ducnt;
 
     vfpi := fpc_in_none;
-    --if FPEN then
-    --   if (r.x.rstate = dsu2) then vfpi.flush := '1'; else vfpi.flush := v.x.annul_all and holdn; end if;
-    --   vfpi.exack := xc_fpexack; vfpi.a_rs1 := r.a.rs1; vfpi.d.inst := de_inst;
-    --   vfpi.d.cnt := r.d.cnt;
-    --   vfpi.d.annul := v.x.annul_all or de_bpannul or r.d.annul or de_fins_hold or (ico.bpmiss and not r.d.pcheld)
-    --     ;
-    --   if REX=1 then vfpi.d.annul := vfpi.d.annul or de_rexbubble; end if;
-    --   vfpi.d.trap := r.d.mexc;
-    --   vfpi.d.pc(1 downto 0) := (others => '0'); vfpi.d.pc(31 downto PCLOW) := r.d.pc(31 downto PCLOW);
-    --   vfpi.d.pv := r.d.pv;
-    --   vfpi.a.pc(1 downto 0) := (others => '0'); vfpi.a.pc(31 downto PCLOW) := r.a.ctrl.pc(31 downto PCLOW);
-    --   vfpi.a.inst := r.a.ctrl.inst; vfpi.a.cnt := r.a.ctrl.cnt; vfpi.a.trap := r.a.ctrl.trap;
-    --   vfpi.a.annul := r.a.ctrl.annul or (ex_bpmiss and r.e.ctrl.inst(29))
-    --     ;
-    --   vfpi.a.pv := r.a.ctrl.pv;
-    --   vfpi.e.pc(1 downto 0) := (others => '0'); vfpi.e.pc(31 downto PCLOW) := r.e.ctrl.pc(31 downto PCLOW);
-    --   vfpi.e.inst := r.e.ctrl.inst; vfpi.e.cnt := r.e.ctrl.cnt; vfpi.e.trap := r.e.ctrl.trap; vfpi.e.annul := r.e.ctrl.annul;
-    --   vfpi.e.pv := r.e.ctrl.pv;
-    --   vfpi.m.pc(1 downto 0) := (others => '0'); vfpi.m.pc(31 downto PCLOW) := r.m.ctrl.pc(31 downto PCLOW);
-    --   vfpi.m.inst := r.m.ctrl.inst; vfpi.m.cnt := r.m.ctrl.cnt; vfpi.m.trap := r.m.ctrl.trap; vfpi.m.annul := r.m.ctrl.annul;
-    --   vfpi.m.pv := r.m.ctrl.pv;
-    --   vfpi.x.pc(1 downto 0) := (others => '0'); vfpi.x.pc(31 downto PCLOW) := r.x.ctrl.pc(31 downto PCLOW);
-    --   vfpi.x.inst := r.x.ctrl.inst; vfpi.x.cnt := r.x.ctrl.cnt; vfpi.x.trap := xc_trap;
-    --   vfpi.x.annul := r.x.ctrl.annul; vfpi.x.pv := r.x.ctrl.pv;
-    --   if (lddel = 2) then vfpi.lddata := r.x.data(conv_integer(r.x.set)); else vfpi.lddata := r.x.data(0); end if;
-    --   if (r.x.rstate = dsu2)
-    --   then vfpi.dbg.enable := dbgi.denable;
-    --   else vfpi.dbg.enable := '0'; end if;
-    --   vfpi.dbg.write := fpcdbgwr;
-    --   vfpi.dbg.fsr := dbgi.daddr(22); -- IU reg access
-    --   vfpi.dbg.addr := dbgi.daddr(6 downto 2);
-    --   vfpi.dbg.data := dbgi.ddata;
-    -- end if;
     fpi <= vfpi;
     cpi <= vfpi;      -- dummy, just to kill some warnings ...
 
