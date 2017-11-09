@@ -1,36 +1,44 @@
 # Author: Lucas Castro
 # Last modification: sep/2017
 #
-# 	Makefile for creating a raw binary RV32I program for ReonV 
+# 	Makefile for creating a raw binary RV32I program for ReonV
 
+
+#######################################################################
+# Update the following variables to your environment
+# to run example program
+CROSS=/home/foo/IC/riscv-leon/rv32i/rv32i-gnu/bin/riscv32-unknown-elf-
+DESIGN_DIR=../designs/leon3-digilent-nexys4ddr
+
+#######################################################################
 CC=gcc
 AS=as
 OBJCOPY=objcopy
-CROSS=/home/foo/IC/riscv-leon/rv32i/rv32i-gnu/bin/riscv32-unknown-elf-
 CFLAGS=-nostdlib
 OBJCPFLAGS=-O binary -j .text
 
 
-CPPROGRAM=
 
 # Target .s
 %.s : %.c
 		${CROSS}$(CC) -S $(CFLAGS) $(CPPFLAGS) $< -o $@
 
+
+#################################################################
+#
+# Note that target %.hex requeries %.S, not the makefile target %.s!
+# They are different here because there are modifications needed
+# on assembly code before running! (set stack, for example)
+# More details on example.s 
+#
+#################################################################
 # Target .o
-%.hex : %.s
+%.hex : %.S
 		${CROSS}$(AS) $< -o $@
 
 # Target raw binary
 %.bin : %.hex
 		${CROSS}$(OBJCOPY) $(OBJCPFLAGS)  $< $@
 
-# Inverts target for grmon load (it considers binary is big-endian)
-%.inv : %.bin
-		./swap $< $@
-
-cp-program :
-		cp $(CPPROGRAM) ./repo/designs/leon3-digilent-xc7z020/
-
 clean:
-		rm -rf *.inv *.bin *.o *.log *.jou *.str
+		rm -rf *.hex *.inv *.bin *.o *.log *.jou *.str
