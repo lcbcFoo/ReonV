@@ -1,4 +1,4 @@
-unning an example on nexys4 ddr board
+# Running an example on nexys4 ddr board
 
 This is an example of how you can run an simple program on ReonV. We will use Nexys4ddr, however to use another board you will follow similar steps, 
 changing a few commands to the ones your board requires.
