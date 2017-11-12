@@ -23,6 +23,10 @@ _start:
 	sw	a0,-20(s0)
 	lw	a5,-24(s0)
 	add	a5,a5,1
+
+	# Move counter to x7
+	mv	x7,a5
+
 	sw	a5,-24(s0)
 	lw	a4,-20(s0)
 	li	a5,4096
@@ -34,7 +38,7 @@ _start:
 	add	sp,sp,32
 
 	###########################
-	# Move result to x6, since we dont have printf yet =( 
+	# Move i to x6, since we dont have printf yet =( 
 	mv	x6,a4
 	# Stop processor
 	sbreak

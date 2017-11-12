@@ -8,8 +8,6 @@
 # Update the following variables to your environment
 # to run example program
 CROSS=/home/foo/IC/riscv-leon/rv32i/rv32i-gnu/bin/riscv32-unknown-elf-
-DESIGN_DIR=../designs/leon3-digilent-nexys4ddr
-
 #######################################################################
 CC=gcc
 AS=as
@@ -29,7 +27,7 @@ OBJCPFLAGS=-O binary -j .text
 # Note that target %.hex requeries %.S, not the makefile target %.s!
 # They are different here because there are modifications needed
 # on assembly code before running! (set stack, for example)
-# More details on example.s 
+# More details on README 
 #
 #################################################################
 # Target .o

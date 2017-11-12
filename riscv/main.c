@@ -4,8 +4,7 @@ void _start(){
 	int i = 1;
 	int count = 0;
 
-	// Multiplies i by 4 while i < 4
-	// Read commentaries on main.s
+	// Multiplies i by 4
 	do{
 		i = mul(i,4);
 		count++;
