@@ -37,4 +37,4 @@ GRMON2 is the Leon3 debugging tool provided by [Cobham Gaisler AB](http://www.ga
 
 ---
 ## <a name="running"></a> Running an Example
-
+Follow instructions of the README on `riscv` directory.
