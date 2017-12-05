@@ -1480,7 +1480,7 @@ architecture rtl of iu3 is
         when others => null;
     end case;
     --tmp(31 downto 2) := "010000000000000000000000000100";
-    tmp(31 downto 2)  :=  addr(31 downto 2) + pc(31 downto 2);
+    tmp(31 downto 2)  :=  addr(31 downto 2) + pc(31 downto 2) + 1;
     return (tmp);
   end;
 
@@ -1915,7 +1915,11 @@ end;
         ex_bpmiss, ra_bpannul : out std_logic) is
   variable miss : std_logic;
   begin
-    miss := (not r.e.ctrl.annul) and r.e.bp and not branch_true(icc, r.e.ctrl.inst);
+    if(r.e.ctrl.inst(6 downto 0) = R_BRANCH) and (r.e.ctrl.cnt = "01") then
+        miss := (not r.e.ctrl.annul) and r.e.bp and not branch_true(icc, r.e.ctrl.inst);
+    else
+        miss := '0';
+    end if;
     --ra_bpannul := miss and r.e.ctrl.inst(29);
     ra_bpannul := miss;
     ex_bpmiss := miss;
@@ -1970,7 +1974,6 @@ end;
       when R_BRANCH =>
         if r.d.cnt = "01" then
             nobp := BPRED;
-            icc_check_bp := '1';
         end if;
 
       when R_LD | R_ST =>
@@ -2001,8 +2004,8 @@ end;
       chkmul := chkmul or divinsn;
     end if;
 
-    bicc_hold := icc_check and not icc_valid(r);
-    bicc_hold_bp := icc_check_bp and not icc_valid(r);
+    bicc_hold := icc_check; --and not icc_valid(r);
+    bicc_hold_bp := icc_check_bp; --and not icc_valid(r);
 
     if (((r.a.ctrl.ld or chkmul) and r.a.ctrl.wreg and ldchkra) = '1') and
        (((ldcheck1 = '1') and (r.a.ctrl.rd = rfa1)) or
@@ -2086,12 +2089,12 @@ end;
 
             when R_BRANCH =>
                 if r.d.cnt = "01" then
-                    branch := branch_true;
+                    de_jmpl := branch_true;
                     if hold_pc = '0' then
-                        if (branch = '1') then
-                            if (annul = '1') then
+                        if (de_jmpl = '1') then
+                            --if (annul = '1') then
                                 annul_next := '1';
-                            end if;
+                            --end if;
                         else
                             annul_next := annul_next or annul;
                         end if;
@@ -2124,18 +2127,18 @@ end;
       cnt := r.d.cnt; annul_next := '0'; pv := '1';
     end if;
     hold_pc := (hold_pc or ldlock) and not annul_all;
-    if icbpmiss='1' and r.d.annul='0' then
-      annul_current := '1'; annul_next := '1'; pv := '0'; hold_pc := '0';
-    end if;
-    if ((exbpmiss and r.a.ctrl.annul and r.d.pv and not hold_pc) = '1') then
-        annul_next := '1'; pv := '0';
-    end if;
-    if ((exbpmiss and not r.a.ctrl.annul and r.d.pv) = '1') then
-        annul_next := '1'; pv := '0'; annul_current := '1';
-    end if;
-    if ((exbpmiss and not r.a.ctrl.annul and not r.d.pv and not hold_pc) = '1') then
-        annul_next := '1'; pv := '0';
-    end if;
+    -- if icbpmiss='1' and r.d.annul='0' then
+    --   annul_current := '1'; annul_next := '1'; pv := '0'; hold_pc := '0';
+    -- end if;
+    -- if ((exbpmiss and r.a.ctrl.annul and r.d.pv and not hold_pc) = '1') then
+    --     annul_next := '1'; pv := '0';
+    -- end if;
+    -- if ((exbpmiss and not r.a.ctrl.annul and r.d.pv) = '1') then
+    --     annul_next := '1'; pv := '0'; annul_current := '1';
+    -- end if;
+    -- if ((exbpmiss and not r.a.ctrl.annul and not r.d.pv and not hold_pc) = '1') then
+    --     annul_next := '1'; pv := '0';
+    -- end if;
 
     if irqlat/=0 and r.d.irqstart='1' and r.d.irqlatmet='0' then
       annul_current := '1';
@@ -3653,11 +3656,17 @@ begin
     dcache_gen(r, v, ex_dci, ex_link_pc, ex_jump, ex_force_a2, ex_load, v.m.casa);
 
     -- RV32I change
-    if(r.e.alusel = EXE_RES_ADD) then                       --
+    if(r.e.ctrl.inst(6 downto 0) = R_BRANCH) then                        -- BRANCH
+        ex_jump_address := branch_address(r.e.ctrl.inst, r.e.ctrl.pc(31 downto PCLOW), de_rexbaddr1, r.d.rexen);
+        --ex_jump_address := x"000002" & "00";
+    elsif(r.e.alusel = EXE_RES_ADD) then                       -- JALR
         ex_jump_address := ex_add_res(32 downto PCLOW+1);
+        --ex_jump_address := x"4000003" & "00";
     else                                                    -- JAL
         ex_jump_address := ex_add_res(32 downto PCLOW+1) + r.e.ctrl.pc(31 downto PCLOW);
+        --ex_jump_address := x"4000004" & "00";
     end if;
+
 
     logic_op(r, ex_op1, ex_op2, v.x.y, ex_ymsb, ex_logic_res, v.m.y);
     ex_shift_res := shift(r, ex_op1, ex_op2, ex_shcnt, ex_sari);
@@ -3697,7 +3706,7 @@ begin
     if (DBGUNIT and (r.x.rstate = dsu2)) then v.m.ctrl.ld := '1'; end if;
     dci.eaddress <= ex_add_res(32 downto 1);
     dci.edata <= ex_edata2;
-    bp_miss_ex(r, r.m.icc, ex_bpmiss, ra_bpannul);
+    --bp_miss_ex(r, r.m.icc, ex_bpmiss, ra_bpannul);
 
 
     v.m .itrhit := r.e.itrhit;
@@ -3732,7 +3741,7 @@ begin
            v.e.ymsb, v.e.mul, ra_div, v.e.mulstep, v.e.mac, v.e.ldbp2, v.e.invop2
     );
     cin_gen(r, v.m.icc(0), v.e.alucin);
-    bp_miss_ra(r, ra_bpmiss, de_bpannul);
+    --bp_miss_ra(r, ra_bpmiss, de_bpannul);
     v.e.bp := r.a.bp and not ra_bpmiss;
 
 
@@ -3936,19 +3945,22 @@ begin
         v.f.pc := ex_jump_address; v.f.branch := '1';
         npc := v.f.pc;
       end if;
-    elsif (ex_jump and not bpmiss) = '1' then
+    elsif ex_jump = '1' then
       v.f.pc := ex_jump_address; v.f.branch := '1';
       npc := v.f.pc;
-    elsif (((ico.bpmiss and not r.d.annul) or r.a.bpimiss) and not bpmiss) = '1' then
-      v.f.pc := r.d.pc; v.f.branch := '1';
-      npc := v.f.pc;
-      v.a.bpimiss := ico.bpmiss and not r.d.annul;
-    elsif (de_branch and not bpmiss) = '1'
-    then
-      v.f.pc := branch_address(de_inst, de_pcout(31 downto PCLOW), de_rexbaddr1, r.d.rexen); v.f.branch := '1';
-      npc := v.f.pc;
+    -- elsif (ex_jump and not bpmiss) = '1' then
+    --   v.f.pc := ex_jump_address; v.f.branch := '1';
+    --   npc := v.f.pc;
+    -- elsif (((ico.bpmiss and not r.d.annul) or r.a.bpimiss) and not bpmiss) = '1' then
+    --   v.f.pc := r.d.pc; v.f.branch := '1';
+    --   npc := v.f.pc;
+    --   v.a.bpimiss := ico.bpmiss and not r.d.annul;
+    -- elsif de_branch = '1'
+    -- then
+    --   v.f.pc := branch_address(de_inst, de_pcout(31 downto PCLOW), de_rexbaddr1, r.d.rexen); v.f.branch := '1';
+    --   npc := v.f.pc;
     else
-      v.f.branch := bpmiss; v.f.pc := fe_npc; npc := v.f.pc;
+      v.f.branch := '0'; v.f.pc := fe_npc; npc := v.f.pc;
     end if;
 
     ici.dpc <= r.d.pc(31 downto 2) & "00";

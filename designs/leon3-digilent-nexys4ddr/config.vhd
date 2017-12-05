@@ -1,15 +1,9 @@
-
-
-
 -----------------------------------------------------------------------------
 -- LEON3 Demonstration design test bench configuration
 -- Copyright (C) 2009 Aeroflex Gaisler
 ------------------------------------------------------------------------------
-
-
 library techmap;
 use techmap.gencomp.all;
-
 package config is
 -- Technology and synthesis options
   constant CFG_FABTECH : integer := artix7;
@@ -32,9 +26,9 @@ package config is
   constant CFG_LEON3 : integer := 1;
   constant CFG_NCPU : integer := (1);
   constant CFG_NWIN : integer := (8);
-  constant CFG_V8 : integer := 2 + 4*0;
+  constant CFG_V8 : integer := 0 + 4*0;
   constant CFG_MAC : integer := 0;
-  constant CFG_BP : integer := 1;
+  constant CFG_BP : integer := 0;
   constant CFG_SVT : integer := 0;
   constant CFG_RSTADDR : integer := 16#00000#;
   constant CFG_LDDEL : integer := (1);
@@ -149,19 +143,12 @@ package config is
   constant CFG_GRETH : integer := 1;
   constant CFG_GRETH1G : integer := 0;
   constant CFG_ETH_FIFO : integer := 8;
-
-
-
-
-
 -- UART 1
   constant CFG_UART1_ENABLE : integer := 1;
   constant CFG_UART1_FIFO : integer := 1;
-
 -- LEON3 interrupt controller
   constant CFG_IRQ3_ENABLE : integer := 1;
   constant CFG_IRQ3_NSEC : integer := 0;
-
 -- Modular timer
   constant CFG_GPT_ENABLE : integer := 1;
   constant CFG_GPT_NTIM : integer := (2);
@@ -171,12 +158,10 @@ package config is
   constant CFG_GPT_SEPIRQ : integer := 1;
   constant CFG_GPT_WDOGEN : integer := 0;
   constant CFG_GPT_WDOG : integer := 16#0#;
-
 -- GPIO port
   constant CFG_GRGPIO_ENABLE : integer := 1;
   constant CFG_GRGPIO_IMASK : integer := 16#0000#;
   constant CFG_GRGPIO_WIDTH : integer := (8);
-
 -- SPI memory controller
   constant CFG_SPIMCTRL : integer := 1;
   constant CFG_SPIMCTRL_SDCARD : integer := 0;
@@ -187,7 +172,6 @@ package config is
   constant CFG_SPIMCTRL_ASCALER : integer := (2);
   constant CFG_SPIMCTRL_PWRUPCNT : integer := (0);
   constant CFG_SPIMCTRL_OFFSET : integer := 16#0#;
-
 -- Dynamic Partial Reconfiguration
   constant CFG_PRC : integer := 0;
   constant CFG_CRC_EN : integer := 0;
@@ -195,7 +179,6 @@ package config is
   constant CFG_WORDS_BLOCK : integer := 100;
   constant CFG_DCM_FIFO : integer := 0;
   constant CFG_DPR_FIFO : integer := 9;
-
 -- GRLIB debugging
   constant CFG_DUART : integer := 1;
 end;

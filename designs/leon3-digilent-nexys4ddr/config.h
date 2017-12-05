@@ -97,16 +97,8 @@
  * Integer unit                                           
  */
 #define CONFIG_IU_NWINDOWS (8)
-#define CONFIG_IU_V8MULDIV 1
-#undef  CONFIG_IU_MUL_LATENCY_2
-#undef  CONFIG_IU_MUL_LATENCY_4
-#define CONFIG_IU_MUL_LATENCY_5 1
-#undef  CONFIG_IU_MUL_MAC
-#define CONFIG_IU_MUL_INFERRED 1
-#undef  CONFIG_IU_MUL_MODGEN
-#undef  CONFIG_IU_MUL_TECHSPEC
-#undef  CONFIG_IU_MUL_DW
-#define CONFIG_IU_BP 1
+#undef  CONFIG_IU_V8MULDIV
+#undef  CONFIG_IU_BP
 #undef  CONFIG_IU_SVT
 #define CONFIG_IU_LDELAY (1)
 #define CONFIG_IU_WATCHPOINTS (0)
