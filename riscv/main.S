@@ -41,7 +41,7 @@ _start:
 	# Move i to x6, since we dont have printf yet =( 
 	mv	x6,a4
 	# Stop processor
-	sbreak
+	ebreak
 	###########################
 
 	jr	ra
