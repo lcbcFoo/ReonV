@@ -7,7 +7,7 @@ changing a few commands to the ones your board requires.
 ## Overview
 * ReonV currentily implements RV32I without privilegied instructions, so it is important to use a compiler to this ISA (follow instructions on the main README). 
 * We will use GRMON2 to load, run and debug the program, since the processor DSU was not changed and it communicates with GRMON. However, GRMON2 was not designed for RISC-V and we have to change the assembly and binary to workaround this problem (more information on issue [GRMON2 and RISCV](https://github.com/lcbcFoo/ReonV/issues/5)
-* The scrips for running on nexys4ddr is at `designs/leon3-digilent-nexys4ddr`. If you are running on other board, you must use its own design directory.
+* The scrips for running on nexys4ddr are at `designs/leon3-digilent-nexys4ddr`. If you are running on other board, you must use its own design directory.
 
 ## Compiling the program
 We have files `main.c`, `main.s`, `main.S` and `main.bin`. `main.c` contains our simple example, `main.s` was generated after running `make main.s`, `main.S` is the modified assembly we are going to assemble and finally `main.bin` is the binary generated after assembling `main.S` and extracting .text section, it is the binary we are going to run. The process of compilation is:
