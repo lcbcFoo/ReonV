@@ -1,12 +1,18 @@
-int fib(int i);
+int mul();
 
-void _start(){
-	int i = 5;
-	int j = fib(i);
+void main(){
+	int i = 1;
+	int count = 0;
+
+	// Multiplies i by 4
+	do{
+		i = mul(i,4);
+		count++;
+	}while(i < 2500);
 }
 
-int fib(int i){
-	if(i == 2 || i == 1)
-		return 1;
-	return fib(i-1) + fib(i-2);
+int mul(int i,int j){
+	if (i == 0)
+		return 0;
+	return mul(i - 1,j) + j;
 }

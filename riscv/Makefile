@@ -14,6 +14,7 @@ AS=as
 OBJCOPY=objcopy
 CFLAGS=-nostdlib
 OBJCPFLAGS=-O binary -j .text
+LD_SCRIPT=ld_script
 
 
 
@@ -30,13 +31,18 @@ OBJCPFLAGS=-O binary -j .text
 # More details on README 
 #
 #################################################################
+%.out : %.c
+		${CROSS}${CC} -T${LD_SCRIPT} $< -o $@
+
 # Target .o
 %.hex : %.S
 		${CROSS}$(AS) $< -o $@
 
 # Target raw binary
-%.bin : %.hex
+%.bin : %.out
 		${CROSS}$(OBJCOPY) $(OBJCPFLAGS)  $< $@
+
+
 
 clean:
 		rm -rf *.hex *.inv *.bin *.o *.log *.jou *.str
