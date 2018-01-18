@@ -6,7 +6,7 @@
 OUTPUT_FORMAT("elf32-littleriscv", "elf32-littleriscv",
 	      "elf32-littleriscv")
 OUTPUT_ARCH(riscv)
-ENTRY(_reonv_set_stack)
+ENTRY(__reonv_startup)
 SEARCH_DIR("/home/foo/IC/riscv-leon/rv32i/rv32i-gnu/riscv32-unknown-elf/lib");
 SECTIONS
 {
@@ -54,7 +54,10 @@ SECTIONS
   .iplt           : { *(.iplt) }
   .text           :
   {
-    reonv_set_stack.o
+    /*
+     * Forced minimal ctr0 to be the first code	
+     */
+    reonv_crt0.o
     *(.text.unlikely .text.*_unlikely .text.unlikely.*)
     *(.text.exit .text.exit.*)
     *(.text.startup .text.startup.*)

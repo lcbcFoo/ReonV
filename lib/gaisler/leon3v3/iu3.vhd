@@ -1492,7 +1492,7 @@ architecture rtl of iu3 is
   begin
       branch := '0';
 
-       if(inst(6 downto 0) = R_BRANCH and cnt = "01") then
+       if(inst(6 downto 0) = R_BRANCH and cnt = "11") then
           case inst(14 downto 12) is
               when "000" => branch := icc(2);                   -- beq
               when "001" => branch := not icc(2);               -- bne
@@ -1939,7 +1939,7 @@ end;
         -- nobp := BPRED;
 
       when R_BRANCH =>
-        if(r.d.cnt = "01") then
+        if not(r.d.cnt = "00") then
             ldcheck1 := '0'; ldcheck2 := '0';
         end if;
         -- if r.d.cnt = "01" then
@@ -2059,7 +2059,7 @@ end;
                 end case;
 
             when R_BRANCH =>
-                if r.d.cnt = "01" then
+                if r.d.cnt = "11" then
                     branch := branch_true;
                     if (branch = '1') then
                         --if (annul = '1') then
@@ -2076,12 +2076,12 @@ end;
                     cnt := "11";
                     hold_pc := '1';
                     pv := '0';
-                elsif r.d.cnt = "11" then
-                    cnt := "01";
+                elsif r.d.cnt = "01" then
+                    cnt := "10";
                     hold_pc := '1';
                     pv := '0';
                 else
-                    cnt := "10";
+                    cnt := "01";
                     hold_pc := '1';
                     pv := '0';
                 end if;
@@ -2147,41 +2147,23 @@ end;
         rdo : out std_logic_vector(4 downto 0); rexen: out std_ulogic) is
   variable write_reg : std_ulogic;
   variable op : std_logic_vector(6 downto 0);
-  variable op2 : std_logic_vector(2 downto 0);
-  variable op3 : std_logic_vector(5 downto 0);
   variable rd  : std_logic_vector(4 downto 0);
-  variable vrexen: std_ulogic;
   begin
 
     op    := inst(6 downto 0);
-    op2   := inst(24 downto 22);
-    op3   := inst(24 downto 19);
 
 ---------------------------------------------------------------------------
     -- Changed rd according to RISCV32I convention
     write_reg := '1'; rd := inst(11 downto 7);
     -- Default for LEON3 signals
     ld := '0';
-    vrexen := '0';
+    rexen := '0';
 
     case op is
-        when R_ST =>
+        when R_ST | R_BRANCH =>
             write_reg := '0';
         when R_LD =>
             ld := '1';
-
-        when R_BRANCH =>
-            write_reg := '1';
-            rd := (others => '0');
-
-            if(r.d.cnt = "00") then
-                rd := "11110";
-            else
-                rd := "11111";
-            end if;
-
-        when R_JAL | R_JALR =>          -- Save PC in rd
-            write_reg := '1';
         when others => null;
     end case;
 
@@ -2189,12 +2171,12 @@ end;
     if (rd = "00000") then
         write_reg := '0';
     end if;
-    wreg := write_reg; rdo := rd; rexen := vrexen;
+    wreg := write_reg; rdo := rd;
   end;
 
 -- immediate data generation
 
-  function imm_data (r : registers; inst : word; de_reximmexp: std_ulogic; de_reximmval: std_logic_vector(31 downto 13))
+  function imm_data (r : registers; inst : word)
         return word is
   variable immediate_data : std_logic_vector(31 downto 0);
   begin
@@ -2614,6 +2596,7 @@ end;
     when others => aluresult := miscout;
     end case;
 
+    -- Save PC on jump and link
     if r.e.jmpl = '1' then aluresult := (r.e.ctrl.pc(31 downto 2) + 1) & "00"; end if;
 
     -- if(to_integer(signed(op1)) < to_integer(signed(op2))) then
@@ -2641,15 +2624,15 @@ end;
     else icco := r.w.s.icc;
     end if;
 
-    if(r.e.ctrl.inst(6 downto 0) = R_BRANCH) then
-        aluresult := (others => '0');
-        if r.e.ctrl.wicc = '1' then
-            aluresult := addout(32 downto 1);
-        elsif r.m.ctrl.wicc = '1' then aluresult(3 downto 0) := me_icc;
-        elsif r.x.ctrl.wicc = '1' then aluresult(3 downto 0) := r.x.icc;
-        else aluresult(3 downto 0)  := r.w.s.icc;
-        end if;
-    end if;
+    -- if(r.e.ctrl.inst(6 downto 0) = R_BRANCH) then
+    --     aluresult := (others => '0');
+    --     if r.e.ctrl.wicc = '1' then
+    --         aluresult := addout(32 downto 1);
+    --     elsif r.m.ctrl.wicc = '1' then aluresult(3 downto 0) := me_icc;
+    --     elsif r.x.ctrl.wicc = '1' then aluresult(3 downto 0) := r.x.icc;
+    --     else aluresult(3 downto 0)  := r.w.s.icc;
+    --     end if;
+    -- end if;
     --elsif r.m.ctrl.wicc = '1' then icco := me_icc;
     --elsif r.x.ctrl.wicc = '1' then icco := r.x.icc;
     --else icco := r.w.s.icc; end if;
@@ -3821,7 +3804,7 @@ begin
 --    fpbranch(de_inst, cpo.cc, de_cbranch);
 
     -- Get immediate
-    v.a.imm := imm_data(r, de_inst, de_reximmexp, de_reximmval);
+    v.a.imm := imm_data(r, de_inst);
     de_iperr := '0';
 
     -- Generates control signals
