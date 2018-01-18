@@ -1,8 +1,8 @@
 int mul();
-int fib();
+unsigned int fib();
 #include <stdio.h>
 void main(){
-	int i = 8;
+	unsigned int i = 21;
 	int count = 0;
 
 	// Multiplies i by 4
@@ -15,10 +15,11 @@ void main(){
 	i = fib(i);
 
 	//printf("i = \n", i);
-	__asm("ebreak");
+	//__asm("ebreak");
+	return;
 }
 
-int fib(int i){
+unsigned int fib(unsigned int i){
 	if(i == 1 || i == 2)
 		return 1;
 	return fib(i-1) + fib(i-2);

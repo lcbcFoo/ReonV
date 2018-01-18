@@ -23,7 +23,9 @@
 -- Author:      Jiri Gaisler, Edvin Catovic, Gaisler Research
 -- Modified:    Magnus Hjorth, Cobham Gaisler (LEON-REX extension)
 --              Alen Bardizbanyan, Cobham Gaisler (ITRACE filtering extensions)
--- Description: LEON3 7-stage integer pipline
+--              Lucas Castro (ISA modified to RV32I)
+--
+-- Description: ReonV RV32I 7-stage integer pipeline
 ------------------------------------------------------------------------------
 
 library ieee;
@@ -220,7 +222,6 @@ architecture rtl of iu3 is
   constant CASAEN : boolean := (notag = 0);
   signal BPRED : std_logic;
   signal BLOCKBPMISS: std_logic;
-  constant REXPIPE : boolean := (REX=1) and (is_fpga(FABTECH)/=0);
   constant AWPEN : boolean := (altwin /= 0);
   constant RFPART : boolean := (altwin /= 0);
 
@@ -262,21 +263,6 @@ architecture rtl of iu3 is
     branch : std_ulogic;
   end record;
 
-  type rex_pipeline_reg_type is record
-    opout: std_logic_vector(31 downto 0);
-    szout: std_logic_vector(1 downto 0);
-    ncntout: std_logic_vector(0 downto 0);
-    baddr1: std_ulogic;
-    immexp: std_ulogic;
-    immval: std_logic_vector(31 downto 13);
-    getpc: std_ulogic;
-    maskpv: std_ulogic;
-    illinst: std_ulogic;
-    nostep: std_ulogic;
-    itovr: std_ulogic;
-    leave: std_ulogic;
-  end record;
-
   type decode_reg_type is record
     pc    : pctype;
     inst  : icdtype;
@@ -295,11 +281,6 @@ architecture rtl of iu3 is
     step  : std_ulogic;
     divrdy: std_ulogic;
     pcheld: std_ulogic;
-    rexen : std_ulogic;
-    rexpos: std_logic_vector(1 downto 0);
-    rexbuf: std_logic_vector(31 downto 0);
-    rexcnt: std_logic_vector(0 downto 0);
-    rexpl : rex_pipeline_reg_type;
     irqstart : std_ulogic;
     irqlatctr : std_logic_vector(11 downto 0);
     irqlatmet : std_ulogic;
@@ -384,7 +365,6 @@ architecture rtl of iu3 is
     mul    : std_ulogic;
     casa   : std_ulogic;
     casaz  : std_ulogic;
-    rexnalign : std_ulogic;
     itrhit : std_ulogic;
   end record;
 
@@ -457,8 +437,6 @@ architecture rtl of iu3 is
     dwt    : std_ulogic;                           -- disable write error trap
     dbp    : std_ulogic;                           -- disable branch prediction
     dbprepl: std_ulogic;                -- Disable speculative Icache miss/replacement
-    rexdis : std_ulogic;                -- allow entering REX mode
-    rextrap: std_ulogic;                -- trap on saverex/addrex instructions
     aw     : std_ulogic;                -- use alternative window pointer
     paw    : std_ulogic;                -- previous aw (for trap handler)
     awp    : cwptype;                   -- alternative window pointer
@@ -618,10 +596,6 @@ architecture rtl of iu3 is
                 when "0001" =>  -- %ASR17
                   if bp = 2 then s.dbp := dbg.ddata(27); end if;
                   if bp = 2 then s.dbprepl := dbg.ddata(25); end if;
-                  if rex=1 then
-                    s.rexdis := dbg.ddata(22);
-                    s.rextrap := dbg.ddata(21);
-                  end if;
                   s.dwt := dbg.ddata(14);
                   s.svt := dbg.ddata(13);
                 when "0010" =>  -- %ASR18
@@ -695,13 +669,8 @@ architecture rtl of iu3 is
     if notag = 0 then asr17(26) := '1'; end if; -- CASA and tagged arith
     if bp = 2 then asr17(25) := r.w.s.dbprepl;
     elsif bp = 1 then asr17(25) := '1'; end if;
-    if rex=1 then
-      asr17(24 downto 23) := "01";
-      asr17(22) := r.w.s.rexdis;
-      asr17(21) := r.w.s.rextrap;
-    else
       asr17(24 downto 23) := "00";
-    end if;
+
     if (clk2x > 8) then
       asr17(16 downto 15) := conv_std_logic_vector(clk2x-8, 2);
       asr17(17) := '1';
@@ -977,10 +946,7 @@ architecture rtl of iu3 is
       indata(127) := tov;
       indata(126) := not r.x.ctrl.pv;
       indata(125 downto 96) := dbgi.timer(29 downto 0);
-      if REX=1 then
-        indata(125) := r.x.ctrl.pc(2-2*REX);
-        indata(124) := r.x.ctrl.pc(2-1*REX);
-      end if;
+
       indata(95 downto 64) := res;
       indata(63 downto 34) := r.x.ctrl.pc(31 downto 2);
       indata(33) := trap;
@@ -1139,11 +1105,6 @@ architecture rtl of iu3 is
     step   => '0',
     divrdy => '0',
     pcheld => '0',
-    rexen  => '0',
-    rexpos => "10",
-    rexbuf => (others => '0'),
-    rexcnt => (others => '0'),
-    rexpl => ((others => '0'),"00","0",'0','0',(others => '0'),'0','0','0','0','0','0'),
     irqstart => '0',
     irqlatctr => (others => '0'),
     irqlatmet => '0'
@@ -1231,7 +1192,6 @@ architecture rtl of iu3 is
     mul    => '0',
     casa   => '0',
     casaz  => '0',
-    rexnalign => '0',
     itrhit => '1'
     );
   function xnpc_res return std_logic_vector is
@@ -1321,8 +1281,6 @@ architecture rtl of iu3 is
     s.dwt   := '0';
     s.dbp   := '0';
     s.dbprepl := '1';
-    s.rexdis :='1';
-    s.rextrap:='1';
     s.aw     := '0';
     s.paw    := '0';
     s.awp    := (others => '0');
@@ -1456,31 +1414,17 @@ architecture rtl of iu3 is
 
 -- branch adder
 
-  function branch_address(inst : word; pc : pctype; de_rexbaddr1, de_rexen: std_logic) return std_logic_vector is
+  function branch_address(inst : word; pc : pctype) return std_logic_vector is
     variable addr, tmp : pctype;
   begin
 
---------------------------------------------------------------------------------
-    -- RV32I changes
-    -- case inst(6 downto 0) is
-    --     when R_JAL =>
-    --         addr(31 downto 20) := (others => inst(31));
-    --         addr(19 downto 11) := inst(19 downto 12) & inst(20);
-    --         -- PCLOW is 2 for now
-    --         --addr(10 downto 1)  := inst(30 downto 21);
-    --         addr(10 downto 2)  := inst(30 downto 22);
-    --
-    --     when R_BRANCH =>
-            addr(31 downto 12) := (others => inst(31));
-            addr(11)           := inst(7);
-            addr(10 downto 5)  := inst(30 downto 25);
-            --addr(4 downto 1)   := inst(11 downto 8);
-            addr(4 downto 2)   := inst(11 downto 9);
-
-    --     when others => null;
-    -- end case;
-    --tmp(31 downto 2) := x"4000003" & "00";
-    tmp(31 downto 2)  :=  addr(31 downto 2) + pc(31 downto 2) - 2;
+    addr(31 downto 12) := (others => inst(31));
+    addr(11)           := inst(7);
+    addr(10 downto 5)  := inst(30 downto 25);
+    --addr(4 downto 1)   := inst(11 downto 8);
+    -- Align 4 instead of align 2
+    addr(4 downto 2)   := inst(11 downto 9);
+    tmp(31 downto 2)   := addr(31 downto 2) + pc(31 downto 2) - 2;
     return (tmp);
   end;
 
@@ -2020,7 +1964,7 @@ end;
 
 -- PC generation
 
-  procedure ic_ctrl(r : registers; inst : word; annul_all, ldlock, de_rexhold, de_rexbubble, de_rexmaskpv, de_rexillinst, branch_true,
+  procedure ic_ctrl(r : registers; inst : word; annul_all, ldlock, branch_true,
         fbranch_true, cbranch_true, fccv, cccv : in std_ulogic;
         cnt : out std_logic_vector(1 downto 0);
         de_pc : out pctype; de_branch, ctrl_annul, de_annul, jmpl_inst, inull,
@@ -2043,7 +1987,6 @@ end;
 
 --------------------------------------------------------------------------------
     -- RV32I changes
---    if (r.d.annul = '0') and not (icbpmiss = '1' and r.d.pcheld='0') and (REX=0 or de_rexbubble='0') and (irqlat=0 or not (r.d.irqstart='1' and r.d.irqlatmet='0'))
     if (r.d.annul = '0') and (irqlat=0 or not (r.d.irqstart='1' and r.d.irqlatmet='0'))
     then
         case inst(6 downto 0) is
@@ -2104,6 +2047,8 @@ end;
       cnt := r.d.cnt; annul_next := '0'; pv := '1';
     end if;
     hold_pc := (hold_pc or ldlock) and not annul_all;
+
+    -- Used for branch prediction
     -- if icbpmiss='1' and r.d.annul='0' then
     --   annul_current := '1'; annul_next := '1'; pv := '0'; hold_pc := '0';
     -- end if;
@@ -2122,12 +2067,12 @@ end;
       hold_pc := '1';
     end if;
 
-    if (hold_pc or de_rexhold) = '1' then de_pc := r.d.pc; else de_pc := r.f.pc; end if;
+    if (hold_pc) = '1' then de_pc := r.d.pc; else de_pc := r.f.pc; end if;
 
-    annul_current := (annul_current or (ldlock and not inhibit_current) or annul_all or de_rexbubble);
-    annul_current := annul_current and not de_rexillinst;
+    annul_current := (annul_current or (ldlock and not inhibit_current) or annul_all);
+    annul_current := annul_current;
     ctrl_annul := r.d.annul or annul_all or annul_current or inhibit_current;
-    pv := pv and not ((r.d.inull and not hold_pc) or annul_all or de_rexmaskpv);
+    pv := pv and not ((r.d.inull and not hold_pc) or annul_all);
     jmpl_inst := (de_jmpl or branch) and not annul_current and not inhibit_current;
     annul_next := (r.d.inull and not hold_pc) or annul_next or annul_all;
     if (annul_next = '1') or (rstn = '0') then
@@ -2144,7 +2089,7 @@ end;
 -- register write address generation
 
   procedure rd_gen(r : registers; inst : word; wreg, ld : out std_ulogic;
-        rdo : out std_logic_vector(4 downto 0); rexen: out std_ulogic) is
+        rdo : out std_logic_vector(4 downto 0)) is
   variable write_reg : std_ulogic;
   variable op : std_logic_vector(6 downto 0);
   variable rd  : std_logic_vector(4 downto 0);
@@ -2157,7 +2102,6 @@ end;
     write_reg := '1'; rd := inst(11 downto 7);
     -- Default for LEON3 signals
     ld := '0';
-    rexen := '0';
 
     case op is
         when R_ST | R_BRANCH =>
@@ -2227,7 +2171,7 @@ end;
 
 -- immediate data select
 
-  function imm_select(inst : word; de_rexen: std_ulogic) return boolean is
+  function imm_select(inst : word) return boolean is
   variable imm : boolean;
   begin
     imm := true;
@@ -2374,7 +2318,6 @@ end;
   end;
 
 -- operand generation
-
   procedure op_mux(r : in registers; rfd, ed, md, xd, im : in word;
         rsel : in std_logic_vector(2 downto 0);
         ldbp : out std_ulogic; d : out word; id : std_logic) is
@@ -2500,9 +2443,6 @@ end;
     wpi := 0;
     miscout := (others => '0');
     miscout(31 downto PCLOW) := r.e.ctrl.pc(31 downto PCLOW);
-    if REX/=0 and r.e.ctrl.pc(PCLOW)='1' then
-      miscout(31 downto 2) := miscout(31 downto 2)-1;
-    end if;
     edata := aluin1;
 
     bpdata(7 downto 0) := aluin1(31 downto 24);
@@ -2574,21 +2514,12 @@ end;
     case r.e.alusel is
     when EXE_RES_ADD =>
         aluresult := addout(32 downto 1);
-        -- if r.e.aluadd = '0' then
-        --     icc(0) := ((not op1(31)) and not op2(31)) or    -- Carry
-        --           (addout(32) and ((not op1(31)) or not op2(31)));
-        --     icc(1) := (op1(31) and (op2(31)) and not addout(32)) or         -- Overflow
-        --           (addout(32) and (not op1(31)) and not op2(31));
-        -- else
-        --     icc(0) := (op1(31) and op2(31)) or      -- Carry
-        --           ((not addout(32)) and (op1(31) or op2(31)));
-            icc(0) := addout(33);
-            icc(1) := (op1(31) and op2(31) and not addout(32)) or   -- Overflow
-                  (addout(32) and (not op1(31)) and (not op2(31)));
-        --end if;
+        icc(0) := addout(33);                                   -- Carry
+        icc(1) := (op1(31) and op2(31) and not addout(32)) or   -- Overflow
+              (addout(32) and (not op1(31)) and (not op2(31)));
 
-        if aluresult = zero32 then icc(2) := '1'; end if;
-        icc(3) := aluresult(31);
+        if aluresult = zero32 then icc(2) := '1'; end if;       -- Zero
+        icc(3) := aluresult(31);                                -- Negative
 
     when EXE_RES_SHIFT => aluresult := shiftout;
     when EXE_RES_LOGIC => aluresult := logicout;
@@ -2599,43 +2530,13 @@ end;
     -- Save PC on jump and link
     if r.e.jmpl = '1' then aluresult := (r.e.ctrl.pc(31 downto 2) + 1) & "00"; end if;
 
-    -- if(to_integer(signed(op1)) < to_integer(signed(op2))) then
-    --     icc(0) := '0';
-    -- else
-    --     icc(0) := '1';
-    -- end if;
-    -- if(to_integer(unsigned(op1)) >= to_integer(unsigned(op2))) then
-    --     icc(1) := '1';
-    -- else
-    --     icc(1) := '0';
-    -- end if;
-    -- if(op1 = op2) then
-    --     icc(2) := '1';
-    -- else
-    --     icc(2) := '0';
-    -- end if;
-
-    --divz := icc(2);
-    if r.e.ctrl.wicc = '1' then
-    --  if (op = FMT3) and (op3 = WRPSR) then icco := logicout(23 downto 20);
-        icco := icc;
+    -- Writes icc flags (on branch cycle)
+    if r.e.ctrl.wicc = '1' then icco := icc;
     elsif r.m.ctrl.wicc = '1' then icco := me_icc;
     elsif r.x.ctrl.wicc = '1' then icco := r.x.icc;
     else icco := r.w.s.icc;
     end if;
 
-    -- if(r.e.ctrl.inst(6 downto 0) = R_BRANCH) then
-    --     aluresult := (others => '0');
-    --     if r.e.ctrl.wicc = '1' then
-    --         aluresult := addout(32 downto 1);
-    --     elsif r.m.ctrl.wicc = '1' then aluresult(3 downto 0) := me_icc;
-    --     elsif r.x.ctrl.wicc = '1' then aluresult(3 downto 0) := r.x.icc;
-    --     else aluresult(3 downto 0)  := r.w.s.icc;
-    --     end if;
-    -- end if;
-    --elsif r.m.ctrl.wicc = '1' then icco := me_icc;
-    --elsif r.x.ctrl.wicc = '1' then icco := r.x.icc;
-    --else icco := r.w.s.icc; end if;
     res := aluresult;
   end;
 
@@ -2648,9 +2549,6 @@ end;
     op := r.e.ctrl.inst(6 downto 0); f3 := r.e.ctrl.inst(14 downto 12);
     dci.signed := '0'; dci.lock := '0'; dci.dsuen := '0'; dci.size := SZWORD;
     mcasa := '0';
-
------------------------------------------------------------------------------
-    -- RV32I changes
 
     if((op = R_LD) or (op = R_ST)) then
         case f3 is
@@ -2709,8 +2607,8 @@ end;
   begin
     edata2 := edata; eres2 := eres;
 
-    -- RV32I changes
   end;
+
 
   function ld_align(data : dcdtype; set : std_logic_vector(DSETMSB downto 0);
         size, laddr : std_logic_vector(1 downto 0); signed : std_ulogic) return word is
@@ -2745,6 +2643,7 @@ end;
       rdata := align_data;
     end case;
 
+    -- Convert loaded data endianess
     outdata(7 downto 0) := rdata(31 downto 24);
     outdata(15 downto 8) := rdata(23 downto 16);
     outdata(23 downto 16) := rdata(15 downto 8);
@@ -2799,7 +2698,7 @@ end;
             if r.m.divz = '1' then trap := '1'; tt := TT_DIV; end if;
           end if;
         when JMPL | RETT =>
-          if (REX=1 and r.m.rexnalign='1') or (REX=0 and r.m.nalign = '1') then
+          if (r.m.nalign = '1') then
             trap := '1'; tt := TT_UNALA;
           end if;
         when TADDCCTV | TSUBCCTV =>
@@ -2948,10 +2847,6 @@ end;
             if bp = 2 then s.dbprepl := r.x.result(25); end if;
             s.dwt := r.x.result(14);
             if (svt = 1) then s.svt := r.x.result(13); end if;
-            if rex=1 then
-              s.rexdis:=r.x.result(22);
-              s.rextrap:=r.x.result(21);
-            end if;
           elsif (AWPEN or RFPART) and rd="10100" then  -- %ASR20
             if AWPEN then
               s.awp := r.x.result(NWINLOG2-1 downto 0);
@@ -3139,34 +3034,13 @@ end;
   end;
 
 
-  function rex_dpc(pcin: pctype; rexen: std_ulogic; rexpos: std_logic_vector(1 downto 0))
-    return std_logic_vector is
-    variable vpcout: std_logic_vector(31 downto 0);
-  begin
-    vpcout := pcin(31 downto 2) & rexpos(0) & rexen;
-    if rexpos(1)='0' then
-      vpcout(31 downto 2) := vpcout(31 downto 2)-1;
-    end if;
-    return vpcout;
-  end;
-
-  function rex_regunp(rn: std_logic_vector(3 downto 0))
-    return std_logic_vector is
-    variable y: std_logic_vector(4 downto 0);
-  begin
-    y := "00" & rn(2 downto 0);
-    y(4) := rn(3) or rn(2);
-    y(3) := rn(3) or (not rn(2));
-    return y;
-  end rex_regunp;
-
   signal dummy : std_ulogic;
   signal cpu_index : std_logic_vector(3 downto 0);
   signal disasen : std_ulogic;
 
 begin
 
-  BPRED <= '0' when bp = 0 else '1' when bp = 1 else not (r.w.s.dbp or r.d.rexen);
+  BPRED <= '0' when bp = 0 else '1' when bp = 1 else not (r.w.s.dbp);
   BLOCKBPMISS <= '0' when bp = 0 else '1' when bp = 1 else r.w.s.dbprepl;
 
   comb : process(ico, dco, rfo, r, wpr, ir, dsur, rstn, holdn, irqi, dbgi, fpo, cpo, tbo, tbo_2p,
@@ -3192,14 +3066,9 @@ begin
   variable de_bpannul : std_ulogic;
   variable de_fins_hold : std_ulogic;
   variable de_iperr : std_ulogic;
-  variable de_rexen, de_nrexen, de_rexhold, de_rexbubble, de_rexbaddr1 : std_ulogic;
-  variable de_rexmaskpv, de_rexnostep : std_ulogic;
-  variable de_rexillinst: std_ulogic;
   variable de_nbufpos16: std_logic_vector(1 downto 0);
   variable de_ncnt16: std_logic_vector(0 downto 0);
   variable de_pcout: std_logic_vector(31 downto 0);
-  variable de_reximmexp: std_ulogic;
-  variable de_reximmval: std_logic_vector(31 downto 13);
 
   variable ra_op1, ra_op2 : word;
   variable ra_div : std_ulogic;
@@ -3270,7 +3139,7 @@ begin
     v := r; vwpr := wpr; vdsu := dsur; vp := rp;
     xc_fpexack := '0'; sidle := '0';
     fpcdbgwr := '0'; vir := ir; xc_rstn := rstn;
-    de_pcout := rex_dpc(r.d.pc, r.d.rexen, r.d.rexpos);
+    de_pcout := r.d.pc & "00";
 
 -----------------------------------------------------------------------
 -- EXCEPTION STAGE
@@ -3427,7 +3296,6 @@ begin
           v.x.rstate := run; v.x.annul_all := '0'; vp.error := '0';
           xc_trap_address(31 downto PCLOW) := ir.addr; v.x.debug := '0';
           vir.pwd := '1';
-          if REX=1 and r.f.pc(2-2*REX)='1' then xc_exception:='0'; end if;
         end if;
         if (smp /= 0) and (irqi.resume = '1') then
           vp.pwd := '0'; vp.error := '0';
@@ -3506,8 +3374,6 @@ begin
       end if;
       v.w.s.dbp := RRES.w.s.dbp;
       v.w.s.dbprepl := RRES.w.s.dbprepl;
-      v.w.s.rexdis := RRES.w.s.rexdis;
-      v.w.s.rextrap := RRES.w.s.rextrap;
       v.w.s.tba := RRES.w.s.tba;
       v.x.annul_all := RRES.x.annul_all;
       v.x.rstate := RRES.x.rstate; vir.pwd := IRES.pwd;
@@ -3545,7 +3411,7 @@ begin
     --   v.x.ctrl.inst(4 downto 0) := r.a.ctrl.inst(4 downto 0); -- restore rs2 for trace log
     -- end if;
 
-    mul_res(r, v.w.s.asr18, v.x.result, v.x.y, me_asr18, me_icc);
+    -- mul_res(r, v.w.s.asr18, v.x.result, v.x.y, me_asr18, me_icc);
 
 
     -- mem_trap(r, wpr, v.x.ctrl.annul, holdn, v.x.ctrl.trap, me_iflush,
@@ -3593,6 +3459,7 @@ begin
         v.x.ctrl.trap := '0'; v.x.ctrl.annul := '1';
     end if;
 
+    -- Data cache signals
     dci.maddress <= r.m.result;
     dci.enaddr   <= r.m.dci.enaddr;
     dci.asi      <= r.m.dci.asi;
@@ -3638,59 +3505,56 @@ begin
         end if;
       end if;
     end if;
----
 
+    -- Adder
     ex_add_res := ("0" & ex_op1 & '1') + ("0" & ex_op2 & r.e.alucin);
 
+    -- Data cache signals
     if ex_add_res(2 downto 1) = "00" then v.m.nalign := '0';
     else v.m.nalign := '1'; end if;
---    if REX=1 then
---      if ex_add_res(2 downto 1) /= "10" then v.m.rexnalign := '0';
---      else v.m.rexnalign := '1'; end if;
---    end if;
 
     dcache_gen(r, v, ex_dci, ex_link_pc, ex_jump, ex_force_a2, ex_load, v.m.casa);
 
-    -- RV32I change
-    -- if(r.e.ctrl.inst(6 downto 0) = R_BRANCH) then                        -- BRANCH
-        --ex_jump_address := branch_address(r.e.ctrl.inst, r.e.ctrl.pc(31 downto PCLOW), de_rexbaddr1, r.d.rexen);
-    --    ex_jump_address := x"4000004" & "00";
+    -- Get JAL and JALR addresses
     if(r.e.alusel = EXE_RES_ADD) then                       -- JALR
         ex_jump_address := ex_add_res(32 downto PCLOW+1);
-        --ex_jump_address := x"4000003" & "00";
     else                                                    -- JAL
         ex_jump_address := ex_add_res(32 downto PCLOW+1) + r.e.ctrl.pc(31 downto PCLOW);
         --ex_jump_address := x"4000004" & "00";
     end if;
 
-
+    -- Logic instructions
     logic_op(r, ex_op1, ex_op2, v.x.y, ex_ymsb, ex_logic_res, v.m.y);
-    ex_shift_res := shift(r, ex_op1, ex_op2, ex_shcnt, ex_sari);
-    misc_op(r, wpr, ex_op1, ex_op2, xc_df_result, v.x.y, xc_wimmask, ex_misc_res, ex_edata);
-    --ex_add_res(3):= ex_add_res(3) or ex_force_a2;
 
+    -- Shift instructions
+    ex_shift_res := shift(r, ex_op1, ex_op2, ex_shcnt, ex_sari);
+
+    -- Other instructions
+    misc_op(r, wpr, ex_op1, ex_op2, xc_df_result, v.x.y, xc_wimmask, ex_misc_res, ex_edata);
+
+    -- Select ALU result
     alu_select(r, ex_add_res, ex_op1, ex_op2, ex_shift_res, ex_logic_res,
         ex_misc_res, ex_result, me_icc, v.m.icc, v.m.divz, v.m.casaz);
+
+    -- Debug
     dbg_cache(holdn, dbgi, r, dsur, ex_result, ex_dci, ex_result2, v.m.dci);
+
+    -- Float point
     fpstdata(r, ex_edata, ex_result2, fpo.data, ex_edata2, ex_result3);
+
+    -- Update pipeline registers
     v.m.result := ex_result3;
     cwp_ex(r, v.m.wcwp, v.m.wawp);
 
-    -- if CASAEN and ( (LDDEL=1 and (r.m.casa='1' and r.e.ctrl.cnt="10")) or
-    --                 (LDDEL=2 and (r.m.casa='1' and r.e.ctrl.cnt="11")))
-    --   and v.m.casaz='0' then
-    --   me_nullify2 := '1';
-    -- end if;
-    -- dci.nullify  <= me_nullify2;
     dci.nullify <= '0';
 
-    ex_mulop1 := (ex_op1(31) and r.e.ctrl.inst(19)) & ex_op1;
-    ex_mulop2 := (mul_op2(31) and r.e.ctrl.inst(19)) & mul_op2;
+    --ex_mulop1 := (ex_op1(31) and r.e.ctrl.inst(19)) & ex_op1;
+    --ex_mulop2 := (mul_op2(31) and r.e.ctrl.inst(19)) & mul_op2;
 
-    if is_fpga(fabtech) = 0 and (r.e.mul = '0') then     -- power-save for mul
---    if (r.e.mul = '0') then
-        ex_mulop1 := (others => '0'); ex_mulop2 := (others => '0');
-    end if;
+--     if is_fpga(fabtech) = 0 and (r.e.mul = '0') then     -- power-save for mul
+-- --    if (r.e.mul = '0') then
+--         ex_mulop1 := (others => '0'); ex_mulop2 := (others => '0');
+--     end if;
 
 
     v.m.ctrl.annul := v.m.ctrl.annul or v.x.annul_all;
@@ -3758,11 +3622,8 @@ begin
     if ISETS > 1 then de_inst1 := r.d.inst(conv_integer(r.d.set));
     else de_inst1 := r.d.inst(0); end if;
 
-    de_nrexen := '0'; de_nbufpos16:="10"; de_ncnt16:="0"; de_rexhold:='0';
-    de_rexbubble := '0'; de_rexbaddr1:='0'; de_reximmexp:='0'; de_reximmval:=(others => '0');
-    de_rexmaskpv := '0'; de_rexillinst:='0'; de_rexnostep:='0';
-
     --de_inst := de_inst1;
+
     de_inst(7 downto 0) := de_inst1(31 downto 24);
     de_inst(15 downto 8) := de_inst1(23 downto 16);
     de_inst(23 downto 16) := de_inst1(15 downto 8);
@@ -3796,7 +3657,7 @@ begin
     v.a.rfa2 := de_raddr2(RFBITS-1 downto 0);
 
     -- Get rd and set write enable and other LEON3 signals
-    rd_gen(r, de_inst, v.a.ctrl.wreg, v.a.ctrl.ld, de_rd, de_rexen);
+    rd_gen(r, de_inst, v.a.ctrl.wreg, v.a.ctrl.ld, de_rd);
     regaddr(de_cwp, de_rd, r.d.stwin, r.d.cwpmax, v.a.ctrl.rd);
 
     -- No FP unit
@@ -3807,24 +3668,25 @@ begin
     v.a.imm := imm_data(r, de_inst);
     de_iperr := '0';
 
-    -- Generates control signals
+    -- Set locks, jumps, branches and other control signals
     lock_gen(r, de_rs2, de_rd, v.a.rfa1, v.a.rfa2, v.a.ctrl.rd, de_inst,
         fpo.ldlock, v.e.mul, ra_div, de_wcwp, v.a.ldcheck1, v.a.ldcheck2, de_ldlock,
         v.a.ldchkra, v.a.ldchkex, v.a.bp, v.a.nobp, de_fins_hold, de_iperr, ico.bpmiss);
 
-    -- Generates behavior of next cycle based on current instruction
-    ic_ctrl(r, de_inst, v.x.annul_all, de_ldlock, de_rexhold, de_rexbubble, de_rexmaskpv, de_rexillinst, branch_true(r.d.cnt, de_icc, de_inst),
+    ic_ctrl(r, de_inst, v.x.annul_all, de_ldlock, branch_true(r.d.cnt, de_icc, de_inst),
         de_fbranch, de_cbranch, fpo.ccv, cpo.ccv, v.d.cnt, v.d.pc, de_branch,
         v.a.ctrl.annul, v.d.annul, v.a.jmpl, de_inull, v.d.pv, v.a.ctrl.pv,
         de_hold_pc, v.a.ticc, v.a.ctrl.rett, v.a.mulstart, v.a.divstart,
         ra_bpmiss, ex_bpmiss, de_iperr, ico.bpmiss, ico.eocl);
+
     v.d.pcheld := de_hold_pc;
 
     --v.a.bp := v.a.bp and not v.a.ctrl.annul;
     --v.a.nobp := v.a.nobp and not v.a.ctrl.annul;
 
+
     v.a.ctrl.inst := de_inst;
-    v.a.decill := de_rexillinst or (de_rexen and r.w.s.rextrap);
+    v.a.decill := '0';
 
     cwp_gen(r, v, v.a.ctrl.annul, de_wcwp, de_cwp, v.d.cwp, v.d.awp, v.d.aw, v.d.paw, v.d.stwin, v.d.cwpmax);
 
@@ -3834,9 +3696,8 @@ begin
     op_find(r, v.a.ldchkra, v.a.ldchkex, v.a.rs1, v.a.rfa1,
             false, v.a.rfe1, v.a.rsel1, v.a.ldcheck1);
     op_find(r, v.a.ldchkra, v.a.ldchkex, de_rs2, v.a.rfa2,
-            imm_select(de_inst,(de_rexen and not r.w.s.rexdis)), v.a.rfe2, v.a.rsel2, v.a.ldcheck2);
+            imm_select(de_inst), v.a.rfe2, v.a.rsel2, v.a.ldcheck2);
 
-    -- May change this part for Branch prediction
     v.a.ctrl.wicc := v.a.ctrl.wicc and (not v.a.ctrl.annul);
     v.a.ctrl.wreg := v.a.ctrl.wreg and (not v.a.ctrl.annul);
     v.a.ctrl.rett := v.a.ctrl.rett and (not v.a.ctrl.annul);
@@ -3866,20 +3727,10 @@ begin
         de_raddr1(RFBITS-1 downto 0) := dbgi.daddr(RFBITS+1 downto 2); de_ren1 := '1';
         de_raddr2 := de_raddr1; de_ren2 := '1';
       end if;
-      v.d.step := dbgi.step and not r.d.annul and not de_rexnostep;
+      v.d.step := dbgi.step and not r.d.annul;
     end if;
 
-    if de_hold_pc='0' then
-      v.d.rexen := de_nrexen or de_rexen;
-      v.d.rexpos := de_nbufpos16;
-      v.d.rexcnt := de_ncnt16;
-    end if;
-    if (de_rexhold='1' and de_branch='0') then de_hold_pc:='1'; de_inull:='1'; end if;
-    if v.x.annul_all='1' then
-      v.d.rexen := '0';
-      v.d.rexpos := "10";
-    end if;
-
+    -- Register File signals
     rfi.wren <= (xc_wreg and holdn);
     rfi.raddr1 <= de_raddr1; rfi.raddr2 <= de_raddr2;
     rfi.ren1 <= de_ren1;
@@ -3892,8 +3743,6 @@ begin
     dbgo.bpmiss <= bpmiss and holdn;
     if (xc_rstn = '0') then
       v.d.cnt := (others => '0');
-      v.d.rexen := '0';
-      v.d.rexpos := "10";
       if need_extra_sync_reset(fabtech) /= 0 then
         v.d.cwp := (others => '0');
       end if;
@@ -3932,6 +3781,8 @@ begin
       npc := v.f.pc;
     elsif de_hold_pc = '1' then
       v.f.pc := r.f.pc; v.f.branch := r.f.branch;
+
+      -- branch prediction miss
     --   if bpmiss = '1' then
     --     v.f.pc := fe_npc; v.f.branch := '1';
     --     npc := v.f.pc;
@@ -3951,7 +3802,7 @@ begin
     --    v.a.bpimiss := ico.bpmiss and not r.d.annul;
     elsif de_branch = '1'
     then
-       v.f.pc := branch_address(de_inst, de_pcout(31 downto PCLOW), de_rexbaddr1, r.d.rexen); v.f.branch := '1';
+       v.f.pc := branch_address(de_inst, de_pcout(31 downto PCLOW)); v.f.branch := '1';
        npc := v.f.pc;
     else
       v.f.branch := '0'; v.f.pc := fe_npc; npc := v.f.pc;
@@ -3966,7 +3817,6 @@ begin
 
 
     if (ico.mds and de_hold_pc) = '0' then
-      v.d.rexbuf := de_inst1;
       for i in 0 to isets-1 loop
         v.d.inst(i) := ico.data(i);                     -- latch instruction
       end loop;
@@ -3975,11 +3825,6 @@ begin
 
     end if;
 
-    -- For pipelined REX implementation
-    --if REX/=0 and REXPIPE then
-    --  rex_pl_fetch(v.d,r.d,holdn,
-    --               v.d.rexpl);
-    --end if;
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
@@ -4044,16 +3889,13 @@ begin
     --   if (r.x.rstate = dsu2) then vfpi.flush := '1'; else vfpi.flush := v.x.annul_all and holdn; end if;
     --   vfpi.exack := xc_fpexack; vfpi.a_rs1 := r.a.rs1; vfpi.d.inst := de_inst;
     --   vfpi.d.cnt := r.d.cnt;
-    --   vfpi.d.annul := v.x.annul_all or de_bpannul or r.d.annul or de_fins_hold or (ico.bpmiss and not r.d.pcheld)
-    --     ;
-    --   if REX=1 then vfpi.d.annul := vfpi.d.annul or de_rexbubble; end if;
+    --   vfpi.d.annul := v.x.annul_all or de_bpannul or r.d.annul or de_fins_hold or (ico.bpmiss and not r.d.pcheld);
     --   vfpi.d.trap := r.d.mexc;
     --   vfpi.d.pc(1 downto 0) := (others => '0'); vfpi.d.pc(31 downto PCLOW) := r.d.pc(31 downto PCLOW);
     --   vfpi.d.pv := r.d.pv;
     --   vfpi.a.pc(1 downto 0) := (others => '0'); vfpi.a.pc(31 downto PCLOW) := r.a.ctrl.pc(31 downto PCLOW);
     --   vfpi.a.inst := r.a.ctrl.inst; vfpi.a.cnt := r.a.ctrl.cnt; vfpi.a.trap := r.a.ctrl.trap;
-    --   vfpi.a.annul := r.a.ctrl.annul or (ex_bpmiss and r.e.ctrl.inst(29))
-    --     ;
+    --   vfpi.a.annul := r.a.ctrl.annul or (ex_bpmiss and r.e.ctrl.inst(29));
     --   vfpi.a.pv := r.a.ctrl.pv;
     --   vfpi.e.pc(1 downto 0) := (others => '0'); vfpi.e.pc(31 downto PCLOW) := r.e.ctrl.pc(31 downto PCLOW);
     --   vfpi.e.inst := r.e.ctrl.inst; vfpi.e.cnt := r.e.ctrl.cnt; vfpi.e.trap := r.e.ctrl.trap; vfpi.e.annul := r.e.ctrl.annul;
@@ -4110,7 +3952,6 @@ begin
         if (holdn or ico.mds) = '0' then
           r.d.inst <= rin.d.inst; r.d.mexc <= rin.d.mexc;
           r.d.set <= rin.d.set;
-          r.d.rexpl <= rin.d.rexpl;
         end if;
         if (holdn or dco.mds) = '0' then
           r.x.data <= rin.x.data; r.x.mexc <= rin.x.mexc;
@@ -4140,20 +3981,12 @@ begin
           end if;
         end if;
       end if;
-      if REX=0 then
-        r.d.rexen <= RRES.d.rexen;
-        r.d.rexpos <= RRES.d.rexpos;
-        r.d.rexbuf <= RRES.d.rexbuf;
-        r.d.rexcnt <= RRES.d.rexcnt;
         r.a.getpc <= RRES.a.getpc;
         r.a.decill <= RRES.a.decill;
-        r.m.rexnalign <= RRES.m.rexnalign;
         r.a.ctrl.itovr <= RRES.a.ctrl.itovr;
         r.e.ctrl.itovr <= RRES.e.ctrl.itovr;
         r.m.ctrl.itovr <= RRES.m.ctrl.itovr;
         r.x.ctrl.itovr <= RRES.x.ctrl.itovr;
-      end if;
-      if not REXPIPE then r.d.rexpl <= RRES.d.rexpl; end if;
       if not AWPEN then
         r.w.s.aw <= RRES.w.s.aw;
         r.w.s.paw <= RRES.w.s.paw;
@@ -4269,8 +4102,6 @@ begin
       valid := (((not r.x.ctrl.annul) and (r.x.ctrl.pv or r.x.ctrl.itovr)) = '1') and (not ((fpins or fpld) and (r.x.ctrl.trap = '0')));
       valid := valid and (holdn = '1');
     pc := r.x.ctrl.pc(31 downto 2) & "00";
-    rexen:=false;
-    if rex=1 then pc(1):=r.x.ctrl.pc(2-1*REX); rexen:=(r.x.ctrl.pc(2-2*REX)='1'); end if;
     if (disas = 1) and rising_edge(clk) and (rstn = '1') then
       print_insn (index, pc, r.x.ctrl.inst,
                   rin.w.result, valid, r.x.ctrl.trap = '1', rin.w.wreg = '1',
