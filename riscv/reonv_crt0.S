@@ -1,12 +1,18 @@
+
+#define EX_STACK_SIZE 128
+
 .file "reonv_crt0.S"
 .extern _start
 .extern main
 .globl __reonv_startup
 .type "__reonv_startup",@function
 
-# Build minimal crt0 in future
-__reonv_startup:
-	# Clean registers and set stack (maybe will change this to boot code)
+/* Build minimal crt0 */
+
+reonv_reset_handler:
+	/* Have to configure CSRs in future */
+
+	/* Clean registers and set stack */
 	addi	x1,x0,0
 	addi	x2,x0,0
 	addi	x3,x0,0
@@ -40,16 +46,33 @@ __reonv_startup:
 	addi	x31,x0,0
 
 	li	sp,0x42000000
+
+	/* Call initialzation procedures */
+
+	/* Call main (or kernel in future) */
 	call 	main
 	jal 	__exit
 
-# Exit routine
+/* Exit routine */
 __exit:
 	ebreak
 
+__save_regs:
+
+
+__load_regs:
+
+
+__ex_handler:
+	addi	sp,sp,-EX_STACK_SIZE
+
+
+
+
+.org 0x100
 # Interruptions vector
 __interruption_vector:
-
+	ebreak
 
 
 

@@ -443,6 +443,23 @@ architecture rtl of iu3 is
     stwin  : cwptype;                   -- starting window
     cwpmax : cwptype;                   -- max cwp value
     ducnt  : std_ulogic;
+
+    -- RISC-V CSRs used by GNU/Linux    -- Encoding
+    status   : word                     -- 0
+    epc      : pctype;                  -- 1
+    badvaddr : word;                    -- 2
+    evec     : word := x"40000100";     -- 3
+    count    : word;                    -- 4
+    compare  : word;                    -- 5
+    cause    : word;                    -- 6
+    ptbr     : word;                    -- 7
+    k0       : word;                    -- 12
+    k1       : word;                    -- 13
+    tosim    : word;                    -- 26
+    fromsim  : word;                    -- 27
+    tohost   : word;                    -- 30
+    fromhost : word;                    -- 31
+
   end record;
 
   type write_reg_type is record
@@ -1581,6 +1598,8 @@ begin
           when  R_LUI | R_AUIPC | R_JAL | R_JALR | R_BRANCH | R_LD | R_ST | R_IMM
             | R_NOIMM =>
                 illegal_inst := '0';
+
+          when
           when others =>
                 illegal_inst := '1';
         end case;
