@@ -384,9 +384,13 @@ architecture rtl of iu3 is
     mul    : std_ulogic;
     casa   : std_ulogic;
     casaz  : std_ulogic;
-    rexnalign : std_ulogic;
+    rexalign : std_ulogic;
+    rexnalign :std_ulogic;
     itrhit : std_ulogic;
+
+    rs1     : word;         -- Used to pass rs1 to be used in sp_write
   end record;
+
 
   type exception_state is (run, trap, dsu1, dsu2);
 
@@ -410,6 +414,8 @@ architecture rtl of iu3 is
     nerror : std_ulogic;
     itrhit  : std_ulogic;
     asifilt : std_ulogic;
+
+    rs1     : word;         -- Used to pass rs1 to be used in sp_write
   end record;
 
   type dsu_registers is record
@@ -457,14 +463,33 @@ architecture rtl of iu3 is
     dwt    : std_ulogic;                           -- disable write error trap
     dbp    : std_ulogic;                           -- disable branch prediction
     dbprepl: std_ulogic;                -- Disable speculative Icache miss/replacement
-    rexdis : std_ulogic;                -- allow entering REX mode
-    rextrap: std_ulogic;                -- trap on saverex/addrex instructions
+
+    rexdis : std_ulogic;
+    rextrap : std_ulogic;
+
     aw     : std_ulogic;                -- use alternative window pointer
     paw    : std_ulogic;                -- previous aw (for trap handler)
     awp    : cwptype;                   -- alternative window pointer
     stwin  : cwptype;                   -- starting window
     cwpmax : cwptype;                   -- max cwp value
     ducnt  : std_ulogic;
+
+    -- RISC-V CSRs used by GNU/Linux    -- Encoding
+    status   : word;                    -- 0
+    epc      : pctype;                  -- 1
+    badvaddr : word;                    -- 2
+    evec     : word;                    -- 3
+    count    : word;                    -- 4
+    compare  : word;                    -- 5
+    cause    : word;                    -- 6
+    ptbr     : word;                    -- 7
+    k0       : word;                    -- 12
+    k1       : word;                    -- 13
+    tosim    : word;                    -- 26
+    fromsim  : word;                    -- 27
+    tohost   : word;                    -- 30
+    fromhost : word;                    -- 31
+
   end record;
 
   type write_reg_type is record
@@ -1232,7 +1257,10 @@ architecture rtl of iu3 is
     casa   => '0',
     casaz  => '0',
     rexnalign => '0',
-    itrhit => '1'
+    rexalign => '0',
+    itrhit => '1',
+
+    rs1 => (others => '0')
     );
   function xnpc_res return std_logic_vector is
   begin
@@ -1258,7 +1286,9 @@ architecture rtl of iu3 is
     debug     => '0',                   -- Has special handling
     nerror    => '0',
     itrhit    => '1',
-    asifilt   => '0'
+    asifilt   => '0',
+
+    rs1 => (others => '0')
     );
   constant DRES : dsu_registers := (
     tt      => (others => '0'),
@@ -1623,129 +1653,44 @@ procedure exception_detect(r : registers; wpr : watchpoint_registers; dbgi : l3_
         trap : out std_ulogic; tt : out std_logic_vector(5 downto 0)) is
 variable illegal_inst, privileged_inst : std_ulogic;
 variable cp_disabled, fp_disabled, fpop : std_ulogic;
-variable op : std_logic_vector(1 downto 0);
-variable op2 : std_logic_vector(2 downto 0);
-variable op3 : std_logic_vector(5 downto 0);
 variable rd  : std_logic_vector(4 downto 0);
 variable inst : word;
 variable wph : std_ulogic;
 begin
-  inst := r.a.ctrl.inst; trap := trapin; tt := ttin;
+    inst := r.a.ctrl.inst; trap := trapin; tt := ttin;
+    illegal_inst := '0';
 
-  if r.a.ctrl.annul = '0' then
-      case inst(6 downto 0) is
+    if r.a.ctrl.annul = '0' then
+        case inst(6 downto 0) is
           when  R_LUI | R_AUIPC | R_JAL | R_JALR | R_BRANCH | R_LD | R_ST | R_IMM
             | R_NOIMM =>
-                illegal_inst := '0';
+              illegal_inst := '0';
+
+          -- Must change for correctly treating ecall and ebreak.
+          -- For now, ebreak sends illega instruction
+          when R_CONTROL =>
+              if(inst(14 downto 12) = R_F3_ECALL) and (inst(20) = '1') then --ebreak
+                  illegal_inst := '1';
+              end if;
+
           when others =>
-                illegal_inst := '1';
+              illegal_inst := '1';
         end case;
 
-    --   if(inst(31 downto 0) = "00000000000100000000000001110011")then
-    --       illegal_inst := '1';
-    --   elsif(inst(31 downto 0) = "00000000000000000000000001110011")then
-    --       illegal_inst := '1';
-    --   else
-    --       illegal_inst := '0';
-    --   end if;
+        wph := wphit(r, wpr, dbgi, dsur, pccomp);
 
-
-
-  --   op  := inst(31 downto 30); op2 := inst(24 downto 22);
-  --   op3 := inst(24 downto 19); rd  := inst(29 downto 25);
-  --   illegal_inst := '0'; privileged_inst := '0'; cp_disabled := '0';
-  --   fp_disabled := '0'; fpop := '0';
-  --   case op is
-  --   when CALL => null;
-  --   when FMT2 =>
-  --     case op2 is
-  --     when SETHI | BICC => null;
-  --     when FBFCC =>
-  --       if FPEN then fp_disabled := not r.w.s.ef; else fp_disabled := '1'; end if;
-  --     when CBCCC =>
-  --       if (not CPEN) or (r.w.s.ec = '0') then cp_disabled := '1'; end if;
-  --     when others => illegal_inst := '1';
-  --     end case;
-  --   when FMT3 =>
-  --     case op3 is
-  --     when IAND | ANDCC | ANDN | ANDNCC | IOR | ORCC | ORN | ORNCC | IXOR |
-  --       XORCC | IXNOR | XNORCC | ISLL | ISRL | ISRA | MULSCC | IADD | ADDX |
-  --       ADDCC | ADDXCC | ISUB | SUBX | SUBCC | SUBXCC | FLUSH | JMPL | TICC |
-  --       SAVE | RESTORE | RDY => null;
-  --     when TADDCC | TADDCCTV | TSUBCC | TSUBCCTV =>
-  --       if notag = 1 then illegal_inst := '1'; end if;
-  --     when UMAC | SMAC =>
-  --       if not MACEN then illegal_inst := '1'; end if;
-  --     when UMUL | SMUL | UMULCC | SMULCC =>
-  --       if not MULEN then illegal_inst := '1'; end if;
-  --     when UDIV | SDIV | UDIVCC | SDIVCC =>
-  --       if not DIVEN then illegal_inst := '1'; end if;
-  --     when RETT => illegal_inst := r.a.et; privileged_inst := not r.a.su;
-  --     when RDPSR | RDTBR | RDWIM => privileged_inst := not r.a.su;
-  --     when WRY =>
-  --       if rd(4) = '1' and rd(3 downto 0) /= "0010" then -- %ASR16-17, %ASR19-31
-  --         privileged_inst := not r.a.su;
-  --       end if;
-  --     when WRPSR =>
-  --       privileged_inst := not r.a.su;
-  --     when WRWIM | WRTBR  => privileged_inst := not r.a.su;
-  --     when FPOP1 | FPOP2 =>
-  --       if FPEN then fp_disabled := not r.w.s.ef; fpop := '1';
-  --       else fp_disabled := '1'; fpop := '0'; end if;
-  --     when CPOP1 | CPOP2 =>
-  --       if (not CPEN) or (r.w.s.ec = '0') then cp_disabled := '1'; end if;
-  --     when others => illegal_inst := '1';
-  --     end case;
-  --   when others =>      -- LDST
-  --     case op3 is
-  --     when LDD | ISTD => illegal_inst := rd(0); -- trap if odd destination register
-  --     when LD | LDUB | LDSTUB | LDUH | LDSB | LDSH | ST | STB | STH | SWAP =>
-  --       null;
-  --     when LDDA | STDA =>
-  --       illegal_inst := inst(13) or rd(0);
-  --       if (npasi = 0) or (inst(12) = '0') then
-  --         privileged_inst := not r.a.su;
-  --       end if;
-  --     when LDA | LDUBA| LDSTUBA | LDUHA | LDSBA | LDSHA | STA | STBA | STHA |
-  --          SWAPA =>
-  --       illegal_inst := inst(13);
-  --       if (npasi = 0) or (inst(12) = '0') then
-  --         privileged_inst := not r.a.su;
-  --       end if;
-  --     when CASA =>
-  --       if CASAEN then
-  --         illegal_inst := inst(13);
-  --         if (inst(12 downto 5) /= X"0A") then privileged_inst := not r.a.su; end if;
-  --       else illegal_inst := '1'; end if;
-  --     when LDDF | STDF | LDF | LDFSR | STF | STFSR =>
-  --       if FPEN then fp_disabled := not r.w.s.ef;
-  --       else fp_disabled := '1'; end if;
-  --     when STDFQ =>
-  --       privileged_inst := not r.a.su;
-  --       if (not FPEN) or (r.w.s.ef = '0') then fp_disabled := '1'; end if;
-  --     when STDCQ =>
-  --       privileged_inst := not r.a.su;
-  --       if (not CPEN) or (r.w.s.ec = '0') then cp_disabled := '1'; end if;
-  --     when LDC | LDCSR | LDDC | STC | STCSR | STDC =>
-  --       if (not CPEN) or (r.w.s.ec = '0') then cp_disabled := '1'; end if;
-  --     when others => illegal_inst := '1';
-  --     end case;
-  --   end case;
-
-    wph := wphit(r, wpr, dbgi, dsur, pccomp);
-
-    trap := '1';
-    if r.a.ctrl.trap = '1' then tt := r.a.ctrl.tt;
-    elsif privileged_inst = '1' then tt := TT_PRIV;
-    elsif illegal_inst = '1' or r.a.decill = '1' then tt := TT_IINST;
-    elsif fp_disabled = '1' then tt := TT_FPDIS;
-    elsif cp_disabled = '1' then tt := TT_CPDIS;
-    elsif wph = '1' then tt := TT_WATCH;
-    elsif r.a.wovf= '1' then tt := TT_WINOF;
-    elsif r.a.wunf= '1' then tt := TT_WINUF;
-    elsif r.a.ticc= '1' then tt := TT_TICC;
-    else trap := '0'; tt:= (others => '0'); end if;
-  end if;
+        trap := '1';
+        if r.a.ctrl.trap = '1' then tt := r.a.ctrl.tt;
+        elsif privileged_inst = '1' then tt := TT_PRIV;
+        elsif illegal_inst = '1' or r.a.decill = '1' then tt := TT_IINST;
+        elsif fp_disabled = '1' then tt := TT_FPDIS;
+        elsif cp_disabled = '1' then tt := TT_CPDIS;
+        elsif wph = '1' then tt := TT_WATCH;
+        elsif r.a.wovf= '1' then tt := TT_WINOF;
+        elsif r.a.wunf= '1' then tt := TT_WINUF;
+        elsif r.a.ticc= '1' then tt := TT_TICC;
+        else trap := '0'; tt:= (others => '0'); end if;
+    end if;
 end;
 
 -- instructions that write the condition codes (psr.icc)
@@ -2207,23 +2152,60 @@ end;
   end;
 
 -- read special registers
-  function get_spr (r : registers; xc_wimmask: std_logic_vector) return word is
-  variable spr : word;
-  begin
+function get_spr (r : registers) return word is
+variable spr : word;
+begin
     spr := (others => '0');
-      case r.e.ctrl.inst(24 downto 19) is
-      when RDPSR => spr(31 downto 5) := conv_std_logic_vector(IMPL,4) &
-        conv_std_logic_vector(VER,4) & r.m.icc & "000000" & r.w.s.ec & r.w.s.ef &
-        r.w.s.pil & r.e.su & r.w.s.ps & r.e.et;
-        spr(NWINLOG2-1 downto 0) := r.e.cwp;
-        if AWPEN then spr(15 downto 14) := r.e.aw & r.e.paw; end if;
-      when RDTBR => spr(31 downto 4) := r.w.s.tba & r.w.s.tt;
-      when RDWIM => spr(NWIN-1 downto 0) := r.w.s.wim;
-                    if RFPART then spr(NWIN-1 downto 0) := r.w.s.wim and not xc_wimmask; end if;
-      when others =>
-      end case;
+    -- Select special registers to be read
+    -- RISC-V CSRs used by GNU/Linux    -- Encoding
+    -- status                                 00
+    -- epc                                    01
+    -- badvaddr                               02
+    -- evec                                   03
+    -- count                                  04
+    -- compare                                05
+    -- cause                                  06
+    -- ptbr                                   07
+    -- k0                                     12
+    -- k1                                     13
+    -- tosim                                  26
+    -- fromsim                                27
+    -- tohost                                 30
+    -- fromhost                               31
+    case r.e.ctrl.inst(31 downto 20) is
+        when x"000" =>
+            spr := r.w.s.status;
+        when x"001" =>
+            spr := r.w.s.epc & "00";
+        when x"002" =>
+            spr := r.w.s.badvaddr;
+        when x"003" =>
+            spr := r.w.s.evec;
+        when x"004" =>
+            spr := r.w.s.count;
+        when x"005" =>
+            spr := r.w.s.compare;
+        when x"006" =>
+            spr := r.w.s.cause;
+        when x"007" =>
+            spr := r.w.s.ptbr;
+        when x"00C" =>
+            spr := r.w.s.k0;
+        when x"00D" =>
+            spr := r.w.s.k1;
+        when x"01A" =>
+            spr := r.w.s.tosim;
+        when x"01B" =>
+            spr := r.w.s.fromsim;
+        when x"01E" =>
+            spr := r.w.s.tohost;
+        when x"01F" =>
+            spr := r.w.s.fromhost;
+        when others => null;
+    end case;
+
     return(spr);
-  end;
+end;
 
 -- immediate data select
 
@@ -2359,6 +2341,10 @@ end;
                     end case;
                 when others => null;
             end case;
+        when R_CONTROL =>
+            if not(f3 = R_F3_ECALL) and not(rd = "00000") then
+                aluop := EXE_SPR;
+            end if;
         when others => null;
     end case;
   end;
@@ -2554,7 +2540,7 @@ end;
         end if;
       end if;
     when EXE_SPR  =>
-      miscout := get_spr(r, xc_wimmask);
+      miscout := get_spr(r);
     when others => null;
     end case;
     mout := miscout;
@@ -2913,152 +2899,123 @@ end;
 
 -- write special registers
 
-  procedure sp_write (r : registers; wpr : watchpoint_registers;
-        s : out special_register_type; vwpr : out watchpoint_registers) is
-  variable op : std_logic_vector(1 downto 0);
-  variable op2 : std_logic_vector(2 downto 0);
-  variable op3 : std_logic_vector(5 downto 0);
-  variable rd  : std_logic_vector(4 downto 0);
-  variable i   : integer range 0 to 3;
-  begin
+procedure sp_write (r : registers; wpr : watchpoint_registers;
+      s : out special_register_type; vwpr : out watchpoint_registers) is
+variable op : std_logic_vector(6 downto 0);
+variable f3 : std_logic_vector(2 downto 0);
+variable rd : std_logic_vector(4 downto 0);
+variable data : word;
+variable rs1 : word;
+variable csr : std_logic_vector(11 downto 0);
+variable enable : std_logic;
+variable old_value : word;
 
-    op  := r.x.ctrl.inst(31 downto 30);
-    op2 := r.x.ctrl.inst(24 downto 22);
-    op3 := r.x.ctrl.inst(24 downto 19);
-    s   := r.w.s;
-    rd  := r.x.ctrl.inst(29 downto 25);
-    vwpr := wpr;
+begin
 
-    if AWPEN then
-      if r.w.s.aw='0' and r.w.s.paw='0' then
-        s.awp := r.w.s.cwp;
-      end if;
-    end if;
+  op  := r.x.ctrl.inst(6 downto 0);
+  f3  := r.x.ctrl.inst(14 downto 12);
+  s   := r.w.s;
+  data := r.x.rs1;
+  rs1 := (others => '0'); rs1(4 downto 0) := r.x.ctrl.inst(19 downto 15);
+  rd  := r.x.ctrl.inst(11 downto 7);
+  csr := r.x.ctrl.inst(31 downto 20);
+  old_value := get_spr(r);
+  enable := '0';
+  vwpr := wpr;
 
-      case op is
-      when FMT3 =>
-        case op3 is
-        when WRY =>
-          if rd = "00000" then
-            s.y := r.x.result;
-          elsif MACEN and (rd = "10010") then
-            s.asr18 := r.x.result;
-          elsif (rd = "10001") then
-            if bp = 2 then s.dbp := r.x.result(27); end if;
-            if bp = 2 then s.dbprepl := r.x.result(25); end if;
-            s.dwt := r.x.result(14);
-            if (svt = 1) then s.svt := r.x.result(13); end if;
-            if rex=1 then
-              s.rexdis:=r.x.result(22);
-              s.rextrap:=r.x.result(21);
-            end if;
-          elsif (AWPEN or RFPART) and rd="10100" then  -- %ASR20
-            if AWPEN then
-              s.awp := r.x.result(NWINLOG2-1 downto 0);
-              if r.x.result(5)='1' then
-                s.cwp := r.x.result(NWINLOG2-1 downto 0);
+  -- if AWPEN then
+  --   if r.w.s.aw='0' and r.w.s.paw='0' then
+  --     s.awp := r.w.s.cwp;
+  --   end if;
+  -- end if;
+
+
+  -- RISC-V CSRs used by GNU/Linux    -- Encoding
+  -- status                                 00
+  -- epc                                    01
+  -- badvaddr                               02
+  -- evec                                   03
+  -- count                                  04
+  -- compare                                05
+  -- cause                                  06
+  -- ptbr                                   07
+  -- k0                                     12
+  -- k1                                     13
+  -- tosim                                  26
+  -- fromsim                                27
+  -- tohost                                 30
+  -- fromhost                               31
+
+  -- Check if we should try to write the special register
+  if(op = R_CONTROL) then
+      enable := '1';
+      case f3 is
+          when R_F3_CSRRW =>
+
+          when R_F3_CSRRWI =>
+              data := rs1;
+
+          when R_F3_CSRRC =>
+              if(rs1(4 downto 0) = "00000") then
+                  enable := '0';
+              else
+                  data := old_value and (not data);
               end if;
-            end if;
-            if RFPART then
-              if r.x.result(15+NWINLOG2 downto 16)/=CWPMIN then
-                s.stwin := r.x.result(20+NWINLOG2 downto 21);
-                s.cwpmax := r.x.result(15+NWINLOG2 downto 16);
+          when R_F3_CSRRCI =>
+              if(rs1(4 downto 0) = "00000") then
+                  enable := '0';
+              else
+                  data := old_value and (not rs1);
               end if;
-            end if;
-          elsif rd = "10110" then  -- ASR22
-            s.ducnt := r.x.result(31);
-          elsif rd(4 downto 3) = "11" then -- %ASR24 - %ASR31
-            case rd(2 downto 0) is
-            when "000" =>
-              vwpr(0).addr := r.x.result(31 downto 2);
-              vwpr(0).exec := r.x.result(0);
-            when "001" =>
-              vwpr(0).mask := r.x.result(31 downto 2);
-              vwpr(0).load := r.x.result(1);
-              vwpr(0).store := r.x.result(0);
-            when "010" =>
-              vwpr(1).addr := r.x.result(31 downto 2);
-              vwpr(1).exec := r.x.result(0);
-            when "011" =>
-              vwpr(1).mask := r.x.result(31 downto 2);
-              vwpr(1).load := r.x.result(1);
-              vwpr(1).store := r.x.result(0);
-            when "100" =>
-              vwpr(2).addr := r.x.result(31 downto 2);
-              vwpr(2).exec := r.x.result(0);
-            when "101" =>
-              vwpr(2).mask := r.x.result(31 downto 2);
-              vwpr(2).load := r.x.result(1);
-              vwpr(2).store := r.x.result(0);
-            when "110" =>
-              vwpr(3).addr := r.x.result(31 downto 2);
-              vwpr(3).exec := r.x.result(0);
-            when others =>   -- "111"
-              vwpr(3).mask := r.x.result(31 downto 2);
-              vwpr(3).load := r.x.result(1);
-              vwpr(3).store := r.x.result(0);
-            end case;
-          end if;
-        when WRPSR =>
-          if pwrpsr = 0 or rd = "00000" then
-            s.cwp := r.x.result(NWINLOG2-1 downto 0);
-            s.icc := r.x.result(23 downto 20);
-            s.ec  := r.x.result(13);
-            if FPEN then s.ef  := r.x.result(12); end if;
-            s.pil := r.x.result(11 downto 8);
-            s.s   := r.x.result(7);
-            s.ps  := r.x.result(6);
-            if AWPEN then
-              s.aw := r.x.result(15);
-              s.paw := r.x.result(14);
-            end if;
-          end if;
-          s.et  := r.x.result(5);
-        when WRWIM =>
-          s.wim := r.x.result(NWIN-1 downto 0);
-        when WRTBR =>
-          s.tba := r.x.result(31 downto 12);
-        when SAVE =>
-          if (not AWPEN) or r.w.s.aw='0' then
-            if RFPART and (r.w.s.cwp=CWPMIN) then s.cwp := r.w.s.cwpmax;
-            elsif (not CWPOPT) and (r.w.s.cwp = CWPMIN) then s.cwp := CWPMAX;
-            else s.cwp := r.w.s.cwp - 1 ; end if;
-          end if;
-          if AWPEN and r.w.s.aw='1' then
-            if RFPART and (r.w.s.awp=CWPMIN) then s.awp := r.w.s.cwpmax;
-            elsif (not CWPOPT) and (r.w.s.awp = CWPMIN) then s.awp := CWPMAX;
-            else s.awp := r.w.s.awp - 1 ; end if;
-          end if;
-        when RESTORE =>
-          if (not AWPEN) or r.w.s.aw='0' then
-            if RFPART and (r.w.s.cwp=r.w.s.cwpmax) then s.cwp := CWPMIN;
-            elsif (not CWPOPT) and (r.w.s.cwp = CWPMAX) then s.cwp := CWPMIN;
-            else s.cwp := r.w.s.cwp + 1; end if;
-          end if;
-          if AWPEN and r.w.s.aw='1' then
-            if RFPART and (r.w.s.awp=r.w.s.cwpmax) then s.awp := CWPMIN;
-            elsif (not CWPOPT) and (r.w.s.awp = CWPMAX) then s.awp := CWPMIN;
-            else s.awp := r.w.s.awp + 1; end if;
-          end if;
-        when RETT =>
-          if ((not CWPOPT) and (r.w.s.cwp = CWPMAX)) or (RFPART and (r.w.s.cwp=r.w.s.cwpmax)) then s.cwp := CWPMIN;
-          else s.cwp := r.w.s.cwp + 1; end if;
-          s.s := r.w.s.ps;
-          s.et := '1';
-          if AWPEN then
-            s.aw := r.w.s.paw;
-          end if;
-        when others => null;
-        end case;
-      when others => null;
+          when R_F3_CSRRS =>
+              if(rs1(4 downto 0) = "00000") then
+                  enable := '0';
+              else
+                  data := data or old_value;
+              end if;
+          when R_F3_CSRRSI =>
+              if(rs1(4 downto 0) = "00000") then
+                  enable := '0';
+              else
+                  data := rs1 or old_value;
+              end if;
+          -- ecall and ebreak
+          when others => enable := '0';
       end case;
-      if r.x.ctrl.wicc = '1' then s.icc := r.x.icc; end if;
-      if r.x.ctrl.wy = '1' then s.y := r.x.y; end if;
-      if MACPIPE and (r.x.mac = '1') then
-        s.asr18 := mulo.result(31 downto 0);
-        s.y := mulo.result(63 downto 32);
-      end if;
-  end;
+  end if;
+
+  -- Must add exception check for this
+
+  -- Updates special register
+  if(enable = '1') then
+      case csr is
+          when x"000" => s.status := data;
+          when x"001" => s.epc := data(31 downto 2);
+          when x"002" => s.badvaddr := data;
+          when x"003" => s.evec := data;
+          when x"004" => s.count := data;
+          when x"005" => s.compare := data;
+          when x"006" => s.cause := data;
+          when x"007" => s.ptbr := data;
+          when x"00C" => s.k0 := data;
+          when x"00D" => s.k1 := data;
+          when x"01A" => s.tosim := data;
+          when x"01B" => s.fromsim := data;
+          when x"01E" => s.tohost := data;
+          when x"01F" => s.fromhost := data;
+          when others => null;
+      end case;
+  end if;
+  -- Conditional branches are evaluated using this icc
+  if r.x.ctrl.wicc = '1' then s.icc := r.x.icc; end if;
+
+  -- Mult signals
+  --if r.x.ctrl.wy = '1' then s.y := r.x.y; end if;
+  --if MACPIPE and (r.x.mac = '1') then
+  --s.asr18 := mulo.result(31 downto 0);
+  --s.y := mulo.result(63 downto 32);
+  --end if;
+end;
 
   function npc_find (r : registers) return std_logic_vector is
   variable npc : std_logic_vector(2 downto 0);
@@ -3539,6 +3496,7 @@ begin
     v.x.ctrl.rett := r.m.ctrl.rett and not r.m.ctrl.annul;
     v.x.mac := r.m.mac; v.x.laddr := r.m.result(1 downto 0);
     v.x.ctrl.annul := r.m.ctrl.annul or v.x.annul_all;
+    v.x.rs1 := r.m.rs1;
     st := '0';
 
     -- if CASAEN and (r.m.casa = '1') and (r.m.ctrl.cnt = "00") then
@@ -3673,6 +3631,8 @@ begin
         ex_misc_res, ex_result, me_icc, v.m.icc, v.m.divz, v.m.casaz);
     dbg_cache(holdn, dbgi, r, dsur, ex_result, ex_dci, ex_result2, v.m.dci);
     fpstdata(r, ex_edata, ex_result2, fpo.data, ex_edata2, ex_result3);
+
+    v.m.rs1 := ex_op1;
     v.m.result := ex_result3;
     cwp_ex(r, v.m.wcwp, v.m.wawp);
 
