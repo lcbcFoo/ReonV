@@ -33,7 +33,7 @@ LD_SCRIPT=ld_script
 #
 #####################################################################
 # Compiled binary linked with reonv_crt0
-%.out : %.c
+%.out : %.c reonv_crt0.o
 	${CROSS}${CC} -static -T${LD_SCRIPT} $< -o $@
 
 # Targets for .S. 

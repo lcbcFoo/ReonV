@@ -1357,7 +1357,7 @@ architecture rtl of iu3 is
     s.paw    := '0';
     s.awp    := (others => '0');
     s.stwin  := (others => '0');
-    s.cwpmax := CWPMAX;
+    s.cwpmax := "000";
     s.ducnt  := '1';
     return s;
   end function special_register_res;
@@ -1466,21 +1466,21 @@ architecture rtl of iu3 is
   begin
     vcwp := cwp;
     ra := (others => '0'); ra(4 downto 0) := reg;
-    if RFPART then
-      if ra(4)='0' and cwp=CWPMIN then
-        ra(4):='1';
-        vcwp := std_logic_vector(unsigned(de_cwpmax) + unsigned(stwin));
-      else
-        vcwp := std_logic_vector(unsigned(cwp) + unsigned(stwin));
-      end if;
-    end if;
-    if reg(4 downto 3) = "00" then ra(RFBITS -1 downto 4) := globals;
-    else
-      ra(NWINLOG2+3 downto 4) := vcwp + ra(4);
-      if ra(RFBITS-1 downto 4) = globals then
-        ra(RFBITS-1 downto 4) := (others => '0');
-      end if;
-    end if;
+    -- if RFPART then
+    --   if ra(4)='0' and cwp=CWPMIN then
+    --     ra(4):='1';
+    --     vcwp := std_logic_vector(unsigned(de_cwpmax) + unsigned(stwin));
+    --   else
+    --     vcwp := std_logic_vector(unsigned(cwp) + unsigned(stwin));
+    --   end if;
+    -- end if;
+    -- if reg(4 downto 3) = "00" then ra(RFBITS -1 downto 4) := globals;
+    -- else
+    --   ra(NWINLOG2+3 downto 4) := vcwp + ra(4);
+    --   if ra(RFBITS-1 downto 4) = globals then
+    --     ra(RFBITS-1 downto 4) := (others => '0');
+    --   end if;
+    -- end if;
     rao := ra;
   end;
 
@@ -1671,8 +1671,10 @@ begin
           when R_CONTROL =>
               if(inst(14 downto 12) = R_F3_ECALL) and (inst(20) = '1') then --ebreak
                   illegal_inst := '1';
-              end if;
 
+              elsif(inst(14 downto 12) = R_F3_ECALL) then -- ecall
+                  privileged_inst := '1';
+              end if;
           when others =>
               illegal_inst := '1';
         end case;
@@ -1708,41 +1710,48 @@ end;
 procedure cwp_gen(r, v : registers; annul, wcwp : std_ulogic; ncwp : cwptype;
                   cwp : out cwptype; awp: out cwptype; aw,paw: out std_ulogic;
                   stwin,de_cwpmax: out cwptype) is
-begin
-  if (r.x.rstate = trap) or
-      (r.x.rstate = dsu2)
-     or (rstn = '0') then cwp := v.w.s.cwp;
-  elsif (wcwp = '1') and (annul = '0') and ((not AWPEN) or r.d.aw='0') then cwp := ncwp;
-  elsif r.m.wcwp = '1' then cwp := r.m.result(NWINLOG2-1 downto 0);
-  else cwp := r.d.cwp; end if;
+ begin
+--   if (r.x.rstate = trap) or
+--       (r.x.rstate = dsu2)
+--      or (rstn = '0') then cwp := v.w.s.cwp;
+--   elsif (wcwp = '1') and (annul = '0') and ((not AWPEN) or r.d.aw='0') then cwp := ncwp;
+--   elsif r.m.wcwp = '1' then cwp := r.m.result(NWINLOG2-1 downto 0);
+--   else cwp := r.d.cwp; end if;
+--
+--   if AWPEN and ((r.x.rstate = trap) or
+--       (r.x.rstate = dsu2)
+--      or (rstn = '0')) then awp := v.w.s.awp;
+--   elsif AWPEN and r.d.aw='1' and (wcwp = '1') and (annul = '0') then awp := ncwp;
+--   elsif AWPEN and r.m.wawp = '1' then awp := r.m.result(NWINLOG2-1 downto 0);
+--   elsif AWPEN and (r.d.aw='0' and r.d.paw='0') then awp := r.d.cwp;
+--   else awp := r.d.awp; end if;
+--
+--   if AWPEN and (
+--     (r.x.rstate = trap) or
+--       (r.x.rstate = dsu2)
+--      or (rstn = '0') ) then aw := v.w.s.aw; paw := v.w.s.paw;
+--   elsif AWPEN and (v.a.ctrl.rett='1') then
+--     aw := r.d.paw; paw := r.d.paw;
+--   elsif AWPEN and r.m.wcwp='1' then aw:=r.m.result(15); paw:=r.m.result(14);
+--   else aw:=r.d.aw; paw:=r.d.paw; end if;
+--
+--   if RFPART and (
+--     (r.x.rstate = trap) or
+--       (r.x.rstate = dsu2)
+--      or (rstn = '0') ) then
+--     stwin := v.w.s.stwin; de_cwpmax:=v.w.s.cwpmax;
+--   elsif RFPART and r.m.wawp='1' and r.m.result(15+NWINLOG2 downto 16)/=CWPMIN then
+--     stwin:=r.m.result(20+NWINLOG2 downto 21); de_cwpmax:=r.m.result(15+NWINLOG2 downto 16);
+--   else
+--     stwin := r.d.stwin; de_cwpmax:=r.d.cwpmax;
+--   end if;
 
-  if AWPEN and ((r.x.rstate = trap) or
-      (r.x.rstate = dsu2)
-     or (rstn = '0')) then awp := v.w.s.awp;
-  elsif AWPEN and r.d.aw='1' and (wcwp = '1') and (annul = '0') then awp := ncwp;
-  elsif AWPEN and r.m.wawp = '1' then awp := r.m.result(NWINLOG2-1 downto 0);
-  elsif AWPEN and (r.d.aw='0' and r.d.paw='0') then awp := r.d.cwp;
-  else awp := r.d.awp; end if;
-
-  if AWPEN and (
-    (r.x.rstate = trap) or
-      (r.x.rstate = dsu2)
-     or (rstn = '0') ) then aw := v.w.s.aw; paw := v.w.s.paw;
-  elsif AWPEN and (v.a.ctrl.rett='1') then
-    aw := r.d.paw; paw := r.d.paw;
-  elsif AWPEN and r.m.wcwp='1' then aw:=r.m.result(15); paw:=r.m.result(14);
-  else aw:=r.d.aw; paw:=r.d.paw; end if;
-
-  if RFPART and (
-    (r.x.rstate = trap) or
-      (r.x.rstate = dsu2)
-     or (rstn = '0') ) then
-    stwin := v.w.s.stwin; de_cwpmax:=v.w.s.cwpmax;
-  elsif RFPART and r.m.wawp='1' and r.m.result(15+NWINLOG2 downto 16)/=CWPMIN then
-    stwin:=r.m.result(20+NWINLOG2 downto 21); de_cwpmax:=r.m.result(15+NWINLOG2 downto 16);
-  else
-    stwin := r.d.stwin; de_cwpmax:=r.d.cwpmax;
-  end if;
+    cwp := "000";
+    aw := '0';
+    paw := '0';
+    awp := "000";
+    stwin := "000";
+    de_cwpmax := "000";
 end;
 
 -- generate wcwp in ex stage
@@ -1751,21 +1760,21 @@ procedure cwp_ex(r : in  registers; wcwp : out std_ulogic; wawp : out std_ulogic
   variable vwcwp, vwawp: std_ulogic;
 begin
   vwcwp := '0'; vwawp := '0';
-  if (r.e.ctrl.inst(31 downto 30) = FMT3) and
-     (r.e.ctrl.inst(24 downto 19) = WRPSR) and
-     (pwrpsr=0 or r.e.ctrl.inst(29 downto 25)="00000")
-  then vwcwp := not r.e.ctrl.annul; else vwcwp := '0'; end if;
-  if AWPEN and
-    (r.e.ctrl.inst(31 downto 30) = FMT3) and
-    (r.e.ctrl.inst(24 downto 19) = WRY) and
-    (r.e.ctrl.inst(29 downto 25) = "10100")
-  then
-    vwawp := not r.e.ctrl.annul;
-    vwcwp := vwcwp or (r.e.op1(5) and not r.e.ctrl.annul);
-  else vwawp := '0';
-  end if;
-  wcwp := vwcwp;
-  wawp := vwawp;
+  -- if (r.e.ctrl.inst(31 downto 30) = FMT3) and
+  --    (r.e.ctrl.inst(24 downto 19) = WRPSR) and
+  --    (pwrpsr=0 or r.e.ctrl.inst(29 downto 25)="00000")
+  -- then vwcwp := not r.e.ctrl.annul; else vwcwp := '0'; end if;
+  -- if AWPEN and
+  --   (r.e.ctrl.inst(31 downto 30) = FMT3) and
+  --   (r.e.ctrl.inst(24 downto 19) = WRY) and
+  --   (r.e.ctrl.inst(29 downto 25) = "10100")
+  -- then
+  --   vwawp := not r.e.ctrl.annul;
+  --   vwcwp := vwcwp or (r.e.op1(5) and not r.e.ctrl.annul);
+  -- else vwawp := '0';
+  -- end if;
+  -- wcwp := vwcwp;
+  -- wawp := vwawp;
 end;
 
 -- generate next cwp & window under- and overflow traps
@@ -1780,22 +1789,22 @@ begin
   op := inst(31 downto 30); op3 := inst(24 downto 19);
   wovf_exc := '0'; wunf_exc := '0'; wim := (others => '0');
   wim(NWIN-1 downto 0) := xc_wim; wcwp := '0';
-  ncwp := rcwp;
-  if (op = FMT3) and ((op3 = RETT) or (op3 = RESTORE) or (op3 = SAVE)) then
-    wcwp := '1';
-    if (op3 = SAVE) then
-      if RFPART and (rcwp=CWPMIN) then ncwp := r.w.s.cwpmax;
-      elsif (not CWPOPT) and (rcwp = CWPMIN) then ncwp := CWPMAX;
-      else ncwp := rcwp - 1 ; end if;
-    else
-      if RFPART and (rcwp = r.w.s.cwpmax) then ncwp := CWPMIN;
-      elsif (not CWPOPT) and (rcwp = CWPMAX) then ncwp := CWPMIN;
-      else ncwp := rcwp + 1; end if;
-    end if;
-    if wim(conv_integer(ncwp)) = '1' then
-      if op3 = SAVE then wovf_exc := '1'; else wunf_exc := '1'; end if;
-    end if;
-  end if;
+  ncwp := "000";
+  -- if (op = FMT3) and ((op3 = RETT) or (op3 = RESTORE) or (op3 = SAVE)) then
+  --   wcwp := '1';
+  --   if (op3 = SAVE) then
+  --     if RFPART and (rcwp=CWPMIN) then ncwp := r.w.s.cwpmax;
+  --     elsif (not CWPOPT) and (rcwp = CWPMIN) then ncwp := CWPMAX;
+  --     else ncwp := rcwp - 1 ; end if;
+  --   else
+  --     if RFPART and (rcwp = r.w.s.cwpmax) then ncwp := CWPMIN;
+  --     elsif (not CWPOPT) and (rcwp = CWPMAX) then ncwp := CWPMIN;
+  --     else ncwp := rcwp + 1; end if;
+  --   end if;
+  --   if wim(conv_integer(ncwp)) = '1' then
+  --     if op3 = SAVE then wovf_exc := '1'; else wunf_exc := '1'; end if;
+  --   end if;
+  -- end if;
   de_cwp := ncwp;
 end;
 
@@ -1936,7 +1945,7 @@ end;
 
     de_fins_holdx := BPRED and fins and (r.a.bp or r.e.bp); -- skip BP on FPU inst in branch target address
     de_fins_hold := de_fins_holdx;
-    ldlock := ldlock or y_hold or fpc_lock or (BPRED and r.a.bp and de_wcwp) or de_fins_holdx;
+    ldlock := ldlock or y_hold or fpc_lock or (BPRED and r.a.bp) or de_fins_holdx;
     if ((icc_check_bp and BPRED) = '1') and ((r.a.nobp or mul_hold) = '0') then
       bp := bicc_hold_bp;
     else ldlock := ldlock or bicc_hold or bicc_hold_bp; end if;
@@ -3246,12 +3255,13 @@ begin
       xc_vectt := '1' & r.x.result(6 downto 0);
     else xc_vectt := "00" & r.x.ctrl.tt; end if;
 
-    if r.w.s.svt = '0' then
-      xc_trap_address(31 downto 2) := r.w.s.tba & xc_vectt & "00";
-    else
-      xc_trap_address(31 downto 2) := r.w.s.tba & "00000000" & "00";
-    end if;
-    xc_trap_address(2 downto PCLOW) := (others => '0');
+    -- if r.w.s.svt = '0' then
+    --   xc_trap_address(31 downto 2) := r.w.s.tba & xc_vectt & "00";
+    -- else
+    --   --xc_trap_address(31 downto 2) := r.w.s.tba & "00000000" & "00";
+    -- end if;
+    xc_trap_address := r.w.s.evec(31 downto 2);
+
     xc_wreg := '0'; v.x.annul_all := '0';
 
     if (not r.x.ctrl.annul and r.x.ctrl.ld) = '1' then
@@ -3273,13 +3283,13 @@ begin
     end if;
 
     xc_trapcwp := r.w.s.cwp;
-    if RFPART then
-      if r.w.s.cwp=CWPMIN then
-        xc_trapcwp := r.w.twcwp;
-      else
-        xc_trapcwp := std_logic_vector(unsigned(r.w.s.stwin) + unsigned(r.w.s.cwp));
-      end if;
-    end if;
+    -- if RFPART then
+    --   if r.w.s.cwp=CWPMIN then
+    --     xc_trapcwp := r.w.twcwp;
+    --   else
+    --     xc_trapcwp := std_logic_vector(unsigned(r.w.s.stwin) + unsigned(r.w.s.cwp));
+    --   end if;
+    -- end if;
 
 
     if DBGUNIT
@@ -3332,13 +3342,14 @@ begin
       xc_waddr(NWINLOG2 + 3  downto 0) :=  xc_trapcwp & "0010";
       if r.w.s.et = '1' then
         v.w.s.et := '0'; v.x.rstate := run;
-        if RFPART and (r.w.s.cwp = CWPMIN) then v.w.s.cwp := r.w.s.cwpmax;
-        elsif (not CWPOPT) and (r.w.s.cwp = CWPMIN) then v.w.s.cwp := CWPMAX;
-        else v.w.s.cwp := r.w.s.cwp - 1 ; end if;
-        if AWPEN then
-          v.w.s.aw := '0';
-          v.w.s.paw := r.w.s.aw;
-        end if;
+        -- change cwp
+        -- if RFPART and (r.w.s.cwp = CWPMIN) then v.w.s.cwp := r.w.s.cwpmax;
+        -- elsif (not CWPOPT) and (r.w.s.cwp = CWPMIN) then v.w.s.cwp := CWPMAX;
+        -- else v.w.s.cwp := r.w.s.cwp - 1 ; end if;
+        -- if AWPEN then
+        --   v.w.s.aw := '0';
+        --   v.w.s.paw := r.w.s.aw;
+        -- end if;
       else
         xc_inull := '1';
         v.x.rstate := dsu1; xc_wreg := '0'; vp.error := '1';
@@ -3429,10 +3440,10 @@ begin
     if (r.x.rstate = dsu2) then v.w.except := '0'; end if;
     v.w.wa := xc_waddr(RFBITS-1 downto 0); v.w.wreg := xc_wreg and holdn;
 
-    if RFPART then
-      v.w.twcwp := std_logic_vector(unsigned(v.w.s.stwin) + unsigned(v.w.s.cwpmax) + 1);
-      if (not CWPOPT) and v.w.twcwp=CWPGLB then v.w.twcwp:=CWPMIN; end if;
-    end if;
+    -- if RFPART then
+    --   v.w.twcwp := std_logic_vector(unsigned(v.w.s.stwin) + unsigned(v.w.s.cwpmax) + 1);
+    --   if (not CWPOPT) and v.w.twcwp=CWPGLB then v.w.twcwp:=CWPMIN; end if;
+    -- end if;
 
     rfi.wdata <= xc_result; rfi.waddr <= xc_waddr;
 
@@ -3453,14 +3464,14 @@ begin
       v.w.except := RRES.w.except; v.w.s.et := RRES.w.s.et;
       v.w.s.svt := RRES.w.s.svt; v.w.s.dwt := RRES.w.s.dwt;
       v.w.s.ef := RRES.w.s.ef;
-      if RFPART then
-        v.w.s.stwin := RRES.w.s.stwin;
-        v.w.s.cwpmax := RRES.w.s.cwpmax;
-      end if;
-      if need_extra_sync_reset(fabtech) /= 0 then
-        v.w.s.cwp := RRES.w.s.cwp;
-        v.w.s.icc := RRES.w.s.icc;
-      end if;
+      -- if RFPART then
+      --   v.w.s.stwin := RRES.w.s.stwin;
+      --   v.w.s.cwpmax := RRES.w.s.cwpmax;
+      -- end if;
+      -- if need_extra_sync_reset(fabtech) /= 0 then
+      --   v.w.s.cwp := RRES.w.s.cwp;
+      --   v.w.s.icc := RRES.w.s.icc;
+      -- end if;
       v.w.s.dbp := RRES.w.s.dbp;
       v.w.s.dbprepl := RRES.w.s.dbprepl;
       v.w.s.rexdis := RRES.w.s.rexdis;
@@ -3610,15 +3621,10 @@ begin
     dcache_gen(r, v, ex_dci, ex_link_pc, ex_jump, ex_force_a2, ex_load, v.m.casa);
 
     -- RV32I change
-    -- if(r.e.ctrl.inst(6 downto 0) = R_BRANCH) then                        -- BRANCH
-        --ex_jump_address := branch_address(r.e.ctrl.inst, r.e.ctrl.pc(31 downto PCLOW), de_rexbaddr1, r.d.rexen);
-    --    ex_jump_address := x"4000004" & "00";
     if(r.e.alusel = EXE_RES_ADD) then                       -- JALR
         ex_jump_address := ex_add_res(32 downto PCLOW+1);
-        --ex_jump_address := x"4000003" & "00";
     else                                                    -- JAL
         ex_jump_address := ex_add_res(32 downto PCLOW+1) + r.e.ctrl.pc(31 downto PCLOW);
-        --ex_jump_address := x"4000004" & "00";
     end if;
 
 
