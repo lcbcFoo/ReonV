@@ -23,7 +23,8 @@
 -- Author:      Jiri Gaisler, Edvin Catovic, Gaisler Research
 -- Modified:    Magnus Hjorth, Cobham Gaisler (LEON-REX extension)
 --              Alen Bardizbanyan, Cobham Gaisler (ITRACE filtering extensions)
--- Description: LEON3 7-stage integer pipline
+--              Lucas Castro, IC-Unicamp (Changed processor ISA to RISCV-RV32I)
+-- Description: ReonV (before was LEON3) 7-stage RV32I integer pipeline
 ------------------------------------------------------------------------------
 
 library ieee;
@@ -32,7 +33,7 @@ use ieee.numeric_std.all;
 library grlib;
 use grlib.config_types.all;
 use grlib.config.all;
-use grlib.sparc.all;
+
 use grlib.stdlib.all;
 library techmap;
 use techmap.gencomp.all;
@@ -177,6 +178,87 @@ architecture rtl of iu3 is
     constant R_F3_CSRRWI : r_funct3_type := "101";
     constant R_F3_CSRRSI : r_funct3_type := "110";
     constant R_F3_CSRRCI : r_funct3_type := "111";
+
+    -- RISCV trap type numbers by privileged ISA manual v1.1
+    subtype r_exc_type is std_logic_vector(3 downto 0);
+    -- AFAULT = access fault
+    -- PFAULT = page fault
+    constant EXC_UNALIGN_INST      : r_exc_type := "0000";
+    constant EXC_AFAULT_INST       : r_exc_type := "0001";
+    constant EXC_IINST             : r_exc_type := "0010";
+    constant EXC_BREAKPOINT        : r_exc_type := "0011";
+    constant EXC_UNALIGN_LD        : r_exc_type := "0100";
+    constant EXC_AFAULT_LD         : r_exc_type := "0101";
+    constant EXC_UNALIGN_ST        : r_exc_type := "0110";
+    constant EXC_AFAULT_ST         : r_exc_type := "0111";
+    constant EXC_USER_ECALL        : r_exc_type := "1000";
+    constant EXC_SUPERVISOR_ECALL  : r_exc_type := "1001";
+    -- 1010 RESERVED
+    constant EXC_MACHINE_ECALL     : r_exc_type := "1011";
+    constant EXC_PFAULT_INST       : r_exc_type := "1100";
+    constant EXC_PFAULT_LD         : r_exc_type := "1101";
+    -- 1110 RESERVED
+    constant EXC_PFAULT_ST         : r_exc_type := "1111";
+
+
+    -- Used by
+    subtype asi_type is std_logic_vector(4 downto 0);
+
+    constant ASI_SYSR    : asi_type := "00010"; -- 0x02
+    constant ASI_UINST   : asi_type := "01000"; -- 0x08
+    constant ASI_SINST   : asi_type := "01001"; -- 0x09
+    constant ASI_UDATA   : asi_type := "01010"; -- 0x0A
+    constant ASI_SDATA   : asi_type := "01011"; -- 0x0B
+    constant ASI_ITAG    : asi_type := "01100"; -- 0x0C
+    constant ASI_IDATA   : asi_type := "01101"; -- 0x0D
+    constant ASI_DTAG    : asi_type := "01110"; -- 0x0E
+    constant ASI_DDATA   : asi_type := "01111"; -- 0x0F
+    constant ASI_IFLUSH  : asi_type := "10000"; -- 0x10
+    constant ASI_DFLUSH  : asi_type := "10001"; -- 0x11
+
+    constant ASI_FLUSH_PAGE     : std_logic_vector(4 downto 0) := "10000";  -- 0x10 i/dcache flush page
+    constant ASI_FLUSH_CTX      : std_logic_vector(4 downto 0) := "10011";  -- 0x13 i/dcache flush ctx
+
+    constant ASI_DCTX           : std_logic_vector(4 downto 0) := "10100";  -- 0x14 dcache ctx
+    constant ASI_ICTX           : std_logic_vector(4 downto 0) := "10101";  -- 0x15 icache ctx
+    -- ASIs traditionally used by LEON for SRMMU
+    constant ASI_MMUFLUSHPROBE  : std_logic_vector(4 downto 0) := "11000";  -- 0x18 i/dtlb flush/(probe)
+    constant ASI_MMUREGS        : std_logic_vector(4 downto 0) := "11001";  -- 0x19 mmu regs access
+    constant ASI_MMU_BP         : std_logic_vector(4 downto 0) := "11100";  -- 0x1c mmu Bypass
+    constant ASI_MMU_DIAG       : std_logic_vector(4 downto 0) := "11101";  -- 0x1d mmu diagnostic
+    constant ASI_MMUSNOOP_DTAG  : std_logic_vector(4 downto 0) := "11110";  -- 0x1e mmusnoop physical dtag
+    --constant ASI_MMU_DSU        : std_logic_vector(4 downto 0) := "11111";  -- 0x1f mmu diagnostic
+    -- ASIs recommended in V8 specification, appendix I
+    constant ASI_MMUFLUSHPROBE_V8 : std_logic_vector(4 downto 0) := "00011";  -- 0x03 i/dtlb flush/(probe)
+    constant ASI_MMUREGS_V8       : std_logic_vector(4 downto 0) := "00100";  -- 0x04 mmu regs access
+    --constant ASI_MMU_BP_V8        : std_logic_vector(4 downto 0) := "11100";  -- 0x1c mmu Bypass
+    --constant ASI_MMU_DIAG_V8      : std_logic_vector(4 downto 0) := "11101";  -- 0x1d mmu diagnostic
+
+    subtype trap_type is std_logic_vector(5 downto 0);
+
+    constant TT_IAEX   : trap_type := "000001";
+    constant TT_IINST  : trap_type := "000010";
+    constant TT_PRIV   : trap_type := "000011";
+    constant TT_FPDIS  : trap_type := "000100";
+    constant TT_WINOF  : trap_type := "000101";
+    constant TT_WINUF  : trap_type := "000110";
+    constant TT_UNALA  : trap_type := "000111";
+    constant TT_FPEXC  : trap_type := "001000";
+    constant TT_DAEX   : trap_type := "001001";
+    constant TT_TAG    : trap_type := "001010";
+    constant TT_WATCH  : trap_type := "001011";
+
+    constant TT_DSU    : trap_type := "010000";
+    constant TT_PWD    : trap_type := "010001";
+
+    constant TT_RFERR  : trap_type := "100000";
+    constant TT_IAERR  : trap_type := "100001";
+    constant TT_CPDIS  : trap_type := "100100";
+    constant TT_CPEXC  : trap_type := "101000";
+    constant TT_DIV    : trap_type := "101010";
+    constant TT_DSEX   : trap_type := "101011";
+    constant TT_TICC   : trap_type := "111111";
+
 
 ---------------------------------------------------------------------------
 
@@ -531,6 +613,44 @@ architecture rtl of iu3 is
 
   type watchpoint_registers is array (0 to 3) of watchpoint_register;
 
+  -- function dbgexc(
+  --   r     : registers; dbgi : l3_debug_in_type;
+  --   trap  : std_ulogic;
+  --   tt    : std_logic_vector(7 downto 0);
+  --   dsur  : dsu_registers) return std_ulogic is
+  --   variable dmode : std_ulogic;
+  -- begin
+  --   dmode := '0';
+  --   if (not r.x.ctrl.annul and trap) = '1' then
+  --     -- if (((tt = "00" & TT_WATCH) and (dbgi.bwatch = '1')) or
+  --     --     ((dbgi.bsoft = '1') and (tt = "10000001")) or
+  --     --     (dbgi.btrapa = '1') or
+  --     --     ((dbgi.btrape = '1') and not ((tt(5 downto 0) = TT_PRIV) or
+  --     --       (tt(5 downto 0) = TT_FPDIS) or (tt(5 downto 0) = TT_WINOF) or
+  --     --       (tt(5 downto 0) = TT_WINUF) or (tt(5 downto 4) = "01") or (tt(7) = '1'))) or
+  --     --     (((not r.w.s.et) and dbgi.berror) = '1')) then
+  --     if (tt = "0000" & EXC_BREAKPOINT) or (TT = "0000" & EXC_IINST) or (TT = "0000" & EXC_AFAULT_INST) or
+  --        ((dbgi.bsoft = '1') and (tt = "10000001")) or ((not r.w.s.et) and dbgi.berror) = '1' then
+  --       dmode := '1';
+  --     end if;
+  --   end if;
+  --   return(dmode);
+  -- end;
+  --
+  -- function dbgerr(r : registers; dbgi : l3_debug_in_type;
+  --                 tt : std_logic_vector(7 downto 0))
+  -- return std_ulogic is
+  --   variable err : std_ulogic;
+  -- begin
+  --   err := not r.w.s.et;
+  --   -- if (((dbgi.dbreak = '1') and (tt = ("00" & TT_WATCH))) or
+  --   --     ((dbgi.bsoft = '1') and (tt = ("10000001")))) then
+  --   if (((dbgi.dbreak = '1') and (tt = ("0000" & EXC_USER_ECALL))) or
+  --        ((dbgi.bsoft = '1') and (tt = ("10000001")))) then
+  --     err := '0';
+  --   end if;
+  --   return(err);
+  -- end;
   function dbgexc(
     r     : registers; dbgi : l3_debug_in_type;
     trap  : std_ulogic;
@@ -879,28 +999,28 @@ architecture rtl of iu3 is
     variable tren : std_ulogic;
   begin
     tren := '0';
-    case filter is
-      when "0001" => 	-- Bicc, SETHI
-        if inst(31 downto 30) = "00" then tren := '1'; end if;
-      when "0010" => 	-- Control-flow change
-        if (inst(31 downto 30) = "01") -- Call
-          or ((inst(31 downto 30) = "00") and (inst(23 downto 22) /= "00")) --Bicc
-          or ((inst(31 downto 30) = "10") and (inst(24 downto 19) = JMPL)) --Jmpl
-          or ((inst(31 downto 30) = "10") and (inst(24 downto 19) = RETT)) --Rett
-          or (trap = '1') or (cfc = '1')
-        then tren := '1'; end if;
-      when "0100" => 	-- Call
-        if inst(31 downto 30) = "01" then tren := '1'; end if;
-      when "1000" => 	-- Normal instructions
-        if inst(31 downto 30) = "10" then tren := '1'; end if;
-      when "1100" => 	-- LDST
-        if inst(31 downto 30) = "11" then tren := '1'; end if;
-      when "1101" =>      -- LDST from alternate space
-        if inst(31 downto 30) = "11" and inst(24 downto 23) = "01" then tren := '1'; end if;
-      when "1110" =>      -- LDST from alternate space 0x80 - 0xFF
-        if inst(31 downto 30) = "11" and inst(24 downto 23) = "01" and inst(12) = '1' and asifilt = '1' then tren := '1'; end if;
-      when others => tren := '1';
-    end case;
+    -- case filter is
+    --   when "0001" => 	-- Bicc, SETHI
+    --     if inst(31 downto 30) = "00" then tren := '1'; end if;
+    --   when "0010" => 	-- Control-flow change
+    --     if (inst(31 downto 30) = "01") -- Call
+    --       or ((inst(31 downto 30) = "00") and (inst(23 downto 22) /= "00")) --Bicc
+    --       or ((inst(31 downto 30) = "10") and (inst(24 downto 19) = JMPL)) --Jmpl
+    --       or ((inst(31 downto 30) = "10") and (inst(24 downto 19) = RETT)) --Rett
+    --       or (trap = '1') or (cfc = '1')
+    --     then tren := '1'; end if;
+    --   when "0100" => 	-- Call
+    --     if inst(31 downto 30) = "01" then tren := '1'; end if;
+    --   when "1000" => 	-- Normal instructions
+    --     if inst(31 downto 30) = "10" then tren := '1'; end if;
+    --   when "1100" => 	-- LDST
+    --     if inst(31 downto 30) = "11" then tren := '1'; end if;
+    --   when "1101" =>      -- LDST from alternate space
+    --     if inst(31 downto 30) = "11" and inst(24 downto 23) = "01" then tren := '1'; end if;
+    --   when "1110" =>      -- LDST from alternate space 0x80 - 0xFF
+    --     if inst(31 downto 30) = "11" and inst(24 downto 23) = "01" and inst(12) = '1' and asifilt = '1' then tren := '1'; end if;
+    --   when others => tren := '1';
+    -- end case;
     return(tren);
   end;
 
@@ -1089,9 +1209,9 @@ architecture rtl of iu3 is
   procedure fpexack(r : in registers; fpexc : out std_ulogic) is
   begin
     fpexc := '0';
-    if FPEN then
-      if r.x.ctrl.tt = TT_FPEXC then fpexc := '1'; end if;
-    end if;
+    -- if FPEN then
+    --   if r.x.ctrl.tt = TT_FPEXC then fpexc := '1'; end if;
+    -- end if;
   end;
 
   procedure diagrdy(denable : in std_ulogic;
@@ -1651,14 +1771,14 @@ architecture rtl of iu3 is
 procedure exception_detect(r : registers; wpr : watchpoint_registers; dbgi : l3_debug_in_type;
         trapin : in std_ulogic; ttin : in std_logic_vector(5 downto 0); pccomp : in std_logic_vector(3 downto 0);
         trap : out std_ulogic; tt : out std_logic_vector(5 downto 0)) is
-variable illegal_inst, privileged_inst : std_ulogic;
+variable illegal_inst, ecall, ebreak,privileged_inst  : std_ulogic;
 variable cp_disabled, fp_disabled, fpop : std_ulogic;
 variable rd  : std_logic_vector(4 downto 0);
 variable inst : word;
 variable wph : std_ulogic;
 begin
     inst := r.a.ctrl.inst; trap := trapin; tt := ttin;
-    illegal_inst := '0';
+    illegal_inst := '0'; privileged_inst := '0'; ecall := '0'; ebreak := '0';
 
     if r.a.ctrl.annul = '0' then
         case inst(6 downto 0) is
@@ -1670,9 +1790,11 @@ begin
           -- For now, ebreak sends illega instruction
           when R_CONTROL =>
               if(inst(14 downto 12) = R_F3_ECALL) and (inst(20) = '1') then --ebreak
+                  ebreak := '1';
                   illegal_inst := '1';
 
               elsif(inst(14 downto 12) = R_F3_ECALL) then -- ecall
+                  ecall := '1';
                   privileged_inst := '1';
               end if;
           when others =>
@@ -1681,6 +1803,21 @@ begin
 
         wph := wphit(r, wpr, dbgi, dsur, pccomp);
 
+        -- trap := '1';
+        -- if r.a.ctrl.trap = '1' then tt := r.a.ctrl.tt;
+        -- elsif (illegal_inst = '1') or r.a.decill = '1' then tt := "00" & EXC_IINST;
+        -- elsif (ebreak = '1') then tt := "00" & EXC_BREAKPOINT;
+        -- elsif (ecall = '1') then
+        --     -- Check if we are at user,supervisor or machine space
+        --     tt := "00" & EXC_USER_ECALL;
+        --
+        -- -- elsif fp_disabled = '1' then tt := TT_FPDIS;
+        -- -- elsif cp_disabled = '1' then tt := TT_CPDIS;
+        -- -- elsif wph = '1' then tt := TT_WATCH;
+        -- -- elsif r.a.wovf= '1' then tt := TT_WINOF;
+        -- -- elsif r.a.wunf= '1' then tt := TT_WINUF;
+        -- -- elsif r.a.ticc= '1' then tt := TT_TICC;
+        -- else trap := '0'; tt:= (others => '0'); end if;
         trap := '1';
         if r.a.ctrl.trap = '1' then tt := r.a.ctrl.tt;
         elsif privileged_inst = '1' then tt := TT_PRIV;
@@ -2748,119 +2885,119 @@ end;
   end;
 
 
-  procedure mem_trap(r : registers; wpr : watchpoint_registers;
-                     annul, holdn : in std_ulogic;
-                     trapout, iflush, nullify, werrout : out std_ulogic;
-                     tt : out std_logic_vector(5 downto 0)) is
-  variable cwp   : std_logic_vector(NWINLOG2-1 downto 0);
-  variable cwpx  : std_logic_vector(5 downto NWINLOG2);
-  variable op : std_logic_vector(1 downto 0);
-  variable op2 : std_logic_vector(2 downto 0);
-  variable op3 : std_logic_vector(5 downto 0);
-  variable nalign_d : std_ulogic;
-  variable trap, werr : std_ulogic;
-  begin
-    op := r.m.ctrl.inst(31 downto 30); op2  := r.m.ctrl.inst(24 downto 22);
-    op3 := r.m.ctrl.inst(24 downto 19);
-    cwpx := r.m.result(5 downto NWINLOG2); cwpx(5) := '0';
-    iflush := '0'; trap := r.m.ctrl.trap; nullify := annul;
-    tt := r.m.ctrl.tt; werr := (dco.werr or r.m.werr) and not r.w.s.dwt;
-    nalign_d := r.m.nalign or r.m.result(2);
-    if (trap = '1') and (r.m.ctrl.pv = '1') then
-      if op = LDST then nullify := '1'; end if;
-    end if;
-    if ((annul or trap) /= '1') and (r.m.ctrl.pv = '1') then
-      if (werr and holdn) = '1' then
-        trap := '1'; tt := TT_DSEX; werr := '0';
-        if op = LDST then nullify := '1'; end if;
-      end if;
-    end if;
-    if ((annul or trap) /= '1') then
-      case op is
-      when FMT2 =>
-        case op2 is
-        when FBFCC =>
-          if FPEN and (fpo.exc = '1') then trap := '1'; tt := TT_FPEXC; end if;
-        when CBCCC =>
-          if CPEN and (cpo.exc = '1') then trap := '1'; tt := TT_CPEXC; end if;
-        when others => null;
-        end case;
-      when FMT3 =>
-        case op3 is
-        when WRPSR =>
-          if (orv(cwpx) = '1') and (pwrpsr=0 or r.m.ctrl.inst(29 downto 25)="00000") then trap := '1'; tt := TT_IINST; end if;
-        when UDIV | SDIV | UDIVCC | SDIVCC =>
-          if DIVEN then
-            if r.m.divz = '1' then trap := '1'; tt := TT_DIV; end if;
-          end if;
-        when JMPL | RETT =>
-          if (REX=1 and r.m.rexnalign='1') or (REX=0 and r.m.nalign = '1') then
-            trap := '1'; tt := TT_UNALA;
-          end if;
-        when TADDCCTV | TSUBCCTV =>
-          if (notag = 0) and (r.m.icc(1) = '1') then
-            trap := '1'; tt := TT_TAG;
-          end if;
-        when FLUSH => iflush := '1';
-        when FPOP1 | FPOP2 =>
-          if FPEN and (fpo.exc = '1') then trap := '1'; tt := TT_FPEXC; end if;
-        when CPOP1 | CPOP2 =>
-          if CPEN and (cpo.exc = '1') then trap := '1'; tt := TT_CPEXC; end if;
-        when others => null;
-        end case;
-      when LDST =>
-        if r.m.ctrl.cnt = "00" then
-          case op3 is
-            when LDDF | STDF | STDFQ =>
-            if FPEN then
-              if nalign_d = '1' then
-                trap := '1'; tt := TT_UNALA; nullify := '1';
-              elsif (fpo.exc and r.m.ctrl.pv) = '1'
-              then trap := '1'; tt := TT_FPEXC; nullify := '1'; end if;
-            end if;
-          when LDDC | STDC | STDCQ =>
-            if CPEN then
-              if nalign_d = '1' then
-                trap := '1'; tt := TT_UNALA; nullify := '1';
-              elsif ((cpo.exc and r.m.ctrl.pv) = '1')
-              then trap := '1'; tt := TT_CPEXC; nullify := '1'; end if;
-            end if;
-          when LDD | ISTD | LDDA | STDA =>
-            if r.m.result(2 downto 0) /= "000" then
-              trap := '1'; tt := TT_UNALA; nullify := '1';
-            end if;
-          when LDF | LDFSR | STFSR | STF =>
-            if FPEN and (r.m.nalign = '1') then
-              trap := '1'; tt := TT_UNALA; nullify := '1';
-            elsif FPEN and ((fpo.exc and r.m.ctrl.pv) = '1')
-            then trap := '1'; tt := TT_FPEXC; nullify := '1'; end if;
-          when LDC | LDCSR | STCSR | STC =>
-            if CPEN and (r.m.nalign = '1') then
-              trap := '1'; tt := TT_UNALA; nullify := '1';
-            elsif CPEN and ((cpo.exc and r.m.ctrl.pv) = '1')
-            then trap := '1'; tt := TT_CPEXC; nullify := '1'; end if;
-          when LD | LDA | ST | STA | SWAP | SWAPA | CASA =>
-            if r.m.result(1 downto 0) /= "00" then
-              trap := '1'; tt := TT_UNALA; nullify := '1';
-            end if;
-          when LDUH | LDUHA | LDSH | LDSHA | STH | STHA =>
-            if r.m.result(0) /= '0' then
-              trap := '1'; tt := TT_UNALA; nullify := '1';
-            end if;
-          when others => null;
-          end case;
-          for i in 1 to NWP loop
-            if ((((wpr(i-1).load and not op3(2)) or (wpr(i-1).store and op3(2))) = '1') and
-                (((wpr(i-1).addr xor r.m.result(31 downto 2)) and wpr(i-1).mask) = zero32(31 downto 2)))
-            then trap := '1'; tt := TT_WATCH; nullify := '1'; end if;
-          end loop;
-        end if;
-      when others => null;
-      end case;
-    end if;
-    if (rstn = '0') or (r.x.rstate = dsu2) then werr := '0'; end if;
-    trapout := trap; werrout := werr;
-  end;
+  -- procedure mem_trap(r : registers; wpr : watchpoint_registers;
+  --                    annul, holdn : in std_ulogic;
+  --                    trapout, iflush, nullify, werrout : out std_ulogic;
+  --                    tt : out std_logic_vector(5 downto 0)) is
+  -- variable cwp   : std_logic_vector(NWINLOG2-1 downto 0);
+  -- variable cwpx  : std_logic_vector(5 downto NWINLOG2);
+  -- variable op : std_logic_vector(1 downto 0);
+  -- variable op2 : std_logic_vector(2 downto 0);
+  -- variable op3 : std_logic_vector(5 downto 0);
+  -- variable nalign_d : std_ulogic;
+  -- variable trap, werr : std_ulogic;
+  -- begin
+  --   op := r.m.ctrl.inst(31 downto 30); op2  := r.m.ctrl.inst(24 downto 22);
+  --   op3 := r.m.ctrl.inst(24 downto 19);
+  --   cwpx := r.m.result(5 downto NWINLOG2); cwpx(5) := '0';
+  --   iflush := '0'; trap := r.m.ctrl.trap; nullify := annul;
+  --   tt := r.m.ctrl.tt; werr := (dco.werr or r.m.werr) and not r.w.s.dwt;
+  --   nalign_d := r.m.nalign or r.m.result(2);
+  --   if (trap = '1') and (r.m.ctrl.pv = '1') then
+  --     if op = LDST then nullify := '1'; end if;
+  --   end if;
+  --   if ((annul or trap) /= '1') and (r.m.ctrl.pv = '1') then
+  --     if (werr and holdn) = '1' then
+  --       trap := '1'; tt := TT_DSEX; werr := '0';
+  --       if op = LDST then nullify := '1'; end if;
+  --     end if;
+  --   end if;
+  --   if ((annul or trap) /= '1') then
+  --     case op is
+  --     when FMT2 =>
+  --       case op2 is
+  --       when FBFCC =>
+  --         if FPEN and (fpo.exc = '1') then trap := '1'; tt := TT_FPEXC; end if;
+  --       when CBCCC =>
+  --         if CPEN and (cpo.exc = '1') then trap := '1'; tt := TT_CPEXC; end if;
+  --       when others => null;
+  --       end case;
+  --     when FMT3 =>
+  --       case op3 is
+  --       when WRPSR =>
+  --         if (orv(cwpx) = '1') and (pwrpsr=0 or r.m.ctrl.inst(29 downto 25)="00000") then trap := '1'; tt := TT_IINST; end if;
+  --       when UDIV | SDIV | UDIVCC | SDIVCC =>
+  --         if DIVEN then
+  --           if r.m.divz = '1' then trap := '1'; tt := TT_DIV; end if;
+  --         end if;
+  --       when JMPL | RETT =>
+  --         if (REX=1 and r.m.rexnalign='1') or (REX=0 and r.m.nalign = '1') then
+  --           trap := '1'; tt := TT_UNALA;
+  --         end if;
+  --       when TADDCCTV | TSUBCCTV =>
+  --         if (notag = 0) and (r.m.icc(1) = '1') then
+  --           trap := '1'; tt := TT_TAG;
+  --         end if;
+  --       when FLUSH => iflush := '1';
+  --       when FPOP1 | FPOP2 =>
+  --         if FPEN and (fpo.exc = '1') then trap := '1'; tt := TT_FPEXC; end if;
+  --       when CPOP1 | CPOP2 =>
+  --         if CPEN and (cpo.exc = '1') then trap := '1'; tt := TT_CPEXC; end if;
+  --       when others => null;
+  --       end case;
+  --     when LDST =>
+  --       if r.m.ctrl.cnt = "00" then
+  --         case op3 is
+  --           when LDDF | STDF | STDFQ =>
+  --           if FPEN then
+  --             if nalign_d = '1' then
+  --               trap := '1'; tt := TT_UNALA; nullify := '1';
+  --             elsif (fpo.exc and r.m.ctrl.pv) = '1'
+  --             then trap := '1'; tt := TT_FPEXC; nullify := '1'; end if;
+  --           end if;
+  --         when LDDC | STDC | STDCQ =>
+  --           if CPEN then
+  --             if nalign_d = '1' then
+  --               trap := '1'; tt := TT_UNALA; nullify := '1';
+  --             elsif ((cpo.exc and r.m.ctrl.pv) = '1')
+  --             then trap := '1'; tt := TT_CPEXC; nullify := '1'; end if;
+  --           end if;
+  --         when LDD | ISTD | LDDA | STDA =>
+  --           if r.m.result(2 downto 0) /= "000" then
+  --             trap := '1'; tt := TT_UNALA; nullify := '1';
+  --           end if;
+  --         when LDF | LDFSR | STFSR | STF =>
+  --           if FPEN and (r.m.nalign = '1') then
+  --             trap := '1'; tt := TT_UNALA; nullify := '1';
+  --           elsif FPEN and ((fpo.exc and r.m.ctrl.pv) = '1')
+  --           then trap := '1'; tt := TT_FPEXC; nullify := '1'; end if;
+  --         when LDC | LDCSR | STCSR | STC =>
+  --           if CPEN and (r.m.nalign = '1') then
+  --             trap := '1'; tt := TT_UNALA; nullify := '1';
+  --           elsif CPEN and ((cpo.exc and r.m.ctrl.pv) = '1')
+  --           then trap := '1'; tt := TT_CPEXC; nullify := '1'; end if;
+  --         when LD | LDA | ST | STA | SWAP | SWAPA | CASA =>
+  --           if r.m.result(1 downto 0) /= "00" then
+  --             trap := '1'; tt := TT_UNALA; nullify := '1';
+  --           end if;
+  --         when LDUH | LDUHA | LDSH | LDSHA | STH | STHA =>
+  --           if r.m.result(0) /= '0' then
+  --             trap := '1'; tt := TT_UNALA; nullify := '1';
+  --           end if;
+  --         when others => null;
+  --         end case;
+  --         for i in 1 to NWP loop
+  --           if ((((wpr(i-1).load and not op3(2)) or (wpr(i-1).store and op3(2))) = '1') and
+  --               (((wpr(i-1).addr xor r.m.result(31 downto 2)) and wpr(i-1).mask) = zero32(31 downto 2)))
+  --           then trap := '1'; tt := TT_WATCH; nullify := '1'; end if;
+  --         end loop;
+  --       end if;
+  --     when others => null;
+  --     end case;
+  --   end if;
+  --   if (rstn = '0') or (r.x.rstate = dsu2) then werr := '0'; end if;
+  --   trapout := trap; werrout := werr;
+  -- end;
 
   procedure irq_trap(r       : in registers;
                      ir      : in irestart_register;
@@ -2883,19 +3020,19 @@ end;
     op := r.m.ctrl.inst(31 downto 30); op3 := r.m.ctrl.inst(24 downto 19);
     irqen := '1'; irqen2 := r.m.irqen;
 
-    if (annul or trap) = '0' then
-      if ((op = FMT3) and (op3 = WRPSR)) then irqen := '0'; end if;
-    end if;
-
-    if (irl = "1111") or (irl > r.w.s.pil) then
-      pend := r.m.irqen and r.m.irqen2 and r.w.s.et and not ir.pwd;
-    else pend := '0'; end if;
-    ipend := pend;
-
-    if ((not annul) and pv and (not trap) and pend) = '1' then
-      trap2 := '1'; tt2 := "01" & irl;
-      if op = LDST then nullify2 := '1'; end if;
-    end if;
+    -- if (annul or trap) = '0' then
+    --   if ((op = FMT3) and (op3 = WRPSR)) then irqen := '0'; end if;
+    -- end if;
+    --
+    -- if (irl = "1111") or (irl > r.w.s.pil) then
+    --   pend := r.m.irqen and r.m.irqen2 and r.w.s.et and not ir.pwd;
+    -- else pend := '0'; end if;
+    -- ipend := pend;
+    --
+    -- if ((not annul) and pv and (not trap) and pend) = '1' then
+    --   trap2 := '1'; tt2 := "01" & irl;
+    --   if op = LDST then nullify2 := '1'; end if;
+    -- end if;
   end;
 
   procedure irq_intack(r : in registers; holdn : in std_ulogic; intack: out std_ulogic) is
@@ -3061,37 +3198,37 @@ end;
   begin
     op    := r.m.ctrl.inst(31 downto 30); op3   := r.m.ctrl.inst(24 downto 19);
     result := r.m.result; y := r.m.y; icc := r.m.icc; asr18 := asr18in;
-    case op is
-    when FMT3 =>
-      case op3 is
-      when UMUL | SMUL =>
-        if MULEN then
-          result := mulo.result(31 downto 0);
-          y := mulo.result(63 downto 32);
-        end if;
-      when UMULCC | SMULCC =>
-        if MULEN then
-          result := mulo.result(31 downto 0); icc := mulo.icc;
-          y := mulo.result(63 downto 32);
-        end if;
-      when UMAC | SMAC =>
-        if MACEN and not MACPIPE then
-          result := mulo.result(31 downto 0);
-          asr18  := mulo.result(31 downto 0);
-          y := mulo.result(63 downto 32);
-        end if;
-      when UDIV | SDIV =>
-        if DIVEN then
-          result := divo.result(31 downto 0);
-        end if;
-      when UDIVCC | SDIVCC =>
-        if DIVEN then
-          result := divo.result(31 downto 0); icc := divo.icc;
-        end if;
-      when others => null;
-      end case;
-    when others => null;
-    end case;
+    -- case op is
+    -- when FMT3 =>
+    --   case op3 is
+    --   when UMUL | SMUL =>
+    --     if MULEN then
+    --       result := mulo.result(31 downto 0);
+    --       y := mulo.result(63 downto 32);
+    --     end if;
+    --   when UMULCC | SMULCC =>
+    --     if MULEN then
+    --       result := mulo.result(31 downto 0); icc := mulo.icc;
+    --       y := mulo.result(63 downto 32);
+    --     end if;
+    --   when UMAC | SMAC =>
+    --     if MACEN and not MACPIPE then
+    --       result := mulo.result(31 downto 0);
+    --       asr18  := mulo.result(31 downto 0);
+    --       y := mulo.result(63 downto 32);
+    --     end if;
+    --   when UDIV | SDIV =>
+    --     if DIVEN then
+    --       result := divo.result(31 downto 0);
+    --     end if;
+    --   when UDIVCC | SDIVCC =>
+    --     if DIVEN then
+    --       result := divo.result(31 downto 0); icc := divo.icc;
+    --     end if;
+    --   when others => null;
+    --   end case;
+    -- when others => null;
+    -- end case;
   end;
 
   function powerdwn(r : registers; trap : std_ulogic; rp : pwd_register_type) return std_ulogic is
@@ -3250,10 +3387,10 @@ begin
     xc_mmucacheclr := '0';
     xc_inull := '0';
 
-    if r.x.mexc = '1' then xc_vectt := "00" & TT_DAEX;
-    elsif r.x.ctrl.tt = TT_TICC then
-      xc_vectt := '1' & r.x.result(6 downto 0);
-    else xc_vectt := "00" & r.x.ctrl.tt; end if;
+    -- if r.x.mexc = '1' then xc_vectt := "00" & TT_DAEX;
+    -- elsif r.x.ctrl.tt = TT_TICC then
+    --   xc_vectt := '1' & r.x.result(6 downto 0);
+    -- else xc_vectt := "00" & r.x.ctrl.tt; end if;
 
     -- if r.w.s.svt = '0' then
     --   xc_trap_address(31 downto 2) := r.w.s.tba & xc_vectt & "00";
@@ -3317,10 +3454,10 @@ begin
         vir.pwd := '0';
         if (r.x.ctrl.pv and not r.x.debug) = '1' then
           icnt := holdn;
-          if (r.x.ctrl.inst(31 downto 30) = FMT3) and
-                ((r.x.ctrl.inst(24 downto 19) = FPOP1) or
-                 (r.x.ctrl.inst(24 downto 19) = FPOP2))
-          then fcnt := holdn; end if;
+          -- if (r.x.ctrl.inst(31 downto 30) = FMT3) and
+          --       ((r.x.ctrl.inst(24 downto 19) = FPOP1) or
+          --        (r.x.ctrl.inst(24 downto 19) = FPOP2))
+          -- then fcnt := holdn; end if;
         end if;
       elsif ((not r.x.ctrl.annul) and xc_trap) = '1' then
         xc_exception := '1';
@@ -3746,9 +3883,9 @@ begin
     v.a.ctrl.wy := '0';
 
     de_rcwp := r.d.cwp;
-    if AWPEN and r.d.aw='1' then de_rcwp := r.d.awp; end if;
+    --if AWPEN and r.d.aw='1' then de_rcwp := r.d.awp; end if;
     cwp_ctrl(r, de_rcwp, v.w.s.wim, de_inst, de_cwp, v.a.wovf, v.a.wunf, de_wcwp);
-    if AWPEN and (r.d.aw='1' or (r.d.paw='1' and de_inst(24 downto 19)=RETT)) then v.a.wovf:='0'; v.a.wunf:='0'; end if;
+    --if AWPEN and (r.d.aw='1' or (r.d.paw='1' and de_inst(24 downto 19)=RETT)) then v.a.wovf:='0'; v.a.wunf:='0'; end if;
 
     -- Get rs1 and rs2
     rs1_gen(r, de_inst, v.a.rs1, de_rs1mod);
@@ -3810,8 +3947,9 @@ begin
 
     v.a.ctrl.trap := r.d.mexc;
     v.a.ctrl.tt := "000000";
+    -- Memory exception
       if r.d.mexc = '1' then
-        v.a.ctrl.tt := "000001";
+        v.a.ctrl.tt := "00" & EXC_AFAULT_INST;
       end if;
     v.a.ctrl.pc := de_pcout(31 downto PCLOW);
     v.a.ctrl.cnt := r.d.cnt;
@@ -4225,13 +4363,13 @@ begin
     variable pc: std_logic_vector(31 downto 0);
     variable rexen: boolean;
   begin
-    if (fpu /= 0) then
-      op := r.x.ctrl.inst(31 downto 30); op3 := r.x.ctrl.inst(24 downto 19);
-      fpins := (op = FMT3) and ((op3 = FPOP1) or (op3 = FPOP2));
-      fpld := (op = LDST) and ((op3 = LDF) or (op3 = LDDF) or (op3 = LDFSR));
-    else
+    --if (fpu /= 0) then
+    -- op := r.x.ctrl.inst(31 downto 30); op3 := r.x.ctrl.inst(24 downto 19);
+    --  fpins := (op = FMT3) and ((op3 = FPOP1) or (op3 = FPOP2));
+    --  fpld := (op = LDST) and ((op3 = LDF) or (op3 = LDDF) or (op3 = LDFSR));
+    --else
       fpins := false; fpld := false;
-    end if;
+    --end if;
       valid := (((not r.x.ctrl.annul) and (r.x.ctrl.pv or r.x.ctrl.itovr)) = '1') and (not ((fpins or fpld) and (r.x.ctrl.trap = '0')));
       valid := valid and (holdn = '1');
     pc := r.x.ctrl.pc(31 downto 2) & "00";

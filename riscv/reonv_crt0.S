@@ -7,7 +7,7 @@
 # Build minimal crt0 in future
 __reonv_startup:
 	# Set stack (maybe will change this to boot code)
-	li	sp,0x48FFFFF0
+	li	sp,0x43FFFFF0
 	call 	main
 	jal 	__exit
 

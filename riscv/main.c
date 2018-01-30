@@ -1,8 +1,8 @@
 int mul();
 int fib();
 #include <stdio.h>
-void main(){
-	int i = 8;
+int main(){
+	int i = 19;
 	int count = 0;
 
 	// Multiplies i by 4
@@ -15,7 +15,7 @@ void main(){
 	i = fib(i);
 
 	//printf("i = \n", i);
-	__asm("ebreak");
+	return i;
 }
 
 int fib(int i){
