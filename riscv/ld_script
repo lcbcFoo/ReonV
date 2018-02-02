@@ -55,9 +55,10 @@ SECTIONS
   .text           :
   {
     /*
-     * Forced minimal ctr0 to be the first code	
+     * Forced minimal ctr0 to be the first code
      */
     reonv_crt0.o
+    posix.o
     *(.text.unlikely .text.*_unlikely .text.unlikely.*)
     *(.text.exit .text.exit.*)
     *(.text.startup .text.startup.*)
@@ -236,4 +237,3 @@ SECTIONS
   .gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
   /DISCARD/ : { *(.note.GNU-stack) *(.gnu_debuglink) *(.gnu.lto_*) }
 }
-

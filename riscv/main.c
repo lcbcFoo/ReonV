@@ -2,7 +2,7 @@ int mul();
 int fib();
 #include <stdio.h>
 int main(){
-	int i = 19;
+	int i = 3;
 	int count = 0;
 
 	// Multiplies i by 4

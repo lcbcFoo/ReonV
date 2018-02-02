@@ -16,7 +16,7 @@ CROSS=../../rv32i/rv32i-gnu/bin/riscv32-unknown-elf-
 DESIGN=leon3-digilent-nexys4ddr
 
 # Leon3 designs might use a prom.srec to load boot code.
-# This is the binary to .srec converter this makefile will look for. 
+# This is the binary to .srec converter this makefile will look for.
 # In need check this one under GPL: http://www.s-record.com/
 BIN2SREC=../../srec/bin2srec
 
@@ -26,6 +26,7 @@ OBJCOPY=objcopy
 CFLAGS=-nostdlib
 OBJCPFLAGS=-O binary -j .text
 LD_SCRIPT=ld_script
+WRAP=-Wl,-wrap,exit,-wrap,open,-wrap,close,-wrap,write,-wrap,read
 
 #####################################################################
 #
@@ -33,20 +34,23 @@ LD_SCRIPT=ld_script
 #
 #####################################################################
 # Compiled binary linked with reonv_crt0
-%.out : %.c reonv_crt0.o
+%.out : %.c reonv_crt0.o posix.o
 	${CROSS}${CC} -static -march=rv32i -T${LD_SCRIPT} $< -o $@
 
-# Targets for .S. 
+# Targets for .S.
 # .o is for linking programs (i.e. crt0.S)
-# .hex is for other assembly programs 
+# .hex is for other assembly programs
 %.hex : %.S
 	${CROSS}$(AS) $< -o $@
 
-%.o : %.S
-	${CROSS}${CC} -c $< -o $@
+posix.o : posix.c
+	${CROSS}${CC} -c $< -o $@ -nostdlib ${WRAP}
+
+reonv_crt0.o : reonv_crt0.S
+	${CROSS}${CC} -c $< -o $@ -nostdlib ${WRAP}
 
 # Target raw binary to avoid grmon2 errors saying this is not SPARC '-'
-%.bin : %.out 
+%.bin : %.out
 	${CROSS}$(OBJCOPY) $(OBJCPFLAGS)  $< $@
 
 %.bin : %.hex
@@ -57,10 +61,10 @@ ahbrom.vhd : ahbrom boot_code.bin
 	./ahbrom boot_code.bin ahbrom.vhd
 
 bootcode : ahbrom.vhd
-	cp ahbrom.vhd ../designs/${DESIGN}/ahbrom.vhd -f	
+	cp ahbrom.vhd ../designs/${DESIGN}/ahbrom.vhd -f
 	@echo "Generated ahbrom.vhd and placed at ../../designs/${DESIGN}"
 
-ahbrom : ../bin/ahbrom.c 
+ahbrom : ../bin/ahbrom.c
 	gcc ../bin/ahbrom.c -o ahbrom
 
 clean:
