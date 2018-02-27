@@ -6,12 +6,12 @@
 OUTPUT_FORMAT("elf32-littleriscv", "elf32-littleriscv",
 	      "elf32-littleriscv")
 OUTPUT_ARCH(riscv)
-ENTRY(__reonv_startup)
+ENTRY(__reonv_start)
 SEARCH_DIR("/home/foo/IC/riscv-leon/rv32i/rv32i-gnu/riscv32-unknown-elf/lib");
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */
-  PROVIDE (__executable_start = SEGMENT_START("text-segment", 0x40000000)); . = SEGMENT_START("text-segment", 0x40000000) + SIZEOF_HEADERS;
+  PROVIDE (__executable_start = SEGMENT_START("text-segment", 0x40000000)); . = SEGMENT_START("text-segment", 0x40000000) + 0x1000;
   .interp         : { *(.interp) }
   .note.gnu.build-id : { *(.note.gnu.build-id) }
   .hash           : { *(.hash) }
@@ -54,16 +54,21 @@ SECTIONS
   .iplt           : { *(.iplt) }
   .text           :
   {
+
+
     /*
      * Forced minimal ctr0 to be the first code
      */
     reonv_crt0.o
     posix.o
+    console.o
+
     *(.text.unlikely .text.*_unlikely .text.unlikely.*)
     *(.text.exit .text.exit.*)
     *(.text.startup .text.startup.*)
     *(.text.hot .text.hot.*)
     *(.text .stub .text.* .gnu.linkonce.t.*)
+
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
   }

@@ -3,24 +3,27 @@
 .file "reonv_crt0.S"
 .extern _start
 .extern main
-.extern _exit
-.extern _open
-.extern _close
-.extern _write
-.extern _read
 
-
-.globl __reonv_startup
-.type "__reonv_startup",@function
-.type "exit",@function
-.type "open",@function
-.type "close",@function
-.type "write",@function
-.type "read",@function
+.globl __reonv_start
+.globl __wrap_write
+.globl __wrap_exit
+.globl __wrap_read
+.globl __wrap_open
+.globl __wrap_close
+.globl __wrap_lseek
+.globl __wrap_sbrk
+.type "__reonv_start",@function
+.type "__wrap_exit",@function
+.type "__wrap_open",@function
+.type "__wrap_close",@function
+.type "__wrap_write",@function
+.type "__wrap_read",@function
+.type "__wrap_lseek",@function
+.type "__wrap_sbrk", @function
 
 .org 0x0
 // Reset Function
-__reonv_startup:
+__reonv_start:
 	mv 	x1,x0
 	mv 	x2,x0
 	mv 	x3,x0
@@ -59,16 +62,22 @@ __reonv_startup:
 
 // Wrap some existent glibc posix functions used by benchmarkers
 __wrap_exit:
-	call 	_exit_c
+	jal 	x0,_exit_c
 
 __wrap_open:
-	call 	_open_c
+	jal 	x0,_open_c
 
 __wrap_close:
-	call 	_close_c
+	jal 	x0,_close_c
 
 __wrap_write:
-	call 	_write_c
+	jal 	x0,_write_c
 
 __wrap_read:
-	call 	_read_c
+	jal 	x0,_read_c
+
+__wrap_lseek:
+	jal 	x0,_lseek_c
+
+__wrap_sbrk:
+	jal 	x0,_sbrk_c

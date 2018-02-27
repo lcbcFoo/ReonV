@@ -1,82 +1,127 @@
-#include <stdio.h>
+// #include <stdio.h>
+// #include <sys/types.h>
+// #include <sys/stat.h>
+// #include <errno.h>
 #include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
+#include <unistd.h>
 #include "reonv.h"
 
-#undef errno
+static char* heap = (char*) HEAP_START;
+static char* out_mem = (char*)OUT_MEM_BEGIN;
 
-extern int errno;
-char *__env[1] = { 0 };
-char **environ = __env;
+// Currently only reads/writes data from output section of memory
 
-#define SYS_RESTART      0x0
-#define SYS_EXIT         0x1
-#define SYS_FORK         0x2
-#define SYS_READ         0x3
-#define SYS_WRITE        0x4
-#define SYS_OPEN         0x5
-#define SYS_CLOSE        0x6
-#define SYS_WAIT         0x7
-#define SYS_CREAT        0x8
-#define SYS_LINK         0x9
-#define SYS_UNLINK       0xA
-#define SYS_EXECVE       0xB
-#define SYS_CHDIR        0xC
-#define SYS_MKNOD        0xE
-#define SYS_CHMOD        0xF
-#define SYS_LCHOW        0x10
-#define SYS_STAT         0x12
-#define SYS_LSEEK        0x13
-#define SYS_GETPID       0x14
-#define SYS_ALARM        0x1B
-#define SYS_FSTAT        0x6C
-#define SYS_KILL         0x25
-#define SYS_TIMES        0x2B
-#define SYS_BRK          0x2D
-#define SYS_GETTIMEOFDAY 0x4E
-#define SYS_SLEEP        0xA2
-#define SYS_ACCESS       0x21
+#define DREADY 1
+#define TREADY 4
+
+volatile char *console = (char *) 0x80000100;
+volatile int *uart_shifter = (int *) 0x80000104;
 
 
-static unsigned *out_mem = (unsigned *)OUT_MEM_BEGIN;
-static unsigned current_position = 0;
+// extern void
+// outbyte (int c)
+// {
+//   volatile int *rxstat;
+//   volatile int *rxadata;
+//   int rxmask;
+//   while ((console[1] & TREADY) == 0);
+//   console[0] = (0x0ff & c);
+//   if (c == '\n')
+//     {
+//       while ((console[1] & TREADY) == 0);
+//       console[0] = (int) '\r';
+//     }
+// }
+//
+// int
+// inbyte (void)
+// {
+//   if (!console)
+//     return (0);
+//   while (!(console[1] & DREADY));
+//   return console[0];
+// }
+
 
 // exit application
-extern  void _exit_c( int status ) {
+void _exit_c( int status ) {
 	__asm("ebreak");
 }
 
+// Repositions the offset of the open file associated with the file descriptor fd to the argument offset.
+int _lseek_c( int fd, int offset, int whence ) {
+
+    if(whence == SEEK_SET)
+        out_mem = (char*) (OUT_MEM_BEGIN + offset);
+   else if(whence == SEEK_CUR)
+       out_mem = (char*) (out_mem + offset);
+   else if(whence == SEEK_END)
+       out_mem = (char*) (OUT_MEM_END + offset);
+   else
+       return -1;
+
+    if(out_mem < (char*) OUT_MEM_BEGIN)
+        return -1;
+    else if(out_mem > (char*) OUT_MEM_END)
+        return -1;
+
+	return out_mem - (char*) OUT_MEM_BEGIN;
+}
+
+
 // Read from a file descriptor.
-extern  int _read_c( int fd, char *buffer, int len ) {
+int _read_c( int fd, char *buffer, int len ) {
 	volatile register int r0 asm("t0") = fd;
 	volatile register char* r1 asm("t1") = buffer;
 	volatile register int r2 asm("t2") = len;
-	volatile register unsigned r7 asm("a0") = SYS_READ;
-	return r0;
+
+    int i;
+    for(i = 0; (i < len) && (&out_mem[i] < (char*)OUT_MEM_END); i++){
+        buffer[i] = out_mem[i];
+    }
+
+    out_mem += i;
+    return i;
 }
 
 // Write to a file descriptor.
-extern  int _write_c( int fd, char *buffer, int len ) {
+int _write_c( int fd, char *buffer, int len ) {
 	volatile register int r0 asm("t0") = fd;
 	volatile register char* r1 asm("t1") = buffer;
 	volatile register int r2 asm("t2") = len;
-	volatile register unsigned r7 asm("a0") = SYS_WRITE;
-	return r0;
+
+    int i;
+	for(i = 0; (i < len) && (&out_mem[i] < (char*)OUT_MEM_END); i++){
+		//out_mem[i] = buffer[i];
+		(*console) = buffer[i];
+
+		while((*uart_shifter) & 0x2 != 0x2);
+	}
+
+    out_mem += i;
+	return i;
 }
 
 // Open a file.
-extern  int _open_c( const char *path, int flags, int mode ) {
+int _open_c( const char *path, int flags, int mode ) {
 	volatile register const char* r0 asm("t0") = path;
 	volatile register int r1 asm("t1") = flags;
 	volatile register int r2 asm("t2") = mode;
-	volatile register unsigned r7 asm("a0") = SYS_OPEN;
-	return *(int*) r0;
+
+
+	return 0;
 }
 
 // Close a file descriptor.
 extern  int _close_c( int fd ) {
 	volatile register int r0 asm("t0") = fd;
-	volatile register unsigned r7 asm("a0") = SYS_CLOSE;
-	return r0;
+
+	return 0;
+}
+
+// Allocate space on heap
+extern void* _sbrk_c( int incr ) {
+	void* addr = (void*) heap;
+	heap += incr;
+	return addr;
 }

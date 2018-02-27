@@ -202,7 +202,9 @@
 #define CONFIG_AHB_FPNPEN 1
 #define CONFIG_AHB_IOADDR FFF
 #define CONFIG_APB_HADDR 800
-#undef  CONFIG_AHB_MON
+#define CONFIG_AHB_MON 1
+#undef  CONFIG_AHB_MONERR
+#undef  CONFIG_AHB_MONWAR
 #undef  CONFIG_AHB_DTRACE
 /*
  * Debug Link           
@@ -255,7 +257,9 @@
 /*
  * On-chip RAM/ROM                 
  */
-#undef  CONFIG_AHBROM_ENABLE
+#define CONFIG_AHBROM_ENABLE 1
+#define CONFIG_AHBROM_START 000
+#undef  CONFIG_AHBROM_PIPE
 #undef  CONFIG_AHBRAM_ENABLE
 /*
  * Ethernet             
@@ -271,8 +275,8 @@
  * UARTs, timers and irq control         
  */
 #define CONFIG_UART1_ENABLE 1
-#define CONFIG_UA1_FIFO1 1
-#undef  CONFIG_UA1_FIFO2
+#undef  CONFIG_UA1_FIFO1
+#define CONFIG_UA1_FIFO2 1
 #undef  CONFIG_UA1_FIFO4
 #undef  CONFIG_UA1_FIFO8
 #undef  CONFIG_UA1_FIFO16

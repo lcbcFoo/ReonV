@@ -10,7 +10,7 @@
 # Update the following variables to your environment and board used
 
 # Cross compiler (Must be RV32I only)
-CROSS=../../rv32i/rv32i-gnu/bin/riscv32-unknown-elf-
+CROSS=../../rv32i-gcc/bin/riscv32-unknown-elf-
 
 # Design you are targeting
 DESIGN=leon3-digilent-nexys4ddr
@@ -24,9 +24,9 @@ CC=gcc
 AS=as
 OBJCOPY=objcopy
 CFLAGS=-nostdlib
-OBJCPFLAGS=-O binary -j .text
+OBJCPFLAGS=-O binary -j .text -j .data
 LD_SCRIPT=ld_script
-WRAP=-Wl,-wrap,exit,-wrap,open,-wrap,close,-wrap,write,-wrap,read
+WRAP=-Wl,-wrap,exit,-wrap,open,-wrap,close,-wrap,write,-wrap,read,-wrap,lseek,-wrap,sbrk
 
 #####################################################################
 #
@@ -34,14 +34,20 @@ WRAP=-Wl,-wrap,exit,-wrap,open,-wrap,close,-wrap,write,-wrap,read
 #
 #####################################################################
 # Compiled binary linked with reonv_crt0
-%.out : %.c reonv_crt0.o posix.o
-	${CROSS}${CC} -static -march=rv32i -T${LD_SCRIPT} $< -o $@
+%.out : %.c reonv_crt0.o posix.o console.o
+	${CROSS}${CC} -static -march=rv32i ${WRAP} -T${LD_SCRIPT} $< -o $@
 
 # Targets for .S.
 # .o is for linking programs (i.e. crt0.S)
 # .hex is for other assembly programs
 %.hex : %.S
 	${CROSS}$(AS) $< -o $@
+
+console.o: console.c
+	${CROSS}${CC} -c -static $< -o $@
+
+reonv_print.o : reonv_print/console_dbg.c
+	${CROSS}${CC} -c -static -static-libgcc -lgcc $< -o $@
 
 posix.o : posix.c
 	${CROSS}${CC} -c $< -o $@ -nostdlib ${WRAP}

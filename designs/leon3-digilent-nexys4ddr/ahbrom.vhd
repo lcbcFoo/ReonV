@@ -35,8 +35,8 @@ entity ahbrom is
 end;
 
 architecture rtl of ahbrom is
-constant abits : integer := 5;
-constant bytes : integer := 20;
+constant abits : integer := 4;
+constant bytes : integer := 12;
 constant dbits : integer := 32;
 
 constant hconfig : ahb_config_type := (
@@ -94,12 +94,10 @@ begin
   comb : process (romaddr)
   begin
     case conv_integer(romaddr) is
-    when 16#00000# => romdata <= X"37010048";
-    when 16#00001# => romdata <= X"130101fe";
-    when 16#00002# => romdata <= X"b7070040";
-    when 16#00003# => romdata <= X"e7800700";
-    when 16#00004# => romdata <= X"13000000";
-    when 16#00005# => romdata <= X"00000000";
+    when 16#00000# => romdata <= X"b7070040";
+    when 16#00001# => romdata <= X"e7800700";
+    when 16#00002# => romdata <= X"13000000";
+    when 16#00003# => romdata <= X"00000000";
     when others => romdata <= (others => '-');
     end case;
   end process;

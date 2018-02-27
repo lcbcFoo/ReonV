@@ -1822,12 +1822,12 @@ begin
         if r.a.ctrl.trap = '1' then tt := r.a.ctrl.tt;
         elsif privileged_inst = '1' then tt := TT_PRIV;
         elsif illegal_inst = '1' or r.a.decill = '1' then tt := TT_IINST;
-        elsif fp_disabled = '1' then tt := TT_FPDIS;
-        elsif cp_disabled = '1' then tt := TT_CPDIS;
+        --elsif fp_disabled = '1' then tt := TT_FPDIS;
+        --elsif cp_disabled = '1' then tt := TT_CPDIS;
         elsif wph = '1' then tt := TT_WATCH;
-        elsif r.a.wovf= '1' then tt := TT_WINOF;
-        elsif r.a.wunf= '1' then tt := TT_WINUF;
-        elsif r.a.ticc= '1' then tt := TT_TICC;
+        --elsif r.a.wovf= '1' then tt := TT_WINOF;
+        --elsif r.a.wunf= '1' then tt := TT_WINUF;
+        --elsif r.a.ticc= '1' then tt := TT_TICC;
         else trap := '0'; tt:= (others => '0'); end if;
     end if;
 end;
@@ -2080,8 +2080,8 @@ end;
         ((ldcheck2 = '1') and (r.e.ctrl.rd = rfa2)))
     then ldlock := '1'; end if;
 
-    de_fins_holdx := BPRED and fins and (r.a.bp or r.e.bp); -- skip BP on FPU inst in branch target address
-    de_fins_hold := de_fins_holdx;
+    -- de_fins_holdx := BPRED and fins and (r.a.bp or r.e.bp); -- skip BP on FPU inst in branch target address
+    -- de_fins_hold := de_fins_holdx;
     ldlock := ldlock or y_hold or fpc_lock or (BPRED and r.a.bp) or de_fins_holdx;
     if ((icc_check_bp and BPRED) = '1') and ((r.a.nobp or mul_hold) = '0') then
       bp := bicc_hold_bp;
@@ -2393,11 +2393,11 @@ end;
     shcnt := iop2(4 downto 0); sari := '0'; shleft := '0'; invop2 := '0';
     ymsb := iop1(0); mulins := '0'; divins := '0'; mulstep := '0';
     macins := '0';
-
-    if r.e.ctrl.wy = '1' then y0 := my;
-    elsif r.m.ctrl.wy = '1' then y0 := r.m.y(0);
-    elsif r.x.ctrl.wy = '1' then y0 := r.x.y(0);
-    else y0 := r.w.s.y(0); end if;
+    --
+    -- if r.e.ctrl.wy = '1' then y0 := my;
+    -- elsif r.m.ctrl.wy = '1' then y0 := r.m.y(0);
+    -- elsif r.x.ctrl.wy = '1' then y0 := r.x.y(0);
+    -- else y0 := r.w.s.y(0); end if;
 
     if r.e.ctrl.wicc = '1' then icc := me_icc;
     elsif r.m.ctrl.wicc = '1' then icc := r.m.icc;

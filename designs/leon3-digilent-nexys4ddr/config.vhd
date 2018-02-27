@@ -91,7 +91,7 @@ package config is
   constant CFG_FPNPEN : integer := 1;
   constant CFG_AHBIO : integer := 16#FFF#;
   constant CFG_APBADDR : integer := 16#800#;
-  constant CFG_AHB_MON : integer := 0;
+  constant CFG_AHB_MON : integer := 1;
   constant CFG_AHB_MONERR : integer := 0;
   constant CFG_AHB_MONWAR : integer := 0;
   constant CFG_AHB_DTRACE : integer := 0;
@@ -129,11 +129,11 @@ package config is
   constant CFG_MIG_7SERIES : integer := 0;
   constant CFG_MIG_7SERIES_MODEL : integer := 0;
 -- AHB ROM
-  constant CFG_AHBROMEN : integer := 0;
+  constant CFG_AHBROMEN : integer := 1;
   constant CFG_AHBROPIP : integer := 0;
   constant CFG_AHBRODDR : integer := 16#000#;
-  constant CFG_ROMADDR : integer := 16#000#;
-  constant CFG_ROMMASK : integer := 16#E00# + 16#000#;
+  constant CFG_ROMADDR : integer := 16#100#;
+  constant CFG_ROMMASK : integer := 16#E00# + 16#100#;
 -- AHB RAM
   constant CFG_AHBRAMEN : integer := 0;
   constant CFG_AHBRSZ : integer := 1;
@@ -145,7 +145,7 @@ package config is
   constant CFG_ETH_FIFO : integer := 8;
 -- UART 1
   constant CFG_UART1_ENABLE : integer := 1;
-  constant CFG_UART1_FIFO : integer := 1;
+  constant CFG_UART1_FIFO : integer := 2;
 -- LEON3 interrupt controller
   constant CFG_IRQ3_ENABLE : integer := 1;
   constant CFG_IRQ3_NSEC : integer := 0;
