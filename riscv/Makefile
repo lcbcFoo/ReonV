@@ -27,12 +27,13 @@ CFLAGS=-nostdlib
 OBJCPFLAGS=-O binary -j .text -j .data
 LD_SCRIPT=ld_script
 WRAP=-Wl,-wrap,exit,-wrap,open,-wrap,close,-wrap,write,-wrap,read,-wrap,lseek,-wrap,sbrk
+TEST_FILES = $(wildcard acstone/*.c)
+TEST_PROGS = $(patsubst %.c,%.out,$(TEST_FILES))
 
-#####################################################################
+################################################################################
 #
-#  Targets for Makefile
+# 	Targets for compiling
 #
-#####################################################################
 # Compiled binary linked with reonv_crt0
 %.out : %.c reonv_crt0.o posix.o console.o
 	${CROSS}${CC} -static -march=rv32i ${WRAP} -T${LD_SCRIPT} $< -o $@
@@ -62,6 +63,10 @@ reonv_crt0.o : reonv_crt0.S
 %.bin : %.hex
 	${CROSS}$(OBJCOPY) $(OBJCPFLAGS)  $< $@
 
+################################################################################
+#
+# 	Boot Code
+#
 # Adapted PROM generation based on original leon3 script (found at ../bin)
 ahbrom.vhd : ahbrom boot_code.bin
 	./ahbrom boot_code.bin ahbrom.vhd
@@ -74,4 +79,11 @@ ahbrom : ../bin/ahbrom.c
 	gcc ../bin/ahbrom.c -o ahbrom
 
 clean:
-	rm -rf ahbrom* *.hex *.inv *.bin *.o *.log *.jou *.str
+	rm -rf ahbrom* *.hex *.inv *.bin *.o *.log *.jou *.str acstone/*.out
+
+################################################################################
+#
+# 	Run tests
+#
+# Create test programs
+build_tests: ${TEST_PROGS}
