@@ -6,17 +6,13 @@ changing a few commands to the ones your board requires.
 ---
 ## Overview
 * ReonV currentily implements RV32I without privilegied instructions, so it is important to use a compiler to this ISA (follow instructions on the main README). 
-* We will use GRMON2 to load, run and debug the program, since the processor DSU was not changed and it communicates with GRMON. However, GRMON2 was not designed for RISC-V and we have to change the assembly and binary to workaround this problem (more information on issue [GRMON2 and RISCV](https://github.com/lcbcFoo/ReonV/issues/5)
+* We will use GRMON2 to load, run and debug the program, since the processor DSU was not changed and it communicates with GRMON. However, GRMON2 was not designed for RISC-V and we have to take some workarounds to run a RISC-V program using it (more information on issue [GRMON2 and RISCV](https://github.com/lcbcFoo/ReonV/issues/5)
 * The scrips for running on nexys4ddr are at `designs/leon3-digilent-nexys4ddr`. If you are running on other board, you must use its own design directory.
 
 ## Compiling the program
-We have files `main.c`, `main.s`, `main.S` and `main.bin`. `main.c` contains our simple example, `main.s` was generated after running `make main.s`, `main.S` is the modified assembly we are going to assemble and finally `main.bin` is the binary generated after assembling `main.S` and extracting .text section, it is the binary we are going to run. The process of compilation is:
+Currently, we have a simple `crt0.S` to initialize stack and other registers. Also, we have some minimal posix functions needed for benchmarks implemented on `posix.c`. These file are linked to the main.c program by the linker script, allowing us to use some commom functions from glibc. However, we do not have complete support for glibc at this moment. The linker script also sets the beginning of `.text` to position 0x40001000 (a workaround needed to run via GRMON2). To compile a program `main.c` on the `riscv` directory run:   
 ```
-make main.s
-# Modify main.s to main.S. We need to set stack point, change `call` commands to `jal`, 
-# since after we remove .text section the calculation for `call` will be wrong. 
-# Put an instruction EBREAK to stop the program.
-make main.bin   # This will assemble main.S and extract .text section 
+make main.out
 ```
 
 ---
@@ -43,9 +39,10 @@ grmon -digilent -u
 ```
 
 ## Running the program
-GRMON2 has many features, but some as still restricted because of our RISC-V ISA. To load and our program use:
+GRMON2 has many features, but some are still restricted because of our RISC-V ISA. To load and our program use:
 ```
-bload ../../riscv/main.bin 0x40000000   # Load on memory position 0x40000000
+bload ../../riscv/main.out 0x40000000   # Load on memory position 0x40000000
+ep 0x40001000                           # Set entry point to position 0x40001000
 run
 ```
-You can `reset` the processor, see the registers with `reg`, set a breakpoint with `bp <address>`, run step by step with `step` and disassemble memory with `disassemble <memory address>`
+You can `reset` the processor, see the registers with `reg`, set a breakpoint with `bp <address>`, run step by step with `step`, disassemble memory with `disassemble <memory address>` and a lot of others commands described on GRMON2´s [manual](http://www.gaisler.com/doc/grmon2.pdf).
