@@ -24,14 +24,14 @@ Also, we wanted to show to the hardware developers community that it is possible
 
 ---
 ## <a name="repo-map"></a> Repository Map
-The directories `bin`, `boards` and `software` where simply copied from GRLIB and contain scripts, templates and small programs used by GRLIB. The directory `doc` constains the documentation from GRLIB (may be updated with ReonV specific documentation on future). Directory `designs` contains all scripts and configuration designs for each specific FPGA board supported by Leon3 (and by ReonV). Directory `lib` constains the source code of the processor and of all peripherals or IP cores provided by GRLIB, the 7-stage integer pipeline changed to RISC-V is at `lib/gaisler/leon3v3/iu4.vhd`. Lastly, `riscv` contains scripts and configuration files to run a test example on ReonV (check [Running an Example[(#running) section). 
+The directories `bin`, `boards` and `software` where simply copied from GRLIB and contain scripts, templates and small programs used by GRLIB. The directory `doc` constains the documentation from GRLIB (may be updated with ReonV specific documentation on future). Directory `designs` contains all scripts and configuration designs for each specific FPGA board supported by Leon3 (and by ReonV). Directory `lib` constains the source code of the processor and of all peripherals or IP cores provided by GRLIB, the 7-stage integer pipeline changed to RISC-V is at `lib/gaisler/leon3v3/iu3.vhd`. Lastly, `riscv` contains scripts and configuration files to run a test example on ReonV (check [Running an Example](#running) section). 
 
 ---
 ## <a name="install"></a> Installation
 ### <a name="install-reonv"></a> ReonV
-As already explained, ReonV is a modified version of the Leon3 processor, which is part of GRLIB, that means you can clone this repository and follow the detailed instructions provided in the GRLIB User Manual (it can be found at doc/grlib.pdf or [here](http://www.gaisler.com/products/grlib/grlib.pdf)) depending on the tools you want to use for synthesis or simulation or even on which FPGA you are goind to run.
+As already explained, ReonV is a modified version of the Leon3 processor, which is part of GRLIB, that means you can clone this repository and follow the detailed instructions provided in the GRLIB User Manual (it can be found at `doc/grlib.pdf` or [here](http://www.gaisler.com/products/grlib/grlib.pdf)) depending on the tools you want to use for synthesis or simulation or even on which FPGA you are going to run.
 ### <a name="rv-toolchain"></a> RISC-V Toolchain
-Needed to compile a program targeting RISC-V architecture, its repository can be found [here](https://github.com/riscv/riscv-gnu-toolchain)
+It is needed to compile a program targeting RISC-V architecture, its repository can be found [here](https://github.com/riscv/riscv-gnu-toolchain). Follow the instructions provided there and make sure to compile it for RV32I only! You can make this by replacing the line `./configure --prefix=/the/path/you/chose` explained on their README by `./configure --with-xlen=32 --with-arch=I --prefix=/the/path/you/chose`.
 ### <a name="install-grmon"></a> GRMON2
 GRMON2 is the Leon3 debugging tool provided by [Cobham Gaisler AB](http://www.gaisler.com/). It communicates with the Debugging Unit of the processor and allows to easily execute programs and debug the processor. GRMON has evaluation and professional versions, you can find the download links and its manual [here](http://www.gaisler.com/index.php/downloads/debug-tools).
 
