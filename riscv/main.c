@@ -3,38 +3,36 @@ int fib();
 #include <stdio.h>
 
 int main(){
-	// int i[3] = {0xF1E2D3C4, 0x12345678, 0xACB45321};
+	// int* array = (int*)sbrk(4 * sizeof(int));
+	// int* array2 = (int*)sbrk(2 * sizeof(int));
 	//
-	int count = 0xDDDDDDDD;
-	// int j[3] = {0xECECECEC, 0xBBBBBBBB, 0x01010202};
+	// array[0] = 0xAAAABBBB;
+	// array[1] = 0xCCCCDDDD;
+	// array[2] = 0xEEEEFFFF;
+	// array[3] = 0x1111AAAA;
+	// array2[0] = 0x2222BBBB;
+	// array2[1] = 0x3333CCCC;
+	//
+	// write(0, array,4 * sizeof(int));
+	// lseek(0, -4*sizeof(int), SEEK_CUR);
+	// read(0, array2, 2 * sizeof(int));
 
-	int* array = (int*)sbrk(4 * sizeof(int));
-	int* array2 = (int*)sbrk(2 * sizeof(int));
+	int n = 16;
+	int* array = (int*)sbrk(n * sizeof(int));
+	int* array2 = (int*)sbrk(n * sizeof(int));
 
-	int cc = 0xcccccccc;
-	array[0] = 0xAAAABBBB;
-	array[1] = 0xCCCCDDDD;
-	array[2] = 0xEEEEFFFF;
-	array[3] = 0x1111AAAA;
-	array2[0] = 0x2222BBBB;
-	array2[1] = 0x3333CCCC;
+	for(int i = 1; i <= n; i++)
+		array[i-1] = fib(i);
 
-	// Multiplies i by 4
-	//do{
-	//	i = mul(i,3);
-	//	__asm("mv x31,a0");
-	//	count++;
-	//}while(i < 2500);
+	write(0, array,n * sizeof(int));
+	lseek(0, -n*sizeof(int), SEEK_CUR);
+	read(0, array2, n * sizeof(int));
 
-	//i = fib(i);	// fib(16) = 987 = 0x3DB
-
-	//dbgleon_printf("%d", i);
-	// bsp_debug_uart_init();
-	// apbuart_write_polled(&i, sizeof(int));
-
-	// write(0,&i,3 * sizeof(int));
-	// lseek(0, -3*sizeof(int), SEEK_CUR);
-	// read(0, &j, 3 * sizeof(int));
+	int correct = 0xAAAABBBB;
+	for(int i = 0; i < n; i++)
+		if(array[i] != array2[i])
+			correct = 0xCCCCDDDD;
+	write(0, &correct, sizeof(int));
 }
 
 int fib(int i){

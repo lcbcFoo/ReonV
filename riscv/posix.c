@@ -92,10 +92,7 @@ int _write_c( int fd, char *buffer, int len ) {
 
     int i;
 	for(i = 0; (i < len) && (&out_mem[i] < (char*)OUT_MEM_END); i++){
-		//out_mem[i] = buffer[i];
-		(*console) = buffer[i];
-
-		while((*uart_shifter) & 0x2 != 0x2);
+		out_mem[i] = buffer[i];
 	}
 
     out_mem += i;
