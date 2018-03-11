@@ -22,9 +22,19 @@
  * THE SOFTWARE.
  */
 
-/* This is a modified version of some files on leon3 compiler bcc 2.0.2 source
+
+/*******************************************************************************
+ *
+ *                        REONV - CONSOLE SUPPORT
+ *
+ *  This is a modified version of some files on leon3 compiler bcc 2.0.2 source
  * code, avaiable with GPL license on Aeroflex Gaisler website.
- */
+ *
+ *  Console via UART is not supported yet on ReonV, this code may be used in
+ * future only.
+ *
+ *******************************************************************************
+*/
 
 #include <stdlib.h>
 #include <ctype.h>

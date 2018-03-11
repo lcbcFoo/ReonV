@@ -112,8 +112,9 @@ end;
 
 architecture rtl of iu3 is
 
-----------------------------------------------------------------------------
-    -- RISCV OP decoding constants --
+
+--------------------------------------------------------------------------------
+--                     RISCV OP decoding constants
 
     subtype r_op_type is std_logic_vector(6 downto 0);
 
@@ -129,8 +130,8 @@ architecture rtl of iu3 is
     constant R_FENCE     : r_op_type := "0001111";
     constant R_CONTROL   : r_op_type := "1110011";
 
-----------------------------------------------------------------------------
-    -- RISCV funct3 decoding constants --
+--------------------------------------------------------------------------------
+--                     RISCV funct3 decoding constants
 
     subtype r_funct3_type is std_logic_vector(2 downto 0);
     --Jump register
@@ -166,6 +167,9 @@ architecture rtl of iu3 is
     constant R_F3_SLL    : r_funct3_type := "001";
     constant R_F3_SRL    : r_funct3_type := "101"; --Same to SRA
 
+
+--                  RISC-V SPECIAL CONSTANTS (NOT USED YET)
+
     -- Fence
     constant R_F3_FENCE  : r_funct3_type := "000";
     constant R_F3_FENCEI : r_funct3_type := "001";
@@ -200,6 +204,9 @@ architecture rtl of iu3 is
     -- 1110 RESERVED
     constant EXC_PFAULT_ST         : r_exc_type := "1111";
 
+--------------------------------------------------------------------------------
+--                      END OF RISC-V SPECIFIC CONSTANTS
+--------------------------------------------------------------------------------
 
     -- Used by
     subtype asi_type is std_logic_vector(4 downto 0);
@@ -259,8 +266,6 @@ architecture rtl of iu3 is
     constant TT_DSEX   : trap_type := "101011";
     constant TT_TICC   : trap_type := "111111";
 
-
----------------------------------------------------------------------------
 
   function get_tbuf(tracebuf_2p: boolean; tbuf: integer) return integer is
   begin
@@ -556,6 +561,10 @@ architecture rtl of iu3 is
     cwpmax : cwptype;                   -- max cwp value
     ducnt  : std_ulogic;
 
+--------------------------------------------------------------------------------
+--                  RISC-V SPECIAL REGISTERS (NOT USED YET)
+--------------------------------------------------------------------------------
+
     -- RISC-V CSRs used by GNU/Linux    -- Encoding
     status   : word;                    -- 0
     epc      : pctype;                  -- 1
@@ -613,44 +622,6 @@ architecture rtl of iu3 is
 
   type watchpoint_registers is array (0 to 3) of watchpoint_register;
 
-  -- function dbgexc(
-  --   r     : registers; dbgi : l3_debug_in_type;
-  --   trap  : std_ulogic;
-  --   tt    : std_logic_vector(7 downto 0);
-  --   dsur  : dsu_registers) return std_ulogic is
-  --   variable dmode : std_ulogic;
-  -- begin
-  --   dmode := '0';
-  --   if (not r.x.ctrl.annul and trap) = '1' then
-  --     -- if (((tt = "00" & TT_WATCH) and (dbgi.bwatch = '1')) or
-  --     --     ((dbgi.bsoft = '1') and (tt = "10000001")) or
-  --     --     (dbgi.btrapa = '1') or
-  --     --     ((dbgi.btrape = '1') and not ((tt(5 downto 0) = TT_PRIV) or
-  --     --       (tt(5 downto 0) = TT_FPDIS) or (tt(5 downto 0) = TT_WINOF) or
-  --     --       (tt(5 downto 0) = TT_WINUF) or (tt(5 downto 4) = "01") or (tt(7) = '1'))) or
-  --     --     (((not r.w.s.et) and dbgi.berror) = '1')) then
-  --     if (tt = "0000" & EXC_BREAKPOINT) or (TT = "0000" & EXC_IINST) or (TT = "0000" & EXC_AFAULT_INST) or
-  --        ((dbgi.bsoft = '1') and (tt = "10000001")) or ((not r.w.s.et) and dbgi.berror) = '1' then
-  --       dmode := '1';
-  --     end if;
-  --   end if;
-  --   return(dmode);
-  -- end;
-  --
-  -- function dbgerr(r : registers; dbgi : l3_debug_in_type;
-  --                 tt : std_logic_vector(7 downto 0))
-  -- return std_ulogic is
-  --   variable err : std_ulogic;
-  -- begin
-  --   err := not r.w.s.et;
-  --   -- if (((dbgi.dbreak = '1') and (tt = ("00" & TT_WATCH))) or
-  --   --     ((dbgi.bsoft = '1') and (tt = ("10000001")))) then
-  --   if (((dbgi.dbreak = '1') and (tt = ("0000" & EXC_USER_ECALL))) or
-  --        ((dbgi.bsoft = '1') and (tt = ("10000001")))) then
-  --     err := '0';
-  --   end if;
-  --   return(err);
-  -- end;
   function dbgexc(
     r     : registers; dbgi : l3_debug_in_type;
     trap  : std_ulogic;
@@ -998,29 +969,7 @@ architecture rtl of iu3 is
   function itfilt (inst : word; asifilt : std_ulogic; filter : std_logic_vector(3 downto 0); trap, cfc : std_logic) return std_ulogic is
     variable tren : std_ulogic;
   begin
-    tren := '0';
-    -- case filter is
-    --   when "0001" => 	-- Bicc, SETHI
-    --     if inst(31 downto 30) = "00" then tren := '1'; end if;
-    --   when "0010" => 	-- Control-flow change
-    --     if (inst(31 downto 30) = "01") -- Call
-    --       or ((inst(31 downto 30) = "00") and (inst(23 downto 22) /= "00")) --Bicc
-    --       or ((inst(31 downto 30) = "10") and (inst(24 downto 19) = JMPL)) --Jmpl
-    --       or ((inst(31 downto 30) = "10") and (inst(24 downto 19) = RETT)) --Rett
-    --       or (trap = '1') or (cfc = '1')
-    --     then tren := '1'; end if;
-    --   when "0100" => 	-- Call
-    --     if inst(31 downto 30) = "01" then tren := '1'; end if;
-    --   when "1000" => 	-- Normal instructions
-    --     if inst(31 downto 30) = "10" then tren := '1'; end if;
-    --   when "1100" => 	-- LDST
-    --     if inst(31 downto 30) = "11" then tren := '1'; end if;
-    --   when "1101" =>      -- LDST from alternate space
-    --     if inst(31 downto 30) = "11" and inst(24 downto 23) = "01" then tren := '1'; end if;
-    --   when "1110" =>      -- LDST from alternate space 0x80 - 0xFF
-    --     if inst(31 downto 30) = "11" and inst(24 downto 23) = "01" and inst(12) = '1' and asifilt = '1' then tren := '1'; end if;
-    --   when others => tren := '1';
-    -- end case;
+      tren := '0';
     return(tren);
   end;
 
@@ -1574,36 +1523,6 @@ architecture rtl of iu3 is
   constant SZWORD    : std_logic_vector(1 downto 0) := "10";
   constant SZDBL     : std_logic_vector(1 downto 0) := "11";
 
--- calculate register file address
-
-  procedure regaddr(cwp : std_logic_vector; reg : std_logic_vector(4 downto 0);
-         stwin, de_cwpmax: std_logic_vector;
-         rao : out rfatype) is
-  variable ra : rfatype;
-  constant globals : std_logic_vector(RFBITS-5  downto 0) :=
-        conv_std_logic_vector(NWIN, RFBITS-4);
-    variable vcwp: cwptype;
-  begin
-    vcwp := cwp;
-    ra := (others => '0'); ra(4 downto 0) := reg;
-    -- if RFPART then
-    --   if ra(4)='0' and cwp=CWPMIN then
-    --     ra(4):='1';
-    --     vcwp := std_logic_vector(unsigned(de_cwpmax) + unsigned(stwin));
-    --   else
-    --     vcwp := std_logic_vector(unsigned(cwp) + unsigned(stwin));
-    --   end if;
-    -- end if;
-    -- if reg(4 downto 3) = "00" then ra(RFBITS -1 downto 4) := globals;
-    -- else
-    --   ra(NWINLOG2+3 downto 4) := vcwp + ra(4);
-    --   if ra(RFBITS-1 downto 4) = globals then
-    --     ra(RFBITS-1 downto 4) := (others => '0');
-    --   end if;
-    -- end if;
-    rao := ra;
-  end;
-
 -- branch adder
 
   function branch_address(inst : word; pc : pctype; de_rexbaddr1, de_rexen: std_logic) return std_logic_vector is
@@ -1611,25 +1530,12 @@ architecture rtl of iu3 is
   begin
 
 --------------------------------------------------------------------------------
-    -- RV32I changes
-    -- case inst(6 downto 0) is
-    --     when R_JAL =>
-    --         addr(31 downto 20) := (others => inst(31));
-    --         addr(19 downto 11) := inst(19 downto 12) & inst(20);
-    --         -- PCLOW is 2 for now
-    --         --addr(10 downto 1)  := inst(30 downto 21);
-    --         addr(10 downto 2)  := inst(30 downto 22);
-    --
-    --     when R_BRANCH =>
-            addr(31 downto 12) := (others => inst(31));
-            addr(11)           := inst(7);
-            addr(10 downto 5)  := inst(30 downto 25);
-            --addr(4 downto 1)   := inst(11 downto 8);
-            addr(4 downto 2)   := inst(11 downto 9);
-
-    --     when others => null;
-    -- end case;
-    --tmp(31 downto 2) := x"4000003" & "00";
+    --     Calculates RISC-V branch address
+    addr(31 downto 12) := (others => inst(31));
+    addr(11)           := inst(7);
+    addr(10 downto 5)  := inst(30 downto 25);
+    --addr(4 downto 1)   := inst(11 downto 8);
+    addr(4 downto 2)   := inst(11 downto 9);
     tmp(31 downto 2)  :=  addr(31 downto 2) + pc(31 downto 2) - 2;
     return (tmp);
   end;
@@ -1653,17 +1559,6 @@ architecture rtl of iu3 is
               when others => null;
           end case;
        end if;
-    -- if(inst(6 downto 0) = R_BRANCH) then
-    --    case inst(14 downto 12) is
-    --        when "000" => branch := icc(2);                   -- beq
-    --        when "001" => branch := not icc(2);               -- bne
-    --        when "100" => branch := not icc(0);        -- blt
-    --        when "101" => branch := icc(0);   -- bge
-    --        when "110" => branch := not icc(1);               -- bltu
-    --        when "111" => branch := icc(1);                   -- bgeu
-    --        when others => null;
-    --    end case;
-    -- end if;
     return(branch);
   end;
 
@@ -1802,32 +1697,11 @@ begin
         end case;
 
         wph := wphit(r, wpr, dbgi, dsur, pccomp);
-
-        -- trap := '1';
-        -- if r.a.ctrl.trap = '1' then tt := r.a.ctrl.tt;
-        -- elsif (illegal_inst = '1') or r.a.decill = '1' then tt := "00" & EXC_IINST;
-        -- elsif (ebreak = '1') then tt := "00" & EXC_BREAKPOINT;
-        -- elsif (ecall = '1') then
-        --     -- Check if we are at user,supervisor or machine space
-        --     tt := "00" & EXC_USER_ECALL;
-        --
-        -- -- elsif fp_disabled = '1' then tt := TT_FPDIS;
-        -- -- elsif cp_disabled = '1' then tt := TT_CPDIS;
-        -- -- elsif wph = '1' then tt := TT_WATCH;
-        -- -- elsif r.a.wovf= '1' then tt := TT_WINOF;
-        -- -- elsif r.a.wunf= '1' then tt := TT_WINUF;
-        -- -- elsif r.a.ticc= '1' then tt := TT_TICC;
-        -- else trap := '0'; tt:= (others => '0'); end if;
         trap := '1';
         if r.a.ctrl.trap = '1' then tt := r.a.ctrl.tt;
         elsif privileged_inst = '1' then tt := TT_PRIV;
         elsif illegal_inst = '1' or r.a.decill = '1' then tt := TT_IINST;
-        --elsif fp_disabled = '1' then tt := TT_FPDIS;
-        --elsif cp_disabled = '1' then tt := TT_CPDIS;
         elsif wph = '1' then tt := TT_WATCH;
-        --elsif r.a.wovf= '1' then tt := TT_WINOF;
-        --elsif r.a.wunf= '1' then tt := TT_WINUF;
-        --elsif r.a.ticc= '1' then tt := TT_TICC;
         else trap := '0'; tt:= (others => '0'); end if;
     end if;
 end;
@@ -1844,45 +1718,12 @@ end;
 
 -- select cwp
 
+-- This is not used by RISC-V, since there is no resgiter window. This should be removed
+-- in future
 procedure cwp_gen(r, v : registers; annul, wcwp : std_ulogic; ncwp : cwptype;
                   cwp : out cwptype; awp: out cwptype; aw,paw: out std_ulogic;
                   stwin,de_cwpmax: out cwptype) is
  begin
---   if (r.x.rstate = trap) or
---       (r.x.rstate = dsu2)
---      or (rstn = '0') then cwp := v.w.s.cwp;
---   elsif (wcwp = '1') and (annul = '0') and ((not AWPEN) or r.d.aw='0') then cwp := ncwp;
---   elsif r.m.wcwp = '1' then cwp := r.m.result(NWINLOG2-1 downto 0);
---   else cwp := r.d.cwp; end if;
---
---   if AWPEN and ((r.x.rstate = trap) or
---       (r.x.rstate = dsu2)
---      or (rstn = '0')) then awp := v.w.s.awp;
---   elsif AWPEN and r.d.aw='1' and (wcwp = '1') and (annul = '0') then awp := ncwp;
---   elsif AWPEN and r.m.wawp = '1' then awp := r.m.result(NWINLOG2-1 downto 0);
---   elsif AWPEN and (r.d.aw='0' and r.d.paw='0') then awp := r.d.cwp;
---   else awp := r.d.awp; end if;
---
---   if AWPEN and (
---     (r.x.rstate = trap) or
---       (r.x.rstate = dsu2)
---      or (rstn = '0') ) then aw := v.w.s.aw; paw := v.w.s.paw;
---   elsif AWPEN and (v.a.ctrl.rett='1') then
---     aw := r.d.paw; paw := r.d.paw;
---   elsif AWPEN and r.m.wcwp='1' then aw:=r.m.result(15); paw:=r.m.result(14);
---   else aw:=r.d.aw; paw:=r.d.paw; end if;
---
---   if RFPART and (
---     (r.x.rstate = trap) or
---       (r.x.rstate = dsu2)
---      or (rstn = '0') ) then
---     stwin := v.w.s.stwin; de_cwpmax:=v.w.s.cwpmax;
---   elsif RFPART and r.m.wawp='1' and r.m.result(15+NWINLOG2 downto 16)/=CWPMIN then
---     stwin:=r.m.result(20+NWINLOG2 downto 21); de_cwpmax:=r.m.result(15+NWINLOG2 downto 16);
---   else
---     stwin := r.d.stwin; de_cwpmax:=r.d.cwpmax;
---   end if;
-
     cwp := "000";
     aw := '0';
     paw := '0';
@@ -1893,29 +1734,18 @@ end;
 
 -- generate wcwp in ex stage
 
+-- This is not used by RISC-V, since there is no resgiter window. This should be removed
+-- in future
 procedure cwp_ex(r : in  registers; wcwp : out std_ulogic; wawp : out std_ulogic) is
   variable vwcwp, vwawp: std_ulogic;
 begin
   vwcwp := '0'; vwawp := '0';
-  -- if (r.e.ctrl.inst(31 downto 30) = FMT3) and
-  --    (r.e.ctrl.inst(24 downto 19) = WRPSR) and
-  --    (pwrpsr=0 or r.e.ctrl.inst(29 downto 25)="00000")
-  -- then vwcwp := not r.e.ctrl.annul; else vwcwp := '0'; end if;
-  -- if AWPEN and
-  --   (r.e.ctrl.inst(31 downto 30) = FMT3) and
-  --   (r.e.ctrl.inst(24 downto 19) = WRY) and
-  --   (r.e.ctrl.inst(29 downto 25) = "10100")
-  -- then
-  --   vwawp := not r.e.ctrl.annul;
-  --   vwcwp := vwcwp or (r.e.op1(5) and not r.e.ctrl.annul);
-  -- else vwawp := '0';
-  -- end if;
-  -- wcwp := vwcwp;
-  -- wawp := vwawp;
 end;
 
 -- generate next cwp & window under- and overflow traps
 
+-- This is not used by RISC-V, since there is no resgiter window. This should be removed
+-- in future
 procedure cwp_ctrl(r : in registers; rcwp: in cwptype; xc_wim : in std_logic_vector(NWIN-1 downto 0);
         inst : word; de_cwp : out cwptype; wovf_exc, wunf_exc, wcwp : out std_ulogic) is
 variable op : std_logic_vector(1 downto 0);
@@ -1927,21 +1757,6 @@ begin
   wovf_exc := '0'; wunf_exc := '0'; wim := (others => '0');
   wim(NWIN-1 downto 0) := xc_wim; wcwp := '0';
   ncwp := "000";
-  -- if (op = FMT3) and ((op3 = RETT) or (op3 = RESTORE) or (op3 = SAVE)) then
-  --   wcwp := '1';
-  --   if (op3 = SAVE) then
-  --     if RFPART and (rcwp=CWPMIN) then ncwp := r.w.s.cwpmax;
-  --     elsif (not CWPOPT) and (rcwp = CWPMIN) then ncwp := CWPMAX;
-  --     else ncwp := rcwp - 1 ; end if;
-  --   else
-  --     if RFPART and (rcwp = r.w.s.cwpmax) then ncwp := CWPMIN;
-  --     elsif (not CWPOPT) and (rcwp = CWPMAX) then ncwp := CWPMIN;
-  --     else ncwp := rcwp + 1; end if;
-  --   end if;
-  --   if wim(conv_integer(ncwp)) = '1' then
-  --     if op3 = SAVE then wovf_exc := '1'; else wunf_exc := '1'; end if;
-  --   end if;
-  -- end if;
   de_cwp := ncwp;
 end;
 
@@ -1968,6 +1783,8 @@ end;
     not_valid := (r.a.ctrl.wicc or r.e.ctrl.wicc);
     return(not not_valid);
   end;
+
+--                  RISC-V BRANCH PREDICTION IS CURRENTLY DISABLED
 
   -- procedure bp_miss_ex(r : registers; icc : std_logic_vector(3 downto 0);
   --       ex_bpmiss, ra_bpannul : out std_logic) is
@@ -2041,12 +1858,10 @@ end;
         ldcheck1 := '1'; ldchkra := '0';
         case r.d.cnt is
             when "00" =>
-                --if (lddel = 2) and (op3(2) = '1') and (op3(5) = '0') then ldcheck3 := '1'; end if;
                 if (op(5) = '1') then ldcheck3 := '1'; end if; -- store
                 ldchkra := '1';
             when "01" =>
                 ldchkra := '1';
-          --if (op  3(5) and op3(2) and not op3(3)) = '1' then ldcheck1 := '0'; ldcheck2 := '0'; end if;  -- STF/STC
             when others => NULL;
         end case;
       when others => null;
@@ -2134,7 +1949,6 @@ end;
 
 --------------------------------------------------------------------------------
     -- RV32I changes
---    if (r.d.annul = '0') and not (icbpmiss = '1' and r.d.pcheld='0') and (REX=0 or de_rexbubble='0') and (irqlat=0 or not (r.d.irqstart='1' and r.d.irqlatmet='0'))
     if (r.d.annul = '0') and (irqlat=0 or not (r.d.irqstart='1' and r.d.irqlatmet='0'))
     then
         case inst(6 downto 0) is
@@ -2149,6 +1963,7 @@ end;
                     when others => null;
                 end case;
 
+            -- This is a workaround to run branch instructions with no branch prediction
             when R_BRANCH =>
                 if r.d.cnt = "11" then
                     branch := branch_true;
@@ -2298,6 +2113,8 @@ end;
   end;
 
 -- read special registers
+
+-- THIS IS NOT READY, SPECIAL INSTRUCTIONS SHOULD NOT BE USED
 function get_spr (r : registers) return word is
 variable spr : word;
 begin
@@ -2375,8 +2192,6 @@ end;
         mulins, divins, mulstep, macins, ldbp2, invop2 : out std_logic
         ) is
   variable op : std_logic_vector(6 downto 0);
-  --variable op2 : std_logic_vector(2 downto 0);
-  --variable op3 : std_logic_vector(5 downto 0);
   variable f3 : std_logic_vector(2 downto 0);
   variable rs1, rs2, rd  : std_logic_vector(4 downto 0);
   variable icc : std_logic_vector(3 downto 0);
@@ -2385,7 +2200,6 @@ end;
 
     op   := r.a.ctrl.inst(6 downto 0);
     f3  := r.a.ctrl.inst(14 downto 12);
---    op3  := r.a.ctrl.inst(24 downto 19);
     rs1 := r.a.ctrl.inst(19 downto 15); i := r.a.ctrl.inst(30);
     rs2 := r.a.ctrl.inst(24 downto 20); rd := r.a.ctrl.inst(29 downto 25);
     aop1 := iop1; aop2 := iop2; ldbp2 := ldbp;
@@ -2393,11 +2207,6 @@ end;
     shcnt := iop2(4 downto 0); sari := '0'; shleft := '0'; invop2 := '0';
     ymsb := iop1(0); mulins := '0'; divins := '0'; mulstep := '0';
     macins := '0';
-    --
-    -- if r.e.ctrl.wy = '1' then y0 := my;
-    -- elsif r.m.ctrl.wy = '1' then y0 := r.m.y(0);
-    -- elsif r.x.ctrl.wy = '1' then y0 := r.x.y(0);
-    -- else y0 := r.w.s.y(0); end if;
 
     if r.e.ctrl.wicc = '1' then icc := me_icc;
     elsif r.m.ctrl.wicc = '1' then icc := r.m.icc;
@@ -2596,9 +2405,6 @@ end;
         end if;
         logicout(31 downto 1) := (others => '0');
 
-    --when EXE_DIV   =>
-    --  if DIVEN then logicout := aluin2;
-    --  else logicout := (others => '-'); end if;
     when others => logicout := (others => '-');
     end case;
     if (r.e.ctrl.wy and r.e.mulstep) = '1' then
@@ -2705,19 +2511,11 @@ end;
     mzero := azero;
     case r.e.alusel is
     when EXE_RES_ADD =>
+        -- Flags are set for branch conditions
         aluresult := addout(32 downto 1);
-        -- if r.e.aluadd = '0' then
-        --     icc(0) := ((not op1(31)) and not op2(31)) or    -- Carry
-        --           (addout(32) and ((not op1(31)) or not op2(31)));
-        --     icc(1) := (op1(31) and (op2(31)) and not addout(32)) or         -- Overflow
-        --           (addout(32) and (not op1(31)) and not op2(31));
-        -- else
-        --     icc(0) := (op1(31) and op2(31)) or      -- Carry
-        --           ((not addout(32)) and (op1(31) or op2(31)));
-            icc(0) := addout(33);
-            icc(1) := (op1(31) and op2(31) and not addout(32)) or   -- Overflow
-                  (addout(32) and (not op1(31)) and (not op2(31)));
-        --end if;
+        icc(0) := addout(33); -- Carry
+        icc(1) := (op1(31) and op2(31) and not addout(32)) or   -- Overflow
+              (addout(32) and (not op1(31)) and (not op2(31)));
 
         if aluresult = zero32 then icc(2) := '1'; end if;
         icc(3) := aluresult(31);
@@ -2731,43 +2529,14 @@ end;
     -- Save PC on jump and link
     if r.e.jmpl = '1' then aluresult := (r.e.ctrl.pc(31 downto 2) + 1) & "00"; end if;
 
-    -- if(to_integer(signed(op1)) < to_integer(signed(op2))) then
-    --     icc(0) := '0';
-    -- else
-    --     icc(0) := '1';
-    -- end if;
-    -- if(to_integer(unsigned(op1)) >= to_integer(unsigned(op2))) then
-    --     icc(1) := '1';
-    -- else
-    --     icc(1) := '0';
-    -- end if;
-    -- if(op1 = op2) then
-    --     icc(2) := '1';
-    -- else
-    --     icc(2) := '0';
-    -- end if;
-
-    --divz := icc(2);
+    -- Write icc, used for branch
     if r.e.ctrl.wicc = '1' then
-    --  if (op = FMT3) and (op3 = WRPSR) then icco := logicout(23 downto 20);
         icco := icc;
     elsif r.m.ctrl.wicc = '1' then icco := me_icc;
     elsif r.x.ctrl.wicc = '1' then icco := r.x.icc;
     else icco := r.w.s.icc;
     end if;
 
-    -- if(r.e.ctrl.inst(6 downto 0) = R_BRANCH) then
-    --     aluresult := (others => '0');
-    --     if r.e.ctrl.wicc = '1' then
-    --         aluresult := addout(32 downto 1);
-    --     elsif r.m.ctrl.wicc = '1' then aluresult(3 downto 0) := me_icc;
-    --     elsif r.x.ctrl.wicc = '1' then aluresult(3 downto 0) := r.x.icc;
-    --     else aluresult(3 downto 0)  := r.w.s.icc;
-    --     end if;
-    -- end if;
-    --elsif r.m.ctrl.wicc = '1' then icco := me_icc;
-    --elsif r.x.ctrl.wicc = '1' then icco := r.x.icc;
-    --else icco := r.w.s.icc; end if;
     res := aluresult;
   end;
 
@@ -2834,14 +2603,22 @@ end;
   end;
 
 
+  -- Memory instructions involving float point registers, not implemented
   procedure fpstdata(r : in registers; edata, eres : in word; fpstdata : in std_logic_vector(31 downto 0);
                        edata2, eres2 : out word) is
     variable op : std_logic_vector(1 downto 0);
     variable op3 : std_logic_vector(5 downto 0);
   begin
     edata2 := edata; eres2 := eres;
-
-    -- RV32I changes
+    -- op := r.e.ctrl.inst(31 downto 30); op3 := r.e.ctrl.inst(24 downto 19);
+    -- if FPEN then
+    --   if FPEN and (op = LDST) and  ((op3(5 downto 4) & op3(2)) = "101") and (r.e.ctrl.cnt /= "00") then
+    --     edata2 := fpstdata; eres2 := fpstdata;
+    --   end if;
+    -- end if;
+    -- if CASAEN and (r.m.casa = '1') and r.e.ctrl.cnt(1)='1' then
+    --   edata2 := r.e.op1; eres2 := r.e.op1;
+    -- end if;
   end;
 
   function ld_align(data : dcdtype; set : std_logic_vector(DSETMSB downto 0);
@@ -2884,6 +2661,7 @@ end;
     return(outdata);
   end;
 
+-- RISC-V mem trap not implemented
 
   -- procedure mem_trap(r : registers; wpr : watchpoint_registers;
   --                    annul, holdn : in std_ulogic;
@@ -2999,6 +2777,7 @@ end;
   --   trapout := trap; werrout := werr;
   -- end;
 
+-- RISC-V IRQ trap not implemented
   procedure irq_trap(r       : in registers;
                      ir      : in irestart_register;
                      irl     : in std_logic_vector(3 downto 0);
@@ -3044,7 +2823,7 @@ end;
   end;
 
 -- write special registers
-
+-- RISC-V SPECIAL INSTRUCTIONS ARE NOT COMPLETLY IMPLEMENTED AND SHOULD NOT BE USED
 procedure sp_write (r : registers; wpr : watchpoint_registers;
       s : out special_register_type; vwpr : out watchpoint_registers) is
 variable op : std_logic_vector(6 downto 0);
@@ -3191,6 +2970,7 @@ end;
     return(npc);
   end;
 
+-- RISC-V mul instructions are not implemented
   procedure mul_res(r : registers; asr18in : word; result, y, asr18 : out word;
           icc : out std_logic_vector(3 downto 0)) is
   variable op  : std_logic_vector(1 downto 0);
@@ -3387,16 +3167,7 @@ begin
     xc_mmucacheclr := '0';
     xc_inull := '0';
 
-    -- if r.x.mexc = '1' then xc_vectt := "00" & TT_DAEX;
-    -- elsif r.x.ctrl.tt = TT_TICC then
-    --   xc_vectt := '1' & r.x.result(6 downto 0);
-    -- else xc_vectt := "00" & r.x.ctrl.tt; end if;
-
-    -- if r.w.s.svt = '0' then
-    --   xc_trap_address(31 downto 2) := r.w.s.tba & xc_vectt & "00";
-    -- else
-    --   --xc_trap_address(31 downto 2) := r.w.s.tba & "00000000" & "00";
-    -- end if;
+    -- Gets trap address of evec (NOT COMPLETY IMPLEMENTED)
     xc_trap_address := r.w.s.evec(31 downto 2);
 
     xc_wreg := '0'; v.x.annul_all := '0';
@@ -3420,14 +3191,6 @@ begin
     end if;
 
     xc_trapcwp := r.w.s.cwp;
-    -- if RFPART then
-    --   if r.w.s.cwp=CWPMIN then
-    --     xc_trapcwp := r.w.twcwp;
-    --   else
-    --     xc_trapcwp := std_logic_vector(unsigned(r.w.s.stwin) + unsigned(r.w.s.cwp));
-    --   end if;
-    -- end if;
-
 
     if DBGUNIT
     then
@@ -3436,6 +3199,7 @@ begin
     else dbgm := '0'; v.x.debug := '0'; end if;
     if PWRD2 then pwrd := powerdwn(r, xc_trap, rp); else pwrd := '0'; end if;
 
+    -- Processor current state
     case r.x.rstate is
     when run =>
       if (dbgm
@@ -3479,14 +3243,6 @@ begin
       xc_waddr(NWINLOG2 + 3  downto 0) :=  xc_trapcwp & "0010";
       if r.w.s.et = '1' then
         v.w.s.et := '0'; v.x.rstate := run;
-        -- change cwp
-        -- if RFPART and (r.w.s.cwp = CWPMIN) then v.w.s.cwp := r.w.s.cwpmax;
-        -- elsif (not CWPOPT) and (r.w.s.cwp = CWPMIN) then v.w.s.cwp := CWPMAX;
-        -- else v.w.s.cwp := r.w.s.cwp - 1 ; end if;
-        -- if AWPEN then
-        --   v.w.s.aw := '0';
-        --   v.w.s.paw := r.w.s.aw;
-        -- end if;
       else
         xc_inull := '1';
         v.x.rstate := dsu1; xc_wreg := '0'; vp.error := '1';
@@ -3568,7 +3324,7 @@ begin
     dci.flushl <= xc_dflushl;
     dci.mmucacheclr <= xc_mmucacheclr;
 
-
+    -- Not changed
     irq_intack(r, holdn, v.x.intack);
     itrace(r, dsur, vdsu, wpr,xc_result, xc_exception, dbgi, rp.error, xc_trap, tbufcntx, tovx, tbufi, tbufi_2p, '0', xc_dcperr);
     vdsu.tbufcnt := tbufcntx; vdsu.tov := tovx;
@@ -3576,11 +3332,6 @@ begin
     v.w.except := xc_exception; v.w.result := xc_result;
     if (r.x.rstate = dsu2) then v.w.except := '0'; end if;
     v.w.wa := xc_waddr(RFBITS-1 downto 0); v.w.wreg := xc_wreg and holdn;
-
-    -- if RFPART then
-    --   v.w.twcwp := std_logic_vector(unsigned(v.w.s.stwin) + unsigned(v.w.s.cwpmax) + 1);
-    --   if (not CWPOPT) and v.w.twcwp=CWPGLB then v.w.twcwp:=CWPMIN; end if;
-    -- end if;
 
     rfi.wdata <= xc_result; rfi.waddr <= xc_waddr;
 
@@ -3601,14 +3352,11 @@ begin
       v.w.except := RRES.w.except; v.w.s.et := RRES.w.s.et;
       v.w.s.svt := RRES.w.s.svt; v.w.s.dwt := RRES.w.s.dwt;
       v.w.s.ef := RRES.w.s.ef;
-      -- if RFPART then
-      --   v.w.s.stwin := RRES.w.s.stwin;
-      --   v.w.s.cwpmax := RRES.w.s.cwpmax;
-      -- end if;
-      -- if need_extra_sync_reset(fabtech) /= 0 then
-      --   v.w.s.cwp := RRES.w.s.cwp;
-      --   v.w.s.icc := RRES.w.s.icc;
-      -- end if;
+
+      if need_extra_sync_reset(fabtech) /= 0 then
+        v.w.s.cwp := RRES.w.s.cwp;
+        v.w.s.icc := RRES.w.s.icc;
+      end if;
       v.w.s.dbp := RRES.w.s.dbp;
       v.w.s.dbprepl := RRES.w.s.dbprepl;
       v.w.s.rexdis := RRES.w.s.rexdis;
@@ -3647,13 +3395,10 @@ begin
     v.x.rs1 := r.m.rs1;
     st := '0';
 
-    -- if CASAEN and (r.m.casa = '1') and (r.m.ctrl.cnt = "00") then
-    --   v.x.ctrl.inst(4 downto 0) := r.a.ctrl.inst(4 downto 0); -- restore rs2 for trace log
-    -- end if;
-
+    -- Mul nos implemented
     mul_res(r, v.w.s.asr18, v.x.result, v.x.y, me_asr18, me_icc);
 
-
+    -- Memory instruction and irq traps disabled
     -- mem_trap(r, wpr, v.x.ctrl.annul, holdn, v.x.ctrl.trap, me_iflush,
     --         me_nullify, v.m.werr, v.x.ctrl.tt);
     -- me_newtt := v.x.ctrl.tt;
@@ -3729,8 +3474,12 @@ begin
     ex_ymsb := r.e.ymsb; mul_op2 := ex_op2; ex_shcnt := r.e.shcnt;
     v.e.cwp := r.a.cwp; ex_sari := r.e.sari;
     v.m.su := r.e.su;
--- May remove this
-    if MULTYPE = 3 then v.m.mul := r.e.mul; else v.m.mul := '0'; end if;
+
+    -- MUL related
+    if MULTYPE = 3 then v.m.mul := r.e.mul;
+    else v.m.mul := '0'; end if;
+
+    -- Related to load instructions, do not remove
     if lddel = 1 then
       if r.e.ldbp1 = '1' then
         ex_op1 := r.x.data(0);
@@ -3744,58 +3493,62 @@ begin
         end if;
       end if;
     end if;
----
 
+    -- Adder
     ex_add_res := ("0" & ex_op1 & '1') + ("0" & ex_op2 & r.e.alucin);
-
+    -- Check align (used by mem instructions)
     if ex_add_res(2 downto 1) = "00" then v.m.nalign := '0';
     else v.m.nalign := '1'; end if;
---    if REX=1 then
---      if ex_add_res(2 downto 1) /= "10" then v.m.rexnalign := '0';
---      else v.m.rexnalign := '1'; end if;
---    end if;
 
+    -- Data cache
     dcache_gen(r, v, ex_dci, ex_link_pc, ex_jump, ex_force_a2, ex_load, v.m.casa);
 
-    -- RV32I change
+    -- Jump address
     if(r.e.alusel = EXE_RES_ADD) then                       -- JALR
         ex_jump_address := ex_add_res(32 downto PCLOW+1);
     else                                                    -- JAL
         ex_jump_address := ex_add_res(32 downto PCLOW+1) + r.e.ctrl.pc(31 downto PCLOW);
     end if;
 
-
+    -- Logic instructions
     logic_op(r, ex_op1, ex_op2, v.x.y, ex_ymsb, ex_logic_res, v.m.y);
-    ex_shift_res := shift(r, ex_op1, ex_op2, ex_shcnt, ex_sari);
-    misc_op(r, wpr, ex_op1, ex_op2, xc_df_result, v.x.y, xc_wimmask, ex_misc_res, ex_edata);
-    --ex_add_res(3):= ex_add_res(3) or ex_force_a2;
 
+    -- Shift instructions
+    ex_shift_res := shift(r, ex_op1, ex_op2, ex_shcnt, ex_sari);
+
+    -- Other instructions
+    misc_op(r, wpr, ex_op1, ex_op2, xc_df_result, v.x.y, xc_wimmask, ex_misc_res, ex_edata);
+
+    -- Select ALU outputs
     alu_select(r, ex_add_res, ex_op1, ex_op2, ex_shift_res, ex_logic_res,
         ex_misc_res, ex_result, me_icc, v.m.icc, v.m.divz, v.m.casaz);
+
+    -- DSU outs
     dbg_cache(holdn, dbgi, r, dsur, ex_result, ex_dci, ex_result2, v.m.dci);
+
+    -- Float point (not implemented)
     fpstdata(r, ex_edata, ex_result2, fpo.data, ex_edata2, ex_result3);
 
+    -- Pass rs1 (may be used in future for special instructions)
     v.m.rs1 := ex_op1;
+    -- ALU result
     v.m.result := ex_result3;
+
+    -- Register windows related, will be removed
     cwp_ex(r, v.m.wcwp, v.m.wawp);
 
-    -- if CASAEN and ( (LDDEL=1 and (r.m.casa='1' and r.e.ctrl.cnt="10")) or
-    --                 (LDDEL=2 and (r.m.casa='1' and r.e.ctrl.cnt="11")))
-    --   and v.m.casaz='0' then
-    --   me_nullify2 := '1';
-    -- end if;
-    -- dci.nullify  <= me_nullify2;
     dci.nullify <= '0';
 
-    ex_mulop1 := (ex_op1(31) and r.e.ctrl.inst(19)) & ex_op1;
-    ex_mulop2 := (mul_op2(31) and r.e.ctrl.inst(19)) & mul_op2;
+    -- Mul related, not implemented
+    --ex_mulop1 := (ex_op1(31) and r.e.ctrl.inst(19)) & ex_op1;
+    --ex_mulop2 := (mul_op2(31) and r.e.ctrl.inst(19)) & mul_op2;
 
     if is_fpga(fabtech) = 0 and (r.e.mul = '0') then     -- power-save for mul
 --    if (r.e.mul = '0') then
         ex_mulop1 := (others => '0'); ex_mulop2 := (others => '0');
     end if;
 
-
+    -- Updates pipeline registers
     v.m.ctrl.annul := v.m.ctrl.annul or v.x.annul_all;
     v.m.ctrl.wicc := r.e.ctrl.wicc and not v.x.annul_all;
     v.m.mac := r.e.mac;
@@ -3803,8 +3556,8 @@ begin
     if (DBGUNIT and (r.x.rstate = dsu2)) then v.m.ctrl.ld := '1'; end if;
     dci.eaddress <= ex_add_res(32 downto 1);
     dci.edata <= ex_edata2;
+    -- BP disabled
     --bp_miss_ex(r, r.m.icc, ex_bpmiss, ra_bpannul);
-
 
     v.m .itrhit := r.e.itrhit;
 
@@ -3826,18 +3579,25 @@ begin
     v.e.rfe1 := r.a.rfe1; v.e.rfe2 := r.a.rfe2;
     v.e.ctrl.pv := r.a.ctrl.pv or (ra_bpannul and r.a.bpimiss);
 
+    -- Exception
     exception_detect(r, wpr, dbgi, r.a.ctrl.trap, r.a.ctrl.tt,
                      pccomp, v.e.ctrl.trap, v.e.ctrl.tt);
-    -- op_mux is the same
+    -- Operands muxes for ALU
     op_mux(r, rfo.data1, ex_result3, v.x.result, xc_df_result, zero32,
         r.a.rsel1, v.e.ldbp1, ra_op1, '0');
     op_mux(r, rfo.data2,  ex_result3, v.x.result, xc_df_result, r.a.imm,
         r.a.rsel2, ex_ldbp2, ra_op2, '1');
+
+    -- Selects ALU operation
     alu_op(r, ra_op1, ra_op2, v.m.icc, v.m.y(0), ex_ldbp2, v.e.op1, v.e.op2,
            v.e.aluop, v.e.alusel, v.e.aluadd, v.e.shcnt, v.e.sari, v.e.shleft,
            v.e.ymsb, v.e.mul, ra_div, v.e.mulstep, v.e.mac, v.e.ldbp2, v.e.invop2
     );
+
+    -- Carry for ALU adder
     cin_gen(r, v.m.icc(0), v.e.alucin);
+
+    -- BP disabled
     --bp_miss_ra(r, ra_bpmiss, de_bpannul);
     --v.e.bp := r.a.bp and not ra_bpmiss;
 
@@ -3865,17 +3625,14 @@ begin
     de_rexbubble := '0'; de_rexbaddr1:='0'; de_reximmexp:='0'; de_reximmval:=(others => '0');
     de_rexmaskpv := '0'; de_rexillinst:='0'; de_rexnostep:='0';
 
-    --de_inst := de_inst1;
+    -- Swap endianess, Leon3 was designed for big-endian
     de_inst(7 downto 0) := de_inst1(31 downto 24);
     de_inst(15 downto 8) := de_inst1(23 downto 16);
     de_inst(23 downto 16) := de_inst1(15 downto 8);
     de_inst(31 downto 24) := de_inst1(7 downto 0);
 
     de_icc := r.m.icc; v.a.cwp := r.d.cwp;
-    if AWPEN then
-      v.a.awp:=r.d.awp; v.a.aw:=r.d.aw; v.a.paw:=r.d.paw;
-      v.e.awp:=r.a.awp; v.e.aw:=r.a.aw; v.e.paw:=r.a.paw;
-    end if;
+    -- May be removed
     su_et_select(r, v.w.s.ps, v.w.s.s, v.w.s.et, v.a.su, v.a.et);
 
     -- ICC is updated on branches for RV32I
@@ -3883,9 +3640,7 @@ begin
     v.a.ctrl.wy := '0';
 
     de_rcwp := r.d.cwp;
-    --if AWPEN and r.d.aw='1' then de_rcwp := r.d.awp; end if;
     cwp_ctrl(r, de_rcwp, v.w.s.wim, de_inst, de_cwp, v.a.wovf, v.a.wunf, de_wcwp);
-    --if AWPEN and (r.d.aw='1' or (r.d.paw='1' and de_inst(24 downto 19)=RETT)) then v.a.wovf:='0'; v.a.wunf:='0'; end if;
 
     -- Get rs1 and rs2
     rs1_gen(r, de_inst, v.a.rs1, de_rs1mod);
@@ -3893,16 +3648,17 @@ begin
 
     -- Get registers address based on the LEON3 register window system
     de_raddr1 := (others => '0'); de_raddr2 := (others => '0');
-    regaddr(de_rcwp, v.a.rs1, r.d.stwin, r.d.cwpmax, de_raddr1(RFBITS-1 downto 0));
-    regaddr(de_rcwp, de_rs2, r.d.stwin, r.d.cwpmax, de_raddr2(RFBITS-1 downto 0));
+    de_raddr1(4 downto 0) := v.a.rs1(4 downto 0);
+    de_raddr2(4 downto 0) := de_rs2(4 downto 0);
+
     v.a.rfa1 := de_raddr1(RFBITS-1 downto 0);
     v.a.rfa2 := de_raddr2(RFBITS-1 downto 0);
 
     -- Get rd and set write enable and other LEON3 signals
     rd_gen(r, de_inst, v.a.ctrl.wreg, v.a.ctrl.ld, de_rd, de_rexen);
-    regaddr(de_cwp, de_rd, r.d.stwin, r.d.cwpmax, v.a.ctrl.rd);
+    v.a.ctrl.rd := de_rd(4 downto 0);
 
-    -- No FP unit
+    -- No RISC-V FP unit
 --    fpbranch(de_inst, fpo.cc, de_fbranch);
 --    fpbranch(de_inst, cpo.cc, de_cbranch);
 
@@ -3923,6 +3679,7 @@ begin
         ra_bpmiss, ex_bpmiss, de_iperr, ico.bpmiss, ico.eocl);
     v.d.pcheld := de_hold_pc;
 
+    -- Branch prediction disabled
     --v.a.bp := v.a.bp and not v.a.ctrl.annul;
     --v.a.nobp := v.a.nobp and not v.a.ctrl.annul;
 
@@ -3939,7 +3696,7 @@ begin
     op_find(r, v.a.ldchkra, v.a.ldchkex, de_rs2, v.a.rfa2,
             imm_select(de_inst,(de_rexen and not r.w.s.rexdis)), v.a.rfe2, v.a.rsel2, v.a.ldcheck2);
 
-    -- May change this part for Branch prediction
+    -- Updates signals
     v.a.ctrl.wicc := v.a.ctrl.wicc and (not v.a.ctrl.annul);
     v.a.ctrl.wreg := v.a.ctrl.wreg and (not v.a.ctrl.annul);
     v.a.ctrl.rett := v.a.ctrl.rett and (not v.a.ctrl.annul);
@@ -4015,6 +3772,7 @@ begin
       if (xc_rstn = '0') then v.d.irqstart:='0'; end if;
     end if;
 
+    -- Slect next PC based on branch predictions (which are disabled)
     bpmiss := ex_bpmiss or ra_bpmiss;
     npc := r.f.pc; fe_pc := r.f.pc;
     if ra_bpmiss = '1' then fe_pc := r.d.pc; end if;
@@ -4034,7 +3792,7 @@ begin
     elsif xc_exception = '1' then       -- exception
       v.f.branch := '1'; v.f.pc := xc_trap_address;
       npc := v.f.pc;
-    elsif de_hold_pc = '1' then
+    elsif de_hold_pc = '1' then         -- 2 or more cycles instructions
       v.f.pc := r.f.pc; v.f.branch := r.f.branch;
     --   if bpmiss = '1' then
     --     v.f.pc := fe_npc; v.f.branch := '1';
@@ -4043,7 +3801,7 @@ begin
         v.f.pc := ex_jump_address; v.f.branch := '1';
         npc := v.f.pc;
       end if;
-    elsif ex_jump = '1' then
+    elsif ex_jump = '1' then            -- Jump
       v.f.pc := ex_jump_address; v.f.branch := '1';
       npc := v.f.pc;
     -- elsif (ex_jump and not bpmiss) = '1' then
@@ -4053,7 +3811,7 @@ begin
     --    v.f.pc := r.d.pc; v.f.branch := '1';
     --    npc := v.f.pc;
     --    v.a.bpimiss := ico.bpmiss and not r.d.annul;
-    elsif de_branch = '1'
+    elsif de_branch = '1'               -- Branch
     then
        v.f.pc := branch_address(de_inst, de_pcout(31 downto PCLOW), de_rexbaddr1, r.d.rexen); v.f.branch := '1';
        npc := v.f.pc;
@@ -4079,11 +3837,6 @@ begin
 
     end if;
 
-    -- For pipelined REX implementation
-    --if REX/=0 and REXPIPE then
-    --  rex_pl_fetch(v.d,r.d,holdn,
-    --               v.d.rexpl);
-    --end if;
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 

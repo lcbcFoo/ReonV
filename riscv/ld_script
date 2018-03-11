@@ -61,7 +61,6 @@ SECTIONS
      */
     reonv_crt0.o
     posix.o
-    console.o
 
     *(.text.unlikely .text.*_unlikely .text.unlikely.*)
     *(.text.exit .text.exit.*)
