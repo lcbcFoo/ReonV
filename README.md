@@ -24,7 +24,7 @@ Also, we wanted to show to the hardware developers community that it is possible
 
 ---
 ## <a name="repo-map"></a> Repository Map
-The directories `bin`, `boards` and `software` where simply copied from GRLIB and contain scripts, templates and small programs used by GRLIB. The directory `doc` constains the documentation from GRLIB (may be updated with ReonV specific documentation on future). Directory `designs` contains all scripts and configuration designs for each specific FPGA board supported by Leon3 (and by ReonV). Directory `lib` constains the source code of the processor and of all peripherals or IP cores provided by GRLIB, the 7-stage integer pipeline changed to RISC-V is at `lib/gaisler/leon3v3/iu3.vhd`. Lastly, `riscv` contains scripts and configuration files to run a test example on ReonV (check [Running an Example](#running) section). 
+The directories `bin`, `boards` and `software` where simply copied from GRLIB and contain scripts, templates and small programs used by GRLIB. The directory `doc` constains the documentation from GRLIB (may be updated with ReonV specific documentation on future). Directory `designs` contains all scripts and configuration designs for each specific FPGA board supported by Leon3 (and by ReonV). Directory `lib` constains the source code of the processor and of all peripherals or IP cores provided by GRLIB, the 7-stage integer pipeline changed to RISC-V is at `lib/gaisler/leon3v3/iu3.vhd`. Lastly, `riscv` contains scripts and configuration files to run a test example on ReonV (check [Running an Example](#running) section). The original Leon3 SPARC `iu3.vhd` is at `riscv/tools` and can be used as a guide to future changes inside ReonV pipeline. 
 
 ---
 ## <a name="install"></a> Installation
