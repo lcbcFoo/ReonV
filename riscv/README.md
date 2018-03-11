@@ -10,7 +10,7 @@ changing a few commands to the ones your board requires.
 * The design directory for this board is `designs/leon3-digilent-nexys4ddr`. If you are running on other board, you must use its own design directory.
 
 ## Compiling the program
-Currently, we have a simple `crt0.S` to initialize stack and other registers. Also, we have some minimal posix functions needed for benchmarks implemented on `posix.c`. These file are linked to the main.c program by the linker script, allowing us to use some commom functions from glibc. However, we do not have complete support for glibc at this moment. The linker script also sets the beginning of `.text` to position 0x40001000 (a workaround needed to run via GRMON2). To compile a program `main.c` on the `riscv` directory run:   
+Currently, we have a simple `crt0.S` to initialize stack and other registers. Also, we have some minimal posix functions needed for benchmarks implemented on `posix.c`. These file are linked to the main.c program by the linker script, allowing us to use some commom functions from glibc. However, we do not have complete support for glibc at this moment. The linker script also sets the beginning of `.text` to position 0x40001000 (a workaround needed to run via GRMON2). To compile a program `main.c` on the `riscv` directory, update the `Makefile` with your cross-compiler and design directory then run:   
 ```
 make main.out
 ```
