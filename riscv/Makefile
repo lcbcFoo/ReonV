@@ -51,6 +51,22 @@ reonv_crt0.o : reonv_crt0.S
 %.bin : %.hex
 	${CROSS}$(OBJCOPY) $(OBJCPFLAGS)  $< $@
 
+%.x86 : %.c
+	gcc $< -o $@
+
+# Make binaries readable
+%.read : %.* ./tools/to_text.x86
+	./tools/to_text.x86 $< $@
+
+# Copy grmon-dump.bin from design directory
+copy_dump : ../designs/$(DESIGN)/grmon-dump.bin
+	cp ../designs/$(DESIGN)/grmon-dump.bin .
+
+# Read dump from grmon
+read_dump : copy_dump ./tools/to_text.x86
+	./tools/to_text.x86 grmon-dump.bin grmon-dump.read
+	rm grmon-dump.bin ./tools/*.x86 -f
+
 ################################################################################
 #
 # 	Boot Code
@@ -67,4 +83,4 @@ ahbrom : ../bin/ahbrom.c
 	gcc ../bin/ahbrom.c -o ahbrom
 
 clean:
-	rm -rf ahbrom* *.hex *.inv *.bin *.o *.log *.jou *.str acstone/*.out *.out *.read
+	rm -rf ahbrom* tools/*.x86 *.hex *.inv *.convert *.bin *.o *log *.jou *.str acstone/*.out *.out *.read
