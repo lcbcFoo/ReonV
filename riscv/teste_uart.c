@@ -29,8 +29,6 @@ int main(){
 
 	// Writes the check into output memory section
 	write(0, &correct, sizeof(int));
-
-	dbgleon_printf("CARAI PRINT");
 }
 
 int fib(int i){

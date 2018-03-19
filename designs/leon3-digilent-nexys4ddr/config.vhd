@@ -57,15 +57,15 @@ package config is
   constant CFG_DLRAMEN : integer := 0;
   constant CFG_DLRAMADDR: integer := 16#8F#;
   constant CFG_DLRAMSZ : integer := 1;
-  constant CFG_MMUEN : integer := 0;
-  constant CFG_ITLBNUM : integer := 2;
+  constant CFG_MMUEN : integer := 1;
+  constant CFG_ITLBNUM : integer := 8;
   constant CFG_DTLBNUM : integer := 2;
   constant CFG_TLB_TYPE : integer := 1 + 0*2;
   constant CFG_TLB_REP : integer := 1;
   constant CFG_MMU_PAGE : integer := 0;
   constant CFG_DSU : integer := 1;
   constant CFG_ITBSZ : integer := 1 + 64*0;
-  constant CFG_ATBSZ : integer := 1;
+  constant CFG_ATBSZ : integer := 0;
   constant CFG_AHBPF : integer := 0;
   constant CFG_LEON3FT_EN : integer := 0;
   constant CFG_IUFT_EN : integer := 0;
@@ -147,15 +147,15 @@ package config is
   constant CFG_UART1_ENABLE : integer := 1;
   constant CFG_UART1_FIFO : integer := 2;
 -- LEON3 interrupt controller
-  constant CFG_IRQ3_ENABLE : integer := 1;
+  constant CFG_IRQ3_ENABLE : integer := 0;
   constant CFG_IRQ3_NSEC : integer := 0;
 -- Modular timer
-  constant CFG_GPT_ENABLE : integer := 1;
-  constant CFG_GPT_NTIM : integer := (2);
-  constant CFG_GPT_SW : integer := (8);
-  constant CFG_GPT_TW : integer := (32);
-  constant CFG_GPT_IRQ : integer := (8);
-  constant CFG_GPT_SEPIRQ : integer := 1;
+  constant CFG_GPT_ENABLE : integer := 0;
+  constant CFG_GPT_NTIM : integer := 1;
+  constant CFG_GPT_SW : integer := 8;
+  constant CFG_GPT_TW : integer := 8;
+  constant CFG_GPT_IRQ : integer := 8;
+  constant CFG_GPT_SEPIRQ : integer := 0;
   constant CFG_GPT_WDOGEN : integer := 0;
   constant CFG_GPT_WDOG : integer := 16#0#;
 -- GPIO port

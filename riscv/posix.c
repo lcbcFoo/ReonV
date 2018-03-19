@@ -1,4 +1,4 @@
-/* 
+/*
  * This file is part of the ReonV distribution (https://github.com/lcbcFoo/ReonV).
  * Copyright (c) 2018 to Lucas C. B. Castro.
  *
@@ -26,6 +26,85 @@
 // Currently only reads/writes data from output section of memory
 static char* heap = (char*) HEAP_START;
 static char* out_mem = (char*)OUT_MEM_BEGIN;
+
+
+
+
+#define LEON_REG_UART_CONTROL_RTD  0x000000FF	/* RX/TX data */
+
+/*
+ *  The following defines the bits in the LEON UART Status Registers.
+ */
+
+#define LEON_REG_UART_STATUS_DR   0x00000001	/* Data Ready */
+#define LEON_REG_UART_STATUS_TSE  0x00000002	/* TX Send Register Empty */
+#define LEON_REG_UART_STATUS_THE  0x00000004	/* TX Hold Register Empty */
+#define LEON_REG_UART_STATUS_BR   0x00000008	/* Break Error */
+#define LEON_REG_UART_STATUS_OE   0x00000010	/* RX Overrun Error */
+#define LEON_REG_UART_STATUS_PE   0x00000020	/* RX Parity Error */
+#define LEON_REG_UART_STATUS_FE   0x00000040	/* RX Framing Error */
+#define LEON_REG_UART_STATUS_ERR  0x00000078	/* Error Mask */
+
+
+/*
+ *  The following defines the bits in the LEON UART Status Registers.
+ */
+
+#define LEON_REG_UART_CTRL_RE     0x00000001	/* Receiver enable */
+#define LEON_REG_UART_CTRL_TE     0x00000002	/* Transmitter enable */
+#define LEON_REG_UART_CTRL_RI     0x00000004	/* Receiver interrupt enable */
+#define LEON_REG_UART_CTRL_TI     0x00000008	/* Transmitter interrupt enable */
+#define LEON_REG_UART_CTRL_PS     0x00000010	/* Parity select */
+#define LEON_REG_UART_CTRL_PE     0x00000020	/* Parity enable */
+#define LEON_REG_UART_CTRL_FL     0x00000040	/* Flow control enable */
+#define LEON_REG_UART_CTRL_LB     0x00000080	/* Loop Back enable */
+
+
+typedef struct
+{
+  volatile unsigned int data;
+  volatile unsigned int status;
+  volatile unsigned int ctrl;
+  volatile unsigned int scaler;
+} LEON23_APBUART_Regs_Map;
+
+
+#define UART_TIMEOUT 100000
+static LEON23_APBUART_Regs_Map *uart_regs = 0;
+//int *console = (int *) 0x80000100;
+int
+dbgleon_printf (const char *fmt, ...)
+{
+  unsigned int i, loops, ch;
+  int printed_len;
+  char printk_buf[1024];
+  char *p = printk_buf;
+
+  /* Emit the output into the temporary buffer */
+  p = fmt;
+  printed_len = 10;
+
+    uart_regs = (LEON23_APBUART_Regs_Map*) 0x80000100;
+	if (uart_regs){
+	    while (printed_len-- != 0){
+    		ch = *p++;
+    		if (uart_regs){
+    		    loops = 0;
+
+                while (!(uart_regs->status & LEON_REG_UART_STATUS_THE) && (loops < UART_TIMEOUT))
+    		          loops++;
+
+                uart_regs->data = ch;
+    		    loops = 0;
+    		    while (!(uart_regs->status & LEON_REG_UART_STATUS_TSE) && (loops < UART_TIMEOUT))
+    		        loops++;
+    		  }
+	      }
+	  }
+  //---------------------
+}
+
+
 
 
 // Exit application
