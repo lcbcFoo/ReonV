@@ -45,7 +45,7 @@ bload ../../riscv/main.out 0x40000000   # Load on memory position 0x40000000
 ep 0x40001000                           # Set entry point to position 0x40001000
 run
 ```
-Our sample program allocates 2 arrays of size 8 on heap, calculates the first 8 fibonacci numbers and places them on array 1, writes this array into output section of memory with `write`, then reads the results written there using `lseek` and `read` into array2. Finally, it compares both arrays and writes `0xAAAAAAAA` if they are equal or `0xBBBBBBBB` if not.
+Our sample program allocates 2 integer arrays on heap, calculates the first 20 fibonacci numbers and places them on array 1, writes this array into output section of memory with `write`, then reads the results written there using `lseek` and `read` into array2, comparing both arrays in sequence. Then it makes some printf tests and finishes.
 After the `run` command, you can check registers with `reg` and `reg w7` (explanation at [GRMON2 and RISCV](https://github.com/lcbcFoo/ReonV/issues/5)). Then check the results with `disassemble 0x44000000` and verify heap with `disassemble 0x43000000`. Below is the entire described process to run our example on GRMON2 with #commentaries added.
 ```
 grmon2> bload ../../riscv/main.out        # Load program 
@@ -61,80 +61,72 @@ grmon2> ep 0x40001000                     # Set entry point
   
 grmon2> run                               # Run
 
+  # There will be many prints from main.c here 
+
+Testing fib calculator, array dealing, write, read and lseek functions
+
+  # ...
+  
+Finished main!
+
+  
   Stopped (tt = 0x00, )                                                                   
   0x400010b8: 73001000  call  0x0C0050B8    # This represents an ebreak instruction which stops execution
   
 grmon2> reg         # The first 3 colluns represents registers 8-31 (8 is OUTS 0, 16 is LOCALS 0, 24 is INS 0)
 
-         INS        LOCALS     OUTS       GLOBALS 
+         INS        LOCALS     OUTS       GLOBALS
      0:  00000000   00000000   43FFFFF0   00000000
      1:  00000000   00000000   00000000   00000000
      2:  00000000   00000000   00000000   00000000
-     3:  00000000   00000000   43FFFFC8   00000000 
-     4:  00000000   00000000   00000004   00000000
-     5:  00000000   00000000   44000020   00000000 
-     6:  00000000   00000000   44000024   00000000 
-     7:  00000000   00000000   00000000   00000000  
-     
+     3:  00000000   00000000   00000016   00000000
+     4:  00000000   00000000   00000016   00000000
+     5:  00000000   00000000   43000016   00000000
+     6:  00000000   00000000   43000016   00000000
+     7:  00000000   00000000   00000000   00000000
+  
    psr: F35000E0   wim: 00000002   tbr: 40001000   y: 00000000
-   pc:   400010B8  call  0x0C0050B8 
-   npc:  400010BC  sethi  %hi(0x0), %o1  
+  
+   pc:   40001A90  call  0x0C005A90            
+   npc:  40001A94  call  0xFC001A94 
    
 grmon2> reg w7      # The LOCALS colluns shows our registers 0-7 (LOCALS 0 is our 0)
 
          INS        LOCALS     OUTS       GLOBALS
-     0:  43FFFFF0   00000000   00000000   00000000                                           
-     1:  00000000   4000108C   00000000   00000000
-     2:  00000000   43FFFFD0   00000000   00000000                                  
-     3:  43FFFFC8   00000000   00000000   00000000                                    
-     4:  00000004   00000000   00000000   00000000                                     
-     5:  44000020   00000000   00000000   00000000                                   
-     6:  44000024   00000000   00000000   00000000                                    
-     7:  00000000   00000000   00000000   00000000  
-                                                                              
-grmon2> disassemble 0x43000000                           # Disassemble our heap
-                                                         # The translation made by GRMON2 is based on SPARC, ignore it
-       0x43000000: 01000000  nop                         # Here starts array1
-       0x43000004: 01000000  nop                                                     
-       0x43000008: 02000000  unimp                                                           
-       0x4300000c: 03000000  sethi  %hi(0x0), %g1                                          
-       0x43000010: 05000000  sethi  %hi(0x0), %g2                                        
-       0x43000014: 08000000  unimp
-       0x43000018: 0d000000  sethi  %hi(0x0), %g6
-       0x4300001c: 15000000  sethi  %hi(0x0), %o2        # Here it ends, the results of fib(i) are correct
-       0x43000020: 01000000  nop                         # Here starts array2
-       0x43000024: 01000000  nop
-       0x43000028: 02000000  unimp
-       0x4300002c: 03000000  sethi  %hi(0x0), %g1
-       0x43000030: 05000000  sethi  %hi(0x0), %g2
-       0x43000034: 08000000  unimp
-       0x43000038: 0d000000  sethi  %hi(0x0), %g6
-       0x4300003c: 15000000  sethi  %hi(0x0), %o2        # Here it ends. Array2 was copied with success 
+     0:  43FFFFF0   00000000   00000000   00000000
+     1:  00000000   400010A4   00000000   00000000
+     2:  00000000   43FFFFD0   00000000   00000000
+     3:  00000016   40003C49   00000000   00000000
+     4:  00000016   00000000   00000000   00000000
+     5:  43000016   400011A8   00000000   00000000
+     6:  43000016   400020A4   00000000   00000000
+     7:  00000000   00000000   00000000   00000000      
 
 grmon2> disassemble 0x44000000                           # Disassemble our output section
                                                          # The translation made by GRMON2 is based on SPARC, ignore it
-       0x44000000: 01000000  nop                         # Here starts the array1 written to output
-       0x44000004: 01000000  nop                       
-       0x44000008: 02000000  unimp                     
-       0x4400000c: 03000000  sethi  %hi(0x0), %g1      
-       0x44000010: 05000000  sethi  %hi(0x0), %g2      
-       0x44000014: 08000000  unimp                     
-       0x44000018: 0d000000  sethi  %hi(0x0), %g6      
-       0x4400001c: 15000000  sethi  %hi(0x0), %o2        # And here it ends
-       0x44000020: bbbbaaaa  unknown opcode: 0xBBBBAAAA  # This is our compare value, the result is correct!
-       0x44000024: 37000000  sethi  %hi(0x0), %i3        # Below here is just junk on memory, ignore it
-       0x44000028: 59000000  call  0xA8000028          
-       0x4400002c: 90000000  add  0, %o0               
-       0x44000030: e9000000  ld  [0], %f20             
-       0x44000034: 79010000  call  0x28040034          
-       0x44000038: 62020000  call  0xCC080038          
-       0x4400003c: db030000  ld  [%o4], %f13   
+       0x44000000: 01000000  nop                 
+       0x44000004: 01000000  nop                 
+       0x44000008: 02000000  unimp               
+       0x4400000c: 03000000  sethi  %hi(0x0), %g1
+       0x44000010: 05000000  sethi  %hi(0x0), %g2
+       0x44000014: 08000000  unimp               
+       0x44000018: 0d000000  sethi  %hi(0x0), %g6
+       0x4400001c: 15000000  sethi  %hi(0x0), %o2
+       0x44000020: 22000000  unimp               
+       0x44000024: 37000000  sethi  %hi(0x0), %i3
+       0x44000028: 59000000  call  0xA8000028    
+       0x4400002c: 90000000  add  0, %o0         
+       0x44000030: e9000000  ld  [0], %f20       
+       0x44000034: 79010000  call  0x28040034    
+       0x44000038: 62020000  call  0xCC080038             # Note, this number is 0x0262!
+       0x4400003c: db030000  ld  [%o4], %f13              # Note, this number is 0x03db!
 ```
 ## Important information (READ IT)
 * As described in the [GRMON2 and RISCV](https://github.com/lcbcFoo/ReonV/issues/5) issue, GRMON2 assumes processor is using big endian, therefore it shows bytes of a word backwards, for example:
 Number 974169 in RISC-V convention is `0x 00 0E DD 59`, GRMON2 shows it as `0x 59 DD 0E 00`
-This is a visual inconvenience that must be kept in mind when reading values from memory while using GRMON2.
-* There is no console yet, you can check the results of your program with the simple `write`, `read` and `lseek` functions implemented at `posix.c`. They use memory section `0x44000000 - 0x450000000` as an output section, allowing you to `dump` this region with GRMON2 and compare result with another environment if you wish. 
+This is only a visual inconvenience that must be kept in mind when reading values from memory while using GRMON2.
+* Console is implemented by sending data via UART (memory position `0x80000100`). Mini-printf (https://github.com/mludvig/mini-printf) is being used to format strings to be printed. 
+* You can also check the results of your program with the simple `write`, `read` and `lseek` functions implemented at `posix.c`. They use memory section `0x44000000 - 0x450000000` as an output section, allowing you to `dump` this region with GRMON2 and compare result with another environment if you wish. 
 * The default value for stack is `0x43FFFFF0` and `0x43000000` for the heap.
 * Some commands of GRMON2 are `reg` and `reg w7` to see registers, set a breakpoint with `bp <address>`, run step by step with `step`, disassemble memory with `disassemble <memory address>` and a lot of others commands described on GRMON2´s [manual](http://www.gaisler.com/doc/grmon2.pdf).
 
