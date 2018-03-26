@@ -28,9 +28,14 @@ WRAP=-Wl,-wrap,exit,-wrap,open,-wrap,close,-wrap,write,-wrap,read,-wrap,lseek,-w
 #
 # 	Targets for compiling
 #
+MAIN_OBJS=reonv_crt0.o posix.o main.o
+
 # Compiled binary linked with reonv_crt0
-%.out : %.c reonv_crt0.o posix.o
-	${CROSS}${CC} -static -march=rv32i ${WRAP} -T${LD_SCRIPT} $< -o $@
+#%.out : %.c reonv_crt0.o posix.o
+#	${CROSS}${CC} -static  -static-libgcc -march=rv32i ${WRAP} -T${LD_SCRIPT} $< -o $@
+%.out : $(MAIN_OBJS)
+	${CROSS}gcc -static -nostartfiles $(MAIN_OBJS) ${WRAP},--no-relax,-melf32lriscv,-Ttext=0x40001000,-e,__reonv_start  \
+	 -o $@
 
 # Targets for .S.
 # .o is for linking programs (i.e. crt0.S)
@@ -38,11 +43,17 @@ WRAP=-Wl,-wrap,exit,-wrap,open,-wrap,close,-wrap,write,-wrap,read,-wrap,lseek,-w
 %.hex : %.S
 	${CROSS}$(AS) $< -o $@
 
+main.o : main.c
+	${CROSS}${CC} -c $< -o $@
+
+# mini_printf.o : mini_printf.c
+# 	${CROSS}${CC} -c $< -o $@
+
 posix.o : posix.c
-	${CROSS}${CC} -c $< -o $@ -nostdlib ${WRAP}
+	${CROSS}${CC} -c $< -o $@ -nostdlib
 
 reonv_crt0.o : reonv_crt0.S
-	${CROSS}${CC} -c $< -o $@ -nostdlib ${WRAP}
+	${CROSS}${CC} -c $< -o $@ -nostdlib
 
 # Target raw binary to avoid grmon2 errors saying this is not SPARC '-'
 %.bin : %.out
