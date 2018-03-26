@@ -28,7 +28,7 @@ WRAP=-Wl,-wrap,exit,-wrap,open,-wrap,close,-wrap,write,-wrap,read,-wrap,lseek,-w
 #
 # 	Targets for compiling
 #
-MAIN_OBJS=reonv_crt0.o posix.o main.o
+MAIN_OBJS=reonv_crt0.o mini_printf.o posix.o main.o
 
 # Compiled binary linked with reonv_crt0
 #%.out : %.c reonv_crt0.o posix.o
@@ -46,8 +46,8 @@ MAIN_OBJS=reonv_crt0.o posix.o main.o
 main.o : main.c
 	${CROSS}${CC} -c $< -o $@
 
-# mini_printf.o : mini_printf.c
-# 	${CROSS}${CC} -c $< -o $@
+mini_printf.o : mini_printf.c
+	${CROSS}${CC} -c $< -o $@
 
 posix.o : posix.c
 	${CROSS}${CC} -c $< -o $@ -nostdlib
@@ -94,4 +94,4 @@ ahbrom : ../bin/ahbrom.c
 	gcc ../bin/ahbrom.c -o ahbrom
 
 clean:
-	rm -rf ahbrom* tools/*.x86 *.hex *.inv *.convert *.bin *.o *log *.jou *.str acstone/*.out *.out *.read
+	rm -rf ahbrom* tools/*.x86 *.hex *.inv *.convert *.bin *.o *log *.jou *.str *.out *.read

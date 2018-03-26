@@ -16,12 +16,12 @@
  */
 
 /*	Author: Lucas C. B. Castro
- *  Description: This file contains minimal implementations of some posix
- * 				 functions for ReonV.
+ *  Description: Assembly header for posix functions
  */
 
+#ifndef POSIX_H_INCLUDED
+#define POSIX_H_INCLUDED
 
-//int *console = (int *) 0x80000100;
 .globl send_uart
 
 
@@ -46,3 +46,5 @@
 
 // Allocate space on heap
 .globl _sbrk
+
+#endif //POSIX_H_INCLUDED

@@ -1,3 +1,10 @@
+#ifndef REONV_H_INCLUDED
+#define REONV_H_INCLUDED
+
+/* Reonv constants, most of them copied from GRLIB manual or BCC compiler
+ * source code
+ */
+
 #define RAM_START               0x40000000
 #define RAM_SIZE                0x08000000
 #define SP_START                0x43FFFFF0
@@ -37,3 +44,5 @@
 #define LEON_REG_UART_CTRL_LB     0x00000080	/* Loop Back enable */
 
 #define UART_TIMEOUT 5000                       /* Timeout for TX */
+
+#endif //REONV_H_INCLUDED

@@ -1,14 +1,15 @@
 int fib();
 #include <stdio.h>
-#include "mini-printf.h"
+#include "mini_printf.h"
 
 int main(){
 	int n = 20;
 
 	printf("Testing fib calculator, array dealing, write, read and lseek functions\n\n");
+
 	// Allocates memory for arrays
-	int* array = sbrk(n * sizeof(int));
-	int* array2 = sbrk(n * sizeof(int));
+	int* array = (int*)sbrk(n * sizeof(int));
+	int* array2 = (int*)sbrk(n * sizeof(int));
 
 	printf("Address array 1: 0x%x\n", array);
 	printf("Address array 2: 0x%x\n", array2);
@@ -37,7 +38,7 @@ int main(){
 			correct = 0;
 
 	if(correct)
-		printf("Copied array1 into array2!\n");
+		printf("\nCopied array1 into array2!\n");
 	else
 		printf("Oh no, error!\n");
 

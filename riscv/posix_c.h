@@ -32,6 +32,7 @@ int _lseek( int fd, int offset, int whence );
 
 // Read from output memory section (no file descriptor implemented)
 int _read( int fd, char *buffer, int len );
+
 // Write to output memory section (no file descriptor implemented)
 int _write( int fd, char *buffer, int len );
 
@@ -44,4 +45,4 @@ int _close( int fd );
 // Allocate space on heap
 void* _sbrk( int incr );
 
-#endif
+#endif //POSIXC_H_INCLUDED
