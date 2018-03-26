@@ -5,7 +5,7 @@ changing a few commands to the ones your board requires.
 
 ---
 ## Overview
-* ReonV currentily implements RV32I without privilegied instructions, so it is important to use a compiler to this ISA (follow instructions on the main README). 
+* ReonV currently implements RV32I without privileged instructions, so it is important to use a compiler to this ISA (follow instructions on the main README). 
 * We will use GRMON2 to load, run and debug the program, since the processor DSU was not changed and it communicates with GRMON. However, GRMON2 was not designed for RISC-V and we have to take some workarounds to run a RISC-V program using it (more information on issue [GRMON2 and RISCV](https://github.com/lcbcFoo/ReonV/issues/5))
 * The design directory for this board is `designs/leon3-digilent-nexys4ddr`. If you are running on other board, you must use its own design directory.
 
@@ -133,7 +133,7 @@ grmon2> disassemble 0x44000000                           # Disassemble our outpu
 ## Important information (READ IT)
 * As described in the [GRMON2 and RISCV](https://github.com/lcbcFoo/ReonV/issues/5) issue, GRMON2 assumes processor is using big endian, therefore it shows bytes of a word backwards, for example:
 Number 974169 in RISC-V convention is `0x 00 0E DD 59`, GRMON2 shows it as `0x 59 DD 0E 00`
-This is an inconvenience that must be kept in mind when reading values from memory while using GRMON2 (especially if you use `dump` and try to compare with other results!).
+This is a visual inconvenience that must be kept in mind when reading values from memory while using GRMON2.
 * There is no console yet, you can check the results of your program with the simple `write`, `read` and `lseek` functions implemented at `posix.c`. They use memory section `0x44000000 - 0x450000000` as an output section, allowing you to `dump` this region with GRMON2 and compare result with another environment if you wish. 
 * The default value for stack is `0x43FFFFF0` and `0x43000000` for the heap.
 * Some commands of GRMON2 are `reg` and `reg w7` to see registers, set a breakpoint with `bp <address>`, run step by step with `step`, disassemble memory with `disassemble <memory address>` and a lot of others commands described on GRMON2´s [manual](http://www.gaisler.com/doc/grmon2.pdf).
