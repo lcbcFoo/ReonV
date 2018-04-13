@@ -12,7 +12,6 @@ typedef struct
 
 #ifndef POSIC_C
 
-extern char* heap;
 extern char* out_mem;
 extern char* console_buffer;
 extern LEON23_APBUART_Regs_Map *uart_regs;
@@ -22,6 +21,10 @@ extern LEON23_APBUART_Regs_Map *uart_regs;
 
 int send_uart (char *fmt, unsigned int len);
 
+// Minimal implementationof memcpy
+void *memcpy(void *dest, const void *src, unsigned int n);
+
+// Startup code
 void _init_reonv();
 
 // Exit application

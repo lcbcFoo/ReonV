@@ -45,14 +45,14 @@ int send_uart (char *fmt, unsigned int len){
     		if (uart_regs){
     		    loops = 0;
 
-                while (!(uart_regs->status & LEON_REG_UART_STATUS_THE) && (loops < UART_TIMEOUT))
+                while (!((uart_regs->status >> 24) & LEON_REG_UART_STATUS_THE) && (loops < UART_TIMEOUT))
     		          loops++;
 				// Moves byte to beginning of TX buffer
 				unsigned int outdata = (unsigned int) ch;
                 outdata <<= 24;
                 uart_regs->data = outdata;
     		    loops = 0;
-    		    while (!(uart_regs->status & LEON_REG_UART_STATUS_TSE) && (loops < UART_TIMEOUT))
+    		    while (!((uart_regs->status >> 24) & LEON_REG_UART_STATUS_TSE) && (loops < UART_TIMEOUT))
     		        loops++;
     		  }
 	      }
@@ -69,6 +69,12 @@ void _init_reonv(){
     console_buffer = (char*) sbrk(CONSOLE_BUFFER_SIZE);
 }
 
+
+void *memcpy(void *dest, const void *src, unsigned int n){
+    for(int i = 0; i < n; i++){
+        *((char*)dest++) = *((char*)src++);
+    }
+}
 
 // Exit application
 void _exit(int status) {
@@ -139,7 +145,7 @@ int _close( int fd ) {
 void* _sbrk( int incr ) {
 	void* addr = (void*) heap;
 	heap += incr;
-	
+
 	// Keep heap byte aligned
 	while((int)heap % 4 != 0)
 		heap++;

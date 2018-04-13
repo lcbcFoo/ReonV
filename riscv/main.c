@@ -1,6 +1,7 @@
 int fib();
 #include <stdio.h>
 #include "mini_printf.h"
+#include "posix_c.h"
 
 int main(){
 	int n = 20;
@@ -8,8 +9,8 @@ int main(){
 	printf("Testing fib calculator, array dealing, write, read and lseek functions\n\n");
 
 	// Allocates memory for arrays
-	int* array = (int*)sbrk(n * sizeof(int));
-	int* array2 = (int*)sbrk(n * sizeof(int));
+	int* array = (int*)_sbrk(n * sizeof(int));
+	int* array2 = (int*)_sbrk(n * sizeof(int));
 
 	printf("Address array 1: 0x%x\n", array);
 	printf("Address array 2: 0x%x\n", array2);
@@ -23,13 +24,13 @@ int main(){
 		printf("Fib(%02d) = %04d\n", i, array[i-1]);
 
 	// Writes results on output memory section
-	write(3, array,n * sizeof(int));
+	_write(3, (char*) array,n * sizeof(int));
 
 	// Sets pointer to beginning of output memory section
-	lseek(3, -n*sizeof(int), SEEK_CUR);
+	_lseek(3, -n*sizeof(int), SEEK_CUR);
 
 	// Reads the results into array2
-	read(3, array2, n * sizeof(int));
+	_read(3, (char*)array2, n * sizeof(int));
 
 	// Checks if they were copied correctly
 	int correct = 1;

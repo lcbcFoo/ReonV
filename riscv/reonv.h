@@ -43,6 +43,6 @@
 #define LEON_REG_UART_CTRL_FL     0x00000040	/* Flow control enable */
 #define LEON_REG_UART_CTRL_LB     0x00000080	/* Loop Back enable */
 
-#define UART_TIMEOUT 5000                       /* Timeout for TX */
+#define UART_TIMEOUT 100000                       /* Timeout for TX */
 
 #endif //REONV_H_INCLUDED

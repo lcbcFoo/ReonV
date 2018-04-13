@@ -141,8 +141,13 @@ int mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, va_li
 		// Move cursor bak to beginning of line when writing to console
 		if(buffer == console_buffer && ch == '\n'){
 			_putc(ch, &b);
-			ch = '\r';
-			_putc(ch, &b);
+
+			// When running benchmark tests we dont need the additional \r to flush
+			// line, since
+//			#ifndef TEST
+				ch = '\r';
+				_putc(ch, &b);
+//			#endif
 		}
 		else if (ch!='%'){
 			_putc(ch, &b);

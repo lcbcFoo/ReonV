@@ -1,0 +1,5 @@
+bload wcet_benchmark/prime.out
+ep 0x40001000
+run
+quit
+

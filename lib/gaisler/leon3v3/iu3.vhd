@@ -2457,10 +2457,10 @@ end;
 
 
     case r.e.aluop is
-    when EXE_STB   => miscout := bpdata(31 downto 24) & bpdata(31 downto 24) &
-                             bpdata(31 downto 24) & bpdata(31 downto 24);
+    when EXE_STB   => miscout := bpdata(7 downto 0) & bpdata(7 downto 0) &
+                             bpdata(7 downto 0) & bpdata(7 downto 0);
                       edata := miscout;
-    when EXE_STH   => miscout := bpdata(31 downto 16) & bpdata(31 downto 16);
+    when EXE_STH   => miscout := bpdata(15 downto 0) & bpdata(15 downto 0);
                       edata := miscout;
     when EXE_PASS1 => miscout := bpdata; edata := miscout;
     when EXE_PASS2 => miscout := aluin2;
@@ -2642,26 +2642,22 @@ end;
         rdata(7 downto 0) := align_data(7 downto 0);
         if signed = '1' then rdata(31 downto 8) := (others => align_data(7)); end if;
       end case;
-      outdata := rdata;
-      
     when "01" =>                        -- half-word read
       if  laddr(1) = '1' then
-        rdata(15 downto 0) := align_data(31 downto 16);
+        rdata(15 downto 0) := align_data(15 downto 0);
         if signed = '1' then rdata(31 downto 15) := (others => align_data(15)); end if;
       else
-        rdata(15 downto 0) := align_data(15 downto 0);
+        rdata(15 downto 0) := align_data(31 downto 16);
         if signed = '1' then rdata(31 downto 15) := (others => align_data(31)); end if;
       end if;
-      outdata := rdata;
-
     when others =>                      -- single and double word read
       rdata := align_data;
-      outdata(7 downto 0) := rdata(31 downto 24);
-      outdata(15 downto 8) := rdata(23 downto 16);
-      outdata(23 downto 16) := rdata(15 downto 8);
-      outdata(31 downto 24) := rdata(7 downto 0);
     end case;
 
+    outdata(7 downto 0) := rdata(31 downto 24);
+    outdata(15 downto 8) := rdata(23 downto 16);
+    outdata(23 downto 16) := rdata(15 downto 8);
+    outdata(31 downto 24) := rdata(7 downto 0);
     return(outdata);
   end;
 

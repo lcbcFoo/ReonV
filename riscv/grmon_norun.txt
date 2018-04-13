@@ -1,0 +1,4 @@
+bload wcet_benchmark/bsort.out
+ep 0x40001000
+quit
+

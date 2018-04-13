@@ -80,7 +80,7 @@ __reonv_start:
 	mv 	x31,x0
 
 	li	sp,SP_START
-	la	gp,__global_pointer$
+//	la	gp,__global_pointer$
 	call 	_init_reonv
 	call 	main
 	call 	__wrap_exit
