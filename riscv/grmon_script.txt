@@ -1,4 +1,4 @@
-bload wcet_benchmark/prime.out
+bload wcet_benchmark/insertsort.out
 ep 0x40001000
 run
 quit
