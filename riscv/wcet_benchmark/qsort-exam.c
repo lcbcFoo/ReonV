@@ -47,12 +47,18 @@ int main()
 
   sort(arr, 0, 60-1);
 
-  for(int i = 0; i < 60-1; i++){
-      if(arr[i] > arr[i + 1]){
-          printf("%d\n", 0);
-          return 0;
-      }
-  }
-  printf("%d\n", 1);
+#ifdef TEST
+    for(int i = 0; i < 60-1; i++){
+        if(arr[i] > arr[i + 1]){
+            int j = 0;
+            memcpy(out_mem, &j, sizeof(int));
+            return 0;
+        }
+    }
+
+    int j = 1;
+    memcpy(out_mem, &j, sizeof(int));
+#endif
+
   return 0;
 }

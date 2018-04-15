@@ -1,5 +1,3 @@
-/* $Id: fibcall.c,v 1.2 2005/04/04 11:34:58 csg Exp $ */
-
 /*************************************************************************/
 /*                                                                       */
 /*   SNU-RT Benchmark Suite for Worst Case Timing Analysis               */
@@ -28,12 +26,12 @@
 /*                                                                       */
 /*************************************************************************/
 /*                                                                       */
-/*  FILE: fibcall.c                                                      */
+/*  FILE: bs.c                                                           */
 /*  SOURCE : Public Domain Code                                          */
 /*                                                                       */
 /*  DESCRIPTION :                                                        */
 /*                                                                       */
-/*     Summing the Fibonacci series.                                     */
+/*     Binary search for the array of 15 integer elements.               */
 /*                                                                       */
 /*  REMARK :                                                             */
 /*                                                                       */
@@ -41,48 +39,93 @@
 /*                                                                       */
 /*                                                                       */
 /*************************************************************************/
-
 #ifdef TEST
-#include "../mini_printf.h"
-#include "../posix_c.h"
+    #include "../mini_printf.h"
+    #include "../posix_c.h"
 #else
-#include <stdio.h>
+    #include <stdio.h>
 #endif
 
-int fib(int n)
-{
-  int  i, Fnew, Fold, temp,ans;
 
-    Fnew = 1;  Fold = 0;
-    for ( i = 2;
-	  i <= 30 && i <= n;          /* apsim_loop 1 0 */
-	  i++ )
-    {
-      temp = Fnew;
-      Fnew = Fnew + Fold;
-      Fold = temp;
+struct DATA {
+  int  key;
+  int  value;
+}  ;
+
+#ifdef DEBUG
+	int cnt1;
+#endif
+
+int binary_search(struct DATA data[],int x);
+
+void main()
+{
+
+    struct DATA data[30] = {
+             {1, 100},
+    	     {5,200},
+    	     {6, 300},
+    	     {7, 700},
+    	     {8, 900},
+    	     {9, 250},
+    	     {10, 400},
+    	     {11, 600},
+    	     {12, 800},
+    	     {13, 1500},
+    	     {14, 1200},
+    	     {15, 110},
+    	     {16, 140},
+    	     {17, 133},
+    	     {18, 10},
+             {19, 1040},
+             {20,2040},
+             {21, 350},
+             {22, 7410},
+             {23, 90043},
+             {24, 25340},
+             {25, 4310},
+             {26, 60970},
+             {27, 8780},
+             {28, 6500},
+             {29, 210},
+             {30, 1761},
+             {31, 14123},
+             {32, 15433},
+             {33, 164} };
+	int res = binary_search(data, 29);
+
+#ifdef TEST
+    if(res == 210){
+        int ok = 1;
+        memcpy(out_mem, &ok, sizeof(int));
+        return;
     }
-    ans = Fnew;
-  return ans;
+    int ok = 0;
+    memcpy(out_mem, &ok, sizeof(int));
+#endif
 }
 
-int main()
+int binary_search(struct DATA data[], int x)
 {
-  int a;
+  int fvalue, mid, up, low ;
 
-  a = 30;
-  a = fib(a);
+  low = 0;
+  up = 29;
+  fvalue = -1 /* all data are positive */ ;
+  while (low <= up) {
+    mid = (low + up) >> 1;
+    if ( data[mid].key == x ) {  /*  found  */
+      up = low - 1;
+      fvalue = data[mid].value;
+    }
+    else  /* not found */
+      if ( data[mid].key > x ) 	{
+	up = mid - 1;
+      }
+      else   {
+          low = mid + 1;
+      }
 
-
-#ifdef TEST
-  if(a == 832040){
-    int i = 1;
-    memcpy(out_mem, &i, sizeof(int));
-    return 0;
   }
-  int i = 0;
-  memcpy(out_mem, &i, sizeof(int));
-#endif
-
- return 0;
+  return fvalue;
 }

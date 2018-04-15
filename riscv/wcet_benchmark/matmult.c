@@ -139,13 +139,19 @@ void Multiply(matrix A, matrix B, matrix Res)
        }
 
        // Check result
+#ifdef TEST
+
        for(int i = 0; i < UPPERLIMIT; i++){
            for(int j = 0; j < UPPERLIMIT; j++){
                if(Res[i][j] != correct[i][j]){
-                   printf("%d ", correct[i][j]);
+                   int ok = 0;
+                   memcpy(out_mem, &ok, sizeof(int));
                    return;
                }
            }
        }
-       printf("%d\n", 1);
+       int ok = 1;
+       memcpy(out_mem, &ok, sizeof(int));
+
+#endif
 }

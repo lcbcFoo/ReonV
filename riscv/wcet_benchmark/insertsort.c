@@ -76,11 +76,18 @@ int main()
       i++;
     }
 
-    for(int i = 0; i < 10; i++)
+#ifdef TEST
+    for(int i = 0; i < 11 - 1; i++){
         if(a[i] > a[i + 1]){
-            printf("%d\n", 0);
+            j = 0;
+            memcpy(out_mem, &j, sizeof(int));
             return 0;
         }
-    printf("%d\n", 1);
+    }
+
+    j = 1;
+    memcpy(out_mem, &j, sizeof(int));
+#endif
+
     return 0;
 }

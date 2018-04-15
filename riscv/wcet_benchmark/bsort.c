@@ -54,13 +54,19 @@ int vector[];
             }
         }
     }
-    int sorted = 1;
-    for(int j = 0; j < NUMELEMS -1 ; j++)
-        if(vector[j] > vector[j + 1]){
-            printf("%d\n", 0);
+
+#ifdef TEST
+    for(int i = 0; i < NUMELEMS -1 ; i++){
+        if(vector[i] > vector[i + 1]){
+            j = 0;
+            memcpy(out_mem, &j, sizeof(int));
             return;
         }
-    printf("%d\n", 1);
+    }
+
+    j = 1;
+    memcpy(out_mem, &j, sizeof(int));
+#endif
 }
 
 

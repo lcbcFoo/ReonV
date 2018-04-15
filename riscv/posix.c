@@ -31,7 +31,7 @@ char* console_buffer;
 
 // Internal
 static char* heap;
-static char* out_mem;
+char* out_mem;
 static LEON23_APBUART_Regs_Map *uart_regs;
 
 /* Sends output via UART, adapted from BCC source code */

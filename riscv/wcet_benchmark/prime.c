@@ -48,10 +48,15 @@ int main () {
   uint x =  154023;
   uint y = 513239;
   swap (&x, &y);
+  int i;
 
-  if(prime(x) && !prime(y))
-    printf("%d\n", 1);
-  else
-    printf("%d\n", 0);
-
+#ifdef TEST
+  if(prime(x) && !prime(y)){
+    i = 1;
+    memcpy(out_mem, &i, sizeof(int));
+    return 0;
+  }
+  i = 0;
+  memcpy(out_mem, &i, sizeof(int));
+#endif
 }
