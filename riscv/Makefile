@@ -1,7 +1,7 @@
 ################################################################################
 #
 # Author: Lucas Castro
-# Last modification: march/2018
+# Last modification: april/2018
 #
 # 	Makefile for running programs on ReonV
 #
@@ -96,6 +96,8 @@ x86: $(X86)
 	@echo "Generated x86 to check correct output"
 
 bench: tests x86
+	chmod +x tools/run_bench.sh
+	tools/run_bench.sh $(GRMON) $(GRMON_OPTIONS)
 
 grmon_run :
 	$(GRMON) $(GRMON_OPTIONS) -c grmon_script.txt -log grmon_log.txt -abaud 115200 > /dev/null

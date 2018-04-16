@@ -1,5 +1,0 @@
-bload wcet_benchmark/insertsort.out
-ep 0x40001000
-run
-dump -binary 0x44000000 1 ../../riscv/res.bin
-quit
