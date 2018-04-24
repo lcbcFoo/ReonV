@@ -1,4 +1,10 @@
-/* $Id: fibcall.c,v 1.2 2005/04/04 11:34:58 csg Exp $ */
+/* MDH WCET BENCHMARK SUITE. */
+
+/* 2012/09/28, Jan Gustafsson <jan.gustafsson@mdh.se>
+ * Changes:
+ *  - This program redefines the C standard function sqrt. Therefore, this function has been renamed to sqrtfcn.
+ *  - qrt.c:79:15: warning: explicitly assigning a variable of type 'float' to itself: fixed
+ */
 
 /*************************************************************************/
 /*                                                                       */
@@ -28,12 +34,12 @@
 /*                                                                       */
 /*************************************************************************/
 /*                                                                       */
-/*  FILE: fibcall.c                                                      */
+/*  FILE: sqrt.c                                                         */
 /*  SOURCE : Public Domain Code                                          */
 /*                                                                       */
 /*  DESCRIPTION :                                                        */
 /*                                                                       */
-/*     Summing the Fibonacci series.                                     */
+/*     Square root function implemented by Taylor series.                */
 /*                                                                       */
 /*  REMARK :                                                             */
 /*                                                                       */
@@ -42,6 +48,7 @@
 /*                                                                       */
 /*************************************************************************/
 
+
 #ifdef TEST
 #include "../mini_printf.h"
 #include "../posix_c.h"
@@ -49,38 +56,59 @@
 #include <stdio.h>
 #endif
 
-unsigned long long int fib(unsigned long long int n)
+
+float t_fabs(float x)
 {
-  unsigned long long int  Fnew, Fold, temp,ans;
-  int i;
-    Fnew = 1;  Fold = 1;
-    for ( i = 3; i <= n;          /* apsim_loop 1 0 */
-	  i++ )
-    {
-      temp = Fnew;
-      Fnew = Fnew + Fold;
-      Fold = temp;
-    }
-    ans = Fnew;
-  return ans;
+   if (x < 0)
+      return -x;
+   else
+      return x;
 }
 
-int main()
+double sqrtfcn(double val)
 {
-  unsigned long long int a;
+   double x = val/10;
 
-  a = 80;
-  a = fib(a);
+   double dx;
 
+   double diff;
+   double min_tol = 0.00001;
+
+   int i, flag;
+
+   flag = 0;
+   if (val == 0 )
+      x = 0;
+   else {
+      for (i=1;i<20;i++)
+      {
+         if (!flag) {
+            dx = (val - (x*x)) / (2.0 * x);
+            x = x + dx;
+            diff = val - (x*x);
+            if (t_fabs(diff) <= min_tol)
+               flag = 1;
+         }
+         else {} /* JG */
+/*            x =x; */
+      }
+   }
+   return (x);
+}
+
+int main(){
+    double a = 57874456.542;
+    a = sqrtfcn(a);
+    //printf("%lf\n",a);
 #ifdef TEST
-  if(a == 23416728348467685){
-    int i = 1;
+    if(t_fabs(a - 7607.5263) <= 0.01){
+        int i = 1;
+        memcpy(out_mem, &i, sizeof(int));
+        return 0;
+    }
+    int i = 0;
     memcpy(out_mem, &i, sizeof(int));
-    return 0;
-  }
-  int i = 0;
-  memcpy(out_mem, &i, sizeof(int));
 #endif
 
- return 0;
+    return 0;
 }

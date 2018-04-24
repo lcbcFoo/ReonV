@@ -37,7 +37,7 @@ MAIN_OBJS=reonv_crt0.o mini_printf.o posix.o
 #	${CROSS}${CC} -static  -static-libgcc -march=rv32i ${WRAP} -T${LD_SCRIPT} $< -o $@
 %.out : $(MAIN_OBJS) %.o
 	${CROSS}gcc -static -nostartfiles $^ \
-	${WRAP},--no-relax,-melf32lriscv,-Ttext=0x40001000,-e,__reonv_start -o $@
+	${WRAP},-lm,--no-relax,-melf32lriscv,-Ttext=0x40001000,-e,__reonv_start -o $@
 #	${WRAP},--verbose -Tlinker_script -o $@
 
 # Targets for .S.
@@ -47,7 +47,7 @@ MAIN_OBJS=reonv_crt0.o mini_printf.o posix.o
 	${CROSS}$(AS) $< -o $@
 
 %.o : %.c
-	${CROSS}${CC} -D TEST -c $< -o $@
+	${CROSS}${CC} -lm -D TEST -c $< -o $@
 
 #mini_printf.o : mini_printf.c
 #	${CROSS}${CC} -c $< -o $@
@@ -96,8 +96,8 @@ x86: $(X86)
 	@echo "Generated x86 to check correct output"
 
 bench: tests x86
-	chmod +x tools/run_bench.sh
-	tools/run_bench.sh $(GRMON) $(GRMON_OPTIONS)
+	@chmod +x tools/run_bench.sh
+	@tools/run_bench.sh $(GRMON) $(GRMON_OPTIONS)
 
 grmon_run :
 	$(GRMON) $(GRMON_OPTIONS) -c grmon_script.txt -log grmon_log.txt -abaud 115200 > /dev/null
@@ -109,7 +109,7 @@ grmon_norun :
 #	$(CC) -I$(SRC) $< -o $@
 
 $(SRC)/%.x86 : $(SRC)/%.c
-	gcc $< -o $@
+	gcc $< -o $@ -lm
 
 
 ################################################################################
@@ -129,4 +129,4 @@ ahbrom : ../bin/ahbrom.c
 
 clean:
 	rm -rf ahbrom* tools/*.x86 *.hex *.inv *.convert *.bin *.o *log *.jou *.str \
-	$(SRC)/*.out $(SRC)/*.x86 *.out *.read grmon_log.txt
+	$(SRC)/*.out $(SRC)/*.o $(SRC)/*.x86 $(SRC)/*.log *.out *.read grmon_log.txt

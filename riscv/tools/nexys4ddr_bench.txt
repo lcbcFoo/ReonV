@@ -1,0 +1,120 @@
+Test bsort: CORRECT
+
+Total running time:  175.68 s
+Total time used by grmon: 6.10 s
+Total bsort test running time:  169.58 s
+Average execution time:  16.96 s
+
+
+Test bs: CORRECT
+
+Total running time:  23.07 s
+Total time used by grmon: 19.16 s
+Total bs test running time:  3.91 s
+Average execution time:  0.39 s
+
+
+Test cover: CORRECT
+
+Total running time:  112.33 s
+Total time used by grmon: 6.50 s
+Total cover test running time:  105.83 s
+Average execution time:  10.58 s
+
+
+Test expint: CORRECT
+
+Total running time:  6.61 s
+Total time used by grmon: 6.07 s
+Total expint test running time:  0.54 s
+Average execution time:  0.05 s
+
+
+Test fac: CORRECT
+
+Total running time:  6.47 s
+Total time used by grmon: 6.05 s
+Total fac test running time:  0.42 s
+Average execution time:  0.04 s
+
+
+Test fibcall: CORRECT
+
+Total running time:  6.45 s
+Total time used by grmon: 5.86 s
+Total fibcall test running time:  0.59 s
+Average execution time:  0.06 s
+
+
+Test insertsort: CORRECT
+
+Total running time:  179.81 s
+Total time used by grmon: 6.07 s
+Total insertsort test running time:  173.74 s
+Average execution time:  17.37 s
+
+
+Test janne_complex: CORRECT
+
+Total running time:  18.33 s
+Total time used by grmon: 6.00 s
+Total janne_complex test running time:  12.33 s
+Average execution time:  1.23 s
+
+
+Test ludcmp: CORRECT
+
+Total running time:  212.78 s
+Total time used by grmon: 32.33 s
+Total ludcmp test running time:  180.45 s
+Average execution time:  18.05 s
+
+
+Test matmult: CORRECT
+
+Total running time:  9.65 s
+Total time used by grmon: 6.42 s
+Total matmult test running time:  3.23 s
+Average execution time:  0.32 s
+
+
+Test ndes: CORRECT
+
+Total running time:  7.47 s
+Total time used by grmon: 6.81 s
+Total ndes test running time:  0.66 s
+Average execution time:  0.07 s
+
+
+Test prime: CORRECT
+
+Total running time:  6.86 s
+Total time used by grmon: 6.01 s
+Total prime test running time:  0.85 s
+Average execution time:  0.09 s
+
+
+Test qsort-exam: CORRECT
+
+Total running time:  45.35 s
+Total time used by grmon: 12.55 s
+Total qsort-exam test running time:  32.80 s
+Average execution time:  3.28 s
+
+
+Test recursion: CORRECT
+
+Total running time:  16.86 s
+Total time used by grmon: 5.92 s
+Total recursion test running time:  10.94 s
+Average execution time:  1.09 s
+
+
+Test sqrt: CORRECT
+
+Total running time:  16.54 s
+Total time used by grmon: 15.90 s
+Total sqrt test running time:  0.64 s
+Average execution time:  0.06 s
+
+

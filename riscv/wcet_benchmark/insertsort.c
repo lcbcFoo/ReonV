@@ -52,17 +52,27 @@
 #endif
 
 
-unsigned int a[11];
+unsigned int a[2500];
+
+#define SEED 84571
+
+int gen_i(int a){
+    int b = SEED * (a + 13) % 66987;
+    b ^= (a * b + 1) % 98746;
+    return b;
+}
 
 int main()
 {
   int  i,j, temp;
 
   a[0] = 0;   /* assume all data is positive */
-  a[1] = 11; a[2]=10;a[3]=9; a[4]=8; a[5]=7; a[6]=6; a[7]=5;
-  a[8] =4; a[9]=3; a[10]=2;
-  i = 2;
-  while(i <= 10){
+  // a[1] = 11; a[2]=10;a[3]=9; a[4]=8; a[5]=7; a[6]=6; a[7]=5;
+  // a[8] =4; a[9]=3; a[10]=2;
+  for(int i = 1; i < 2500; i++)
+    a[i] = gen_i(a[i - 1]);
+  i = 1;
+  while(i < 2500){
 
       j = i;
 
@@ -77,7 +87,7 @@ int main()
     }
 
 #ifdef TEST
-    for(int i = 0; i < 11 - 1; i++){
+    for(int i = 0; i < 2500 - 1; i++){
         if(a[i] > a[i + 1]){
             j = 0;
             memcpy(out_mem, &j, sizeof(int));

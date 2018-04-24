@@ -1,4 +1,0 @@
-bload  wcet_benchmark/ud.out
-ep 0x40001000
-dump -binary 0x44000000 1 res.bin
-quit
