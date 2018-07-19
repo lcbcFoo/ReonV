@@ -10,7 +10,7 @@
 # Update the following variables to your environment and board used
 
 # Cross compiler (Must be RV32I only)
-CROSS=../../rv32i-gcc/bin/riscv32-unknown-elf-
+CROSS=../../riscv-gcc/bin/riscv32-unknown-elf-
 
 # Design you are targeting
 DESIGN=leon3-digilent-nexys4ddr
