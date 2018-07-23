@@ -21,7 +21,7 @@ echo $@
 echo ""
 rm -f wcet_benchmark/*.log tools/bench_res.txt
 gcc tools/to_text.c -o tools/to_text
-echo "01000000" > tools/res.txt
+echo "01" > tools/res.txt
 for input in `ls -1 wcet_benchmark/*.out`; do
     echo "Running:" ${input}
     n=10
