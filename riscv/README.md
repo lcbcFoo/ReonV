@@ -16,7 +16,7 @@ make main.out
 ```
 
 ---
-## Synthetizing and loading design to FPGA
+## Synthesizing and loading design to FPGA
 To synthesize ReonV you must change to your board design directory, in this example it is `designs/leon3-digilent-nexys4ddr`. There is a README in each design directory, follow the instructions there to synthesize and load the design to FPGA. In this example, they are:
 ```
 make sim
