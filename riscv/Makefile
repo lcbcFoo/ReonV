@@ -36,7 +36,7 @@ MAIN_OBJS=reonv_crt0.o mini_printf.o posix.o
 #%.out : %.c reonv_crt0.o posix.o
 #	${CROSS}${CC} -static  -static-libgcc -march=rv32i ${WRAP} -T${LD_SCRIPT} $< -o $@
 %.out : $(MAIN_OBJS) %.o
-	${CROSS}gcc -static -nostartfiles $^ \
+	${CROSS}gcc -static -nostartfiles -march=rv32i $^ \
 	${WRAP},-lm,--no-relax,-melf32lriscv,-Ttext=0x40001000,-e,__reonv_start -o $@
 #	${WRAP},--verbose -Tlinker_script -o $@
 
@@ -47,7 +47,7 @@ MAIN_OBJS=reonv_crt0.o mini_printf.o posix.o
 	${CROSS}$(AS) $< -o $@
 
 %.o : %.c
-	${CROSS}${CC} -lm -D TEST -c $< -o $@
+	${CROSS}${CC} -lm -march=rv32i -D TEST -c $< -o $@
 
 #mini_printf.o : mini_printf.c
 #	${CROSS}${CC} -c $< -o $@
@@ -129,4 +129,5 @@ ahbrom : ../bin/ahbrom.c
 
 clean:
 	rm -rf ahbrom* tools/*.x86 *.hex *.inv *.convert *.bin *.o *log *.jou *.str \
-	$(SRC)/*.out $(SRC)/*.o $(SRC)/*.x86 $(SRC)/*.log *.out *.read grmon_log.txt
+	$(SRC)/*.out $(SRC)/*.o $(SRC)/*.x86 $(SRC)/*.log *.out *.read grmon_log.txt \
+	./tools/grmon_run ./tools/grmon_norun ./tools/res.* ./tools/to_text
