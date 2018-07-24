@@ -10,8 +10,8 @@
 # Update the following variables to your environment and board used
 
 # Cross compiler (Must be RV32I only)
-CROSS=../../rv32i-gcc/bin/riscv32-unknown-elf-
-GRMON=~/Downloads/grmon-eval-64-2.0.87/grmon-eval-2.0.87/linux64/bin/grmon
+CROSS=../../riscv-gcc/bin/riscv32-unknown-elf-
+GRMON=../../grmon-eval-3.0.9/linux/bin64/grmon
 GRMON_OPTIONS=-digilent -u
 
 # Design you are targeting

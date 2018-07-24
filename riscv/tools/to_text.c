@@ -59,6 +59,9 @@ int main(int argc, char** argv){
 		}
 	}
 
+        // Force output to always end with \n 
+        if(i != 0)
+	    fwrite("\n", sizeof(char), 1, output);
 	fclose(input);
 	fclose(output);
 
