@@ -3662,7 +3662,7 @@ begin
 
     -- Get rd and set write enable and other LEON3 signals
     rd_gen(r, de_inst, v.a.ctrl.wreg, v.a.ctrl.ld, de_rd, de_rexen);
-    v.a.ctrl.rd := de_rd(4 downto 0);
+    v.a.ctrl.rd(4 downto 0) := de_rd(4 downto 0);
 
     -- No RISC-V FP unit
 --    fpbranch(de_inst, fpo.cc, de_fbranch);
